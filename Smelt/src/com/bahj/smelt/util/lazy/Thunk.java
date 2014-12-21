@@ -39,4 +39,8 @@ public class Thunk<T> implements Supplier<T> {
 		}
 		return this.value;
 	}
+	
+	public static final <T> Thunk<T> of(T t) {
+		return new Thunk<>(() -> t);
+	}
 }
