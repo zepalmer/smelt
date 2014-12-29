@@ -17,13 +17,29 @@
 					<downloadJavadocs>true</downloadJavadocs>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr4-maven-plugin</artifactId>
+				<version>4.3</version>
+				<executions>
+					<execution>
+						<id>antlr</id>
+						<goals>
+							<goal>antlr4</goal>
+						</goals>
+						<configuration>
+						  <sourceDirectory>${basedir}/parser-src/</sourceDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
 		<dependency>
-			<groupId>Flapjack</groupId>
-			<artifactId>Flapjack</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
