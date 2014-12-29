@@ -1,10 +1,11 @@
 package com.bahj.smelt.model.syntax.datamodel.parser;
 
 import static com.bahj.flapjack.Parsers.apply;
-import static com.bahj.flapjack.Parsers.consume;
+import static com.bahj.flapjack.Parsers.matchesType;
 import static com.bahj.flapjack.Parsers.or;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,11 +16,19 @@ import java.util.Optional;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import com.bahj.flapjack.Context;
+import com.bahj.flapjack.ParseException;
 import com.bahj.flapjack.Parser;
+import com.bahj.flapjack.StandardContext;
 import com.bahj.smelt.model.syntax.datamodel.ast.Ast;
 import com.bahj.smelt.model.syntax.datamodel.ast.ListNode;
 import com.bahj.smelt.model.syntax.datamodel.ast.MessageNode;
-import com.bahj.smelt.model.syntax.datamodel.lexer.Token;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.ColonToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.CommaToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.DedentToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.EqualToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.IdentifierToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.IndentToken;
+import com.bahj.smelt.model.syntax.datamodel.lexer.token.Token;
 
 /**
  * A parser for the Smelt file format.
@@ -28,60 +37,60 @@ import com.bahj.smelt.model.syntax.datamodel.lexer.Token;
  */
 public class SmeltParser {
     // @formatter:off
+    
+	private static final Parser<Token, String> PARSER_IDENTIFIER =
+	    matchesType(Token.class, IdentifierToken.class).apply(IdentifierToken::getText);
 	
-	private static final Parser<Token, Token> exactlyToken(Token.Type type) {
-		return consume((Token tok) -> tok.getType() == type);
-	}
-	
-	private static final Parser<Token, String> PARSER_TEXT =
-		exactlyToken(Token.Type.TEXT)
-			.apply((Token tok) -> tok.getText());
-
 	private static final Parser<Token, List<String>> PARSER_POSITIONAL_ARG =
-	    apply(
-	        PARSER_TEXT,
-	        (String arg) -> Collections.singletonList(arg));
+	    apply(PARSER_IDENTIFIER, Collections::singletonList);
 
 	private static final Parser<Token, Map<String, String>> PARSER_NAMED_ARG =
 		apply(
-			PARSER_TEXT
-				.andThenIgnoring(exactlyToken(Token.Type.EQUAL))
-				.pairWith(PARSER_TEXT),
+			PARSER_IDENTIFIER
+				.andThenIgnoring(matchesType(Token.class, EqualToken.class))
+				.pairWith(PARSER_IDENTIFIER),
 			(String k, String v) -> Collections.singletonMap(k, v));
+	
+	private static final MessageNode.Header joinHeaders(Iterable<MessageNode.Header> headers) {
+        List<String> name = new ArrayList<>();
+        List<String> positional = new ArrayList<>();
+        Map<String, String> named = new HashMap<>();
+        
+        for (MessageNode.Header header : headers) {
+            name.addAll(header.getName());
+            positional.addAll(header.getPositional());
+            named.putAll(header.getNamed());
+            // TODO: verify that mappings are unique?
+        }
+	    return new MessageNode.Header(name, positional, named);
+	}
 
-	private static final Parser<Token, ImmutablePair<List<String>, Map<String, String>>> PARSER_ARG =
+	private static final Parser<Token, MessageNode.Header> PARSER_ARG =
 		or(
-			PARSER_NAMED_ARG.pairLeft(Collections.emptyList()),
-			PARSER_POSITIONAL_ARG.pairRight(Collections.emptyMap()));
+		    PARSER_NAMED_ARG.apply((Map<String,String> map) ->
+		        new MessageNode.Header(Collections.emptyList(), Collections.emptyList(), map)),
+		    PARSER_POSITIONAL_ARG.apply((List<String> args) ->
+		        new MessageNode.Header(Collections.emptyList(), args, Collections.emptyMap())));		    
 
-	private static final Parser<Token, ImmutablePair<List<String>, Map<String, String>>> PARSER_ARGS =
+	private static final Parser<Token, MessageNode.Header> PARSER_ARGS =
 		PARSER_ARG
 			.many()
-			.apply((List<ImmutablePair<List<String>, Map<String, String>>> values) ->
-				{
-					List<String> list = new ArrayList<>();
-					Map<String, String> map = new HashMap<>();
-					for (ImmutablePair<List<String>, Map<String, String>> pair : values) {
-						list.addAll(pair.getLeft());
-						map.putAll(pair.getRight());
-					}
-					return new ImmutablePair<>(list, map);
-				});
+			.apply(SmeltParser::joinHeaders);
 
-	private static final Parser<Token, ImmutablePair<String, ImmutablePair<List<String>, Map<String, String>>>> PARSER_MESSAGE_NODE_HEADER =
+	private static final Parser<Token, MessageNode.Header> PARSER_MESSAGE_NODE_HEADER =
 		apply(
-			PARSER_TEXT.pairWith(PARSER_ARGS.maybe()),
-			(String name, Optional<ImmutablePair<List<String>, Map<String, String>>> args) ->
+			PARSER_IDENTIFIER
+			    .many()
+			    .andThenIgnoring(matchesType(Token.class, ColonToken.class))
+			    .pairWith(PARSER_ARGS.maybe()),
+			(List<String> name, Optional<MessageNode.Header> args) ->
 				{
-					if (args.isPresent()) {
-						return new ImmutablePair<>(name,
-								new ImmutablePair<>(args.get().getLeft(),
-										args.get().getRight()));
+				    MessageNode.Header header =
+				            new MessageNode.Header(name, Collections.emptyList(), Collections.emptyMap());
+				    if (args.isPresent()) {
+				        return joinHeaders(Arrays.asList(header, args.get()));
 					} else {
-						return new ImmutablePair<>(name,
-								new ImmutablePair<>(
-										Collections.emptyList(),
-										Collections.emptyMap()));
+						return header;
 					}
 				});
 
@@ -89,27 +98,23 @@ public class SmeltParser {
 		(Context<Token> ctx) ->
 	        PARSER_NODE()
 				.many()
-				.afterIgnoring(exactlyToken(Token.Type.INDENT))
-				.andThenIgnoring(exactlyToken(Token.Type.DEDENT))
+				.afterIgnoring(matchesType(Token.class, IndentToken.class))
+				.andThenIgnoring(matchesType(Token.class, DedentToken.class))
 				.parse(ctx);
 	
 	private static final Parser<Token, Ast> PARSER_LIST_NODE =
 	    apply(
-	        PARSER_TEXT.sepByEnd(exactlyToken(Token.Type.COMMA)),
-	        (List<String> terms) -> new ListNode(terms)
+	        PARSER_IDENTIFIER.sepByEnd(matchesType(Token.class, CommaToken.class)),
+	        ListNode::new
 	        );
 
 	private static final Parser<Token, Ast> PARSER_MESSAGE_NODE =
 		apply(
 			PARSER_MESSAGE_NODE_HEADER
 				.pairWith(PARSER_MESSAGE_NODE_BODY.maybe()),
-			(ImmutablePair<ImmutablePair<String, ImmutablePair<List<String>, Map<String, String>>>, Optional<List<Ast>>> pair) ->
+			(ImmutablePair<MessageNode.Header, Optional<List<Ast>>> pair) ->
 				{
-					String name = pair.getLeft().getLeft();
-					List<String> posArgs = pair.getLeft().getRight().getLeft();
-					Map<String,String> namArgs = pair.getLeft().getRight().getRight();
-					List<Ast> children = pair.getRight().orElse(Collections.emptyList());
-					return new MessageNode(name, posArgs, namArgs, children);
+				    return new MessageNode(pair.getLeft(), pair.getRight().orElse(Collections.emptyList()));
 				});
 
 	private static final Parser<Token, Ast> PARSER_NODE =
@@ -123,7 +128,10 @@ public class SmeltParser {
 	
 	// @formatter:on
 
-    public SmeltParser(Iterator<Token> tokens) {
-        // TODO
+    public SmeltParser() {
+    }
+
+    public Ast parse(Iterator<Token> tokens) throws ParseException {
+        return PARSER_NODE.parse(new StandardContext<>(tokens));
     }
 }

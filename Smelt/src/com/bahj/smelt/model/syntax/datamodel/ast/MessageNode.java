@@ -4,33 +4,46 @@ import java.util.List;
 import java.util.Map;
 
 public class MessageNode implements Ast {
-	private String name;
-	private List<String> positional;
-	private Map<String, String> named;
-	private List<Ast> children;
+    private Header header;
+    private List<Ast> children;
 
-	public MessageNode(String name, List<String> positional,
-			Map<String, String> named, List<Ast> children) {
-		super();
-		this.name = name;
-		this.positional = positional;
-		this.named = named;
-		this.children = children;
-	}
+    public MessageNode(Header header, List<Ast> children) {
+        super();
+        this.header = header;
+        this.children = children;
+    }
 
-	public String getName() {
-		return name;
-	}
-
-	public List<String> getPositional() {
-		return positional;
-	}
-
-	public Map<String, String> getNamed() {
-		return named;
-	}
+    public Header getHeader() {
+        return header;
+    }
 
     public List<Ast> getChildren() {
         return children;
+    }
+
+    public static class Header {
+        private List<String> name;
+        private List<String> positional;
+        private Map<String, String> named;
+
+        public Header(List<String> name, List<String> positional, Map<String, String> named) {
+            super();
+            this.name = name;
+            this.positional = positional;
+            this.named = named;
+        }
+
+        public List<String> getName() {
+            return name;
+        }
+
+        public List<String> getPositional() {
+            return positional;
+        }
+
+        public Map<String, String> getNamed() {
+            return named;
+        }
+
     }
 }

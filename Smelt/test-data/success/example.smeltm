@@ -1,0 +1,7 @@
+data: Item
+    text: Name
+    text: Description
+
+data: Monster
+    text: Name
+    
