@@ -125,10 +125,23 @@ document
 
 declaration
 :
-    declarationHeader declarationBody?
+    message
+    | list
 ;
 
-declarationHeader
+list
+:
+    IDENTIFIER
+    ( ',' IDENTIFIER )*
+    ','?
+;
+
+message
+:
+    messageHeader messageBody?
+;
+
+messageHeader
 :
     IDENTIFIER
     (
@@ -155,7 +168,7 @@ positionalArgument
     IDENTIFIER+
 ;
 
-declarationBody
+messageBody
 :
     INDENT declaration* DEDENT
 ;

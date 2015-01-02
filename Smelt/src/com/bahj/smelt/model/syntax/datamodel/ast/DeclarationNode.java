@@ -6,6 +6,6 @@ package com.bahj.smelt.model.syntax.datamodel.ast;
  * parsed into a single common subtree format before they are called.
  * @author Zachary Palmer
  */
-public interface Ast {
+public interface DeclarationNode extends AstNode {
 
 }
