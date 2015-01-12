@@ -1,4 +1,4 @@
-package com.bahj.smelt.model.syntax.datamodel.ast;
+package com.bahj.smelt.syntax.ast;
 
 import java.util.Collections;
 import java.util.List;

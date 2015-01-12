@@ -7,5 +7,12 @@ import com.bahj.smelt.model.datamodel.value.SmeltString;
  * @author Zachary Palmer
  */
 public class TextType extends PrimitiveType<SmeltString> {
-
+    public static final TextType INSTANCE = new TextType();
+    
+    public TextType() {
+    }
+    
+    public String getName() {
+        return "text";
+    }
 }

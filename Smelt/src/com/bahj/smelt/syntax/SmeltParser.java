@@ -1,4 +1,4 @@
-package com.bahj.smelt.model.syntax.datamodel;
+package com.bahj.smelt.syntax;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -20,6 +20,8 @@ import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRLexer;
+import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.DeclarationArgumentContext;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.DeclarationContext;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.DocumentContext;
@@ -29,14 +31,14 @@ import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.MessageContext;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.MessageHeaderContext;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.NamedArgumentContext;
 import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser.PositionalArgumentContext;
-import com.bahj.smelt.model.syntax.datamodel.ast.ArgumentNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.DeclarationNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.DocumentNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.ListNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.MessageHeaderNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.MessageNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.NamedArgumentNode;
-import com.bahj.smelt.model.syntax.datamodel.ast.PositionalArgumentNode;
+import com.bahj.smelt.syntax.ast.ArgumentNode;
+import com.bahj.smelt.syntax.ast.DeclarationNode;
+import com.bahj.smelt.syntax.ast.DocumentNode;
+import com.bahj.smelt.syntax.ast.ListNode;
+import com.bahj.smelt.syntax.ast.MessageHeaderNode;
+import com.bahj.smelt.syntax.ast.MessageNode;
+import com.bahj.smelt.syntax.ast.NamedArgumentNode;
+import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
 
 public class SmeltParser {
     public SmeltParser() {

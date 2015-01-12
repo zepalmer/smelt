@@ -1,5 +1,6 @@
 package com.bahj.smelt.model.datamodel.type;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,13 +13,19 @@ import com.bahj.smelt.model.datamodel.value.SmeltDatum;
  *
  */
 public class DataType implements SmeltType<SmeltDatum> {
+    private String name;
 	private Map<String, SmeltType<?>> properties;
 
-	public DataType() {
-		this.properties = new HashMap<>();
+	public DataType(String name, Map<String, SmeltType<?>> properties) {
+	    this.name = name;
+		this.properties = new HashMap<>(properties);
 	}
 
-	public Map<String, SmeltType<?>> getProperties() {
-		return properties;
+	public String getName() {
+        return name;
+    }
+
+    public Map<String, SmeltType<?>> getProperties() {
+		return Collections.unmodifiableMap(properties);
 	}
 }

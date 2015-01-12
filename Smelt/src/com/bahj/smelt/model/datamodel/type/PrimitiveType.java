@@ -9,7 +9,6 @@ import com.bahj.smelt.model.datamodel.value.SmeltValue;
  * @param <V>
  *            The Java representation of a value of this type.
  */
-public abstract class PrimitiveType<V extends SmeltValue> implements
-		SmeltType<V> {
+public abstract class PrimitiveType<V extends SmeltValue> implements SmeltType<V> {
 
 }

@@ -12,13 +12,18 @@ import com.bahj.smelt.model.datamodel.value.SmeltEnumValue;
  * @author Zachary Palmer
  */
 public class EnumType implements SmeltType<SmeltEnumValue> {
+    private String name;
 	private List<String> choices;
 
-	public EnumType(String... choices) {
+	public EnumType(String name, String... choices) {
 		this(Arrays.asList(choices));
 	}
 
-	public EnumType(List<String> choices) {
+	public String getName() {
+        return name;
+    }
+
+    public EnumType(List<String> choices) {
 		this.choices = new ArrayList<>(choices);
 	}
 

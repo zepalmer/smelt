@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.bahj.smelt.model.syntax.datamodel.SmeltParseFailureException;
-import com.bahj.smelt.model.syntax.datamodel.SmeltParser;
-import com.bahj.smelt.model.syntax.datamodel.ast.DocumentNode;
+import com.bahj.smelt.syntax.SmeltParseFailureException;
+import com.bahj.smelt.syntax.SmeltParser;
+import com.bahj.smelt.syntax.ast.DocumentNode;
 
 public class ParserTool {
     public static void main(String[] args) throws IOException {

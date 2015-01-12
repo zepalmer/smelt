@@ -1,4 +1,4 @@
-package com.bahj.smelt.model.syntax.datamodel.ast;
+package com.bahj.smelt.syntax.ast;
 
 /**
  * Represents a raw, parsed AST in the format of the Smelt data model.  While

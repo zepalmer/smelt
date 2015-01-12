@@ -1,4 +1,4 @@
-package com.bahj.smelt.model.syntax.datamodel;
+package com.bahj.smelt.syntax;
 
 public class SmeltParseFailure {
     private int lineStart;
