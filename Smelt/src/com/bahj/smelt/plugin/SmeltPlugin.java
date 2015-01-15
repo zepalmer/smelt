@@ -23,12 +23,12 @@ public interface SmeltPlugin {
     public void registeredToApplicationModel(SmeltApplicationModel model);
 
     /**
-     * A method which is invoked when this plugin is unregistered from an application model. A plugin may wish to remove
-     * listeners from that model.
+     * Determines the set of declaration dependencies for this plugin. This method returns the set of plugin types which
+     * must process their declarations before this plugin processes its own.
      * 
-     * @param model
+     * @return The types on which this plugin depends.
      */
-    public void unregisteredFromApplicationModel(SmeltApplicationModel model);
+    public Set<Class<? extends SmeltPlugin>> getDeclarationDependencyTypes();
 
     /**
      * Determines whether this plugin is responsible for the provided declaration in a Smelt configuration file.
@@ -53,6 +53,9 @@ public interface SmeltPlugin {
      *            The context in which to process the declarations.
      * @param declarationNodes
      *            The declarations to process.
+     * @throws DeclarationProcessingException
+     *             If a provided declaration is invalid.
      */
-    public void processDeclarations(SmeltPluginDeclarationHandlerContext context, Set<DeclarationNode> declarationNodes);
+    public void processDeclarations(SmeltPluginDeclarationHandlerContext context, Set<DeclarationNode> declarationNodes)
+            throws DeclarationProcessingException;
 }

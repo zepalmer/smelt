@@ -16,7 +16,7 @@ public class ParserTool {
         while ((line = br.readLine()) != null && line.length() > 0) {
             sb.append(line).append('\n');
         }
-        SmeltParser parser = new SmeltParser();
+        SmeltParser parser = new SmeltParser("<string>");
         try {
             DocumentNode node = parser.parse(sb.toString());
             System.out.println(node.getTreeDescription());

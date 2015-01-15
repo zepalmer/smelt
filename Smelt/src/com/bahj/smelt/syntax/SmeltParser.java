@@ -14,6 +14,7 @@ import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
@@ -39,10 +40,18 @@ import com.bahj.smelt.syntax.ast.MessageHeaderNode;
 import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.NamedArgumentNode;
 import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
+import com.bahj.smelt.syntax.ast.impl.DocumentNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.ListNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.MessageHeaderNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.MessageNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.NamedArgumentNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.PositionalArgumentNodeImpl;
 
 public class SmeltParser {
-    public SmeltParser() {
+    private String resourceName;
 
+    public SmeltParser(String resourceName) {
+        this.resourceName = resourceName;
     }
 
     public DocumentNode parse(String string) throws SmeltParseFailureException, IOException {
@@ -58,7 +67,7 @@ public class SmeltParser {
             @Override
             public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
                     int charPositionInLine, String msg, RecognitionException e) {
-                failures.add(new SmeltParseFailure(line, charPositionInLine, msg));
+                failures.add(new SmeltParseFailure(new SourceLocation(resourceName, line, charPositionInLine), msg));
             }
 
             @Override
@@ -89,11 +98,12 @@ public class SmeltParser {
     }
 
     private DocumentNode astTransform(DocumentContext documentContext) {
+
         List<DeclarationNode> declarations = new ArrayList<>();
         for (DeclarationContext declarationContext : documentContext.declaration()) {
             declarations.add(astTransform(declarationContext));
         }
-        return new DocumentNode(declarations);
+        return new DocumentNodeImpl(locationOf(documentContext), declarations);
     }
 
     private DeclarationNode astTransform(DeclarationContext declarationContext) {
@@ -111,7 +121,7 @@ public class SmeltParser {
         for (TerminalNode node : listContext.IDENTIFIER()) {
             values.add(node.getText());
         }
-        return new ListNode(values);
+        return new ListNodeImpl(locationOf(listContext), values);
     }
 
     private MessageNode astTransform(MessageContext messageContext) {
@@ -123,7 +133,7 @@ public class SmeltParser {
                 children.add(astTransform(declContext));
             }
         }
-        return new MessageNode(header, children);
+        return new MessageNodeImpl(locationOf(messageContext), header, children);
     }
 
     private MessageHeaderNode astTransform(MessageHeaderContext messageHeaderContext) {
@@ -141,7 +151,7 @@ public class SmeltParser {
                 throw new IllegalStateException("Unrecognized argument node type.");
             }
         }
-        return new MessageHeaderNode(name, posArgs, namedArgs);
+        return new MessageHeaderNodeImpl(locationOf(messageHeaderContext), name, posArgs, namedArgs);
     }
 
     private ArgumentNode astTransform(DeclarationArgumentContext declarationArgumentContext) {
@@ -161,7 +171,7 @@ public class SmeltParser {
         while (it.hasNext()) {
             args.add(it.next().getText());
         }
-        return new NamedArgumentNode(name, args);
+        return new NamedArgumentNodeImpl(locationOf(namedArgumentContext), name, args);
     }
 
     private PositionalArgumentNode astTransform(PositionalArgumentContext positionalArgumentContext) {
@@ -169,6 +179,11 @@ public class SmeltParser {
         for (TerminalNode node : positionalArgumentContext.IDENTIFIER()) {
             args.add(node.getText());
         }
-        return new PositionalArgumentNode(args);
+        return new PositionalArgumentNodeImpl(locationOf(positionalArgumentContext), args);
+    }
+
+    private SourceLocation locationOf(ParserRuleContext context) {
+        return new SourceLocation(resourceName, context.getStart().getLine(), context.getStart()
+                .getCharPositionInLine());
     }
 }

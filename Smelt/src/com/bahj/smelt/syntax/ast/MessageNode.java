@@ -1,36 +1,11 @@
 package com.bahj.smelt.syntax.ast;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class MessageNode implements DeclarationNode {
-    private MessageHeaderNode header;
-    private List<DeclarationNode> children;
+public interface MessageNode extends DeclarationNode {
 
-    public MessageNode(MessageHeaderNode header, List<DeclarationNode> children) {
-        super();
-        this.header = header;
-        this.children = children;
-    }
+    public abstract MessageHeaderNode getHeader();
 
-    public MessageHeaderNode getHeader() {
-        return header;
-    }
+    public abstract List<? extends DeclarationNode> getChildren();
 
-    public List<DeclarationNode> getChildren() {
-        return children;
-    }
-
-    @Override
-    public List<? extends AstNode> getDescriptionChildren() {
-        List<AstNode> descChildren = new ArrayList<>();
-        descChildren.add(header);
-        descChildren.addAll(this.children);
-        return descChildren;
-    }
-
-    @Override
-    public String getSimpleDescription() {
-        return "<message>";
-    }
 }

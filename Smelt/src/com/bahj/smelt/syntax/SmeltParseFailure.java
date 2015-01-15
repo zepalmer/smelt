@@ -1,23 +1,17 @@
 package com.bahj.smelt.syntax;
 
 public class SmeltParseFailure {
-    private int lineStart;
-    private int columnStart;
+    private SourceLocation location;
     private String message;
 
-    public SmeltParseFailure(int lineStart, int columnStart, String message) {
+    public SmeltParseFailure(SourceLocation location, String message) {
         super();
-        this.lineStart = lineStart;
-        this.columnStart = columnStart;
+        this.location = location;
         this.message = message;
     }
 
-    public int getLineStart() {
-        return lineStart;
-    }
-
-    public int getColumnStart() {
-        return columnStart;
+    public SourceLocation getLocation() {
+        return location;
     }
 
     public String getMessage() {

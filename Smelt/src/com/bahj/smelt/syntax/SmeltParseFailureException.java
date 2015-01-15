@@ -19,8 +19,8 @@ public class SmeltParseFailureException extends Exception {
     private static String messageFromFailures(List<SmeltParseFailure> failures) {
         StringBuilder sb = new StringBuilder();
         for (SmeltParseFailure failure : failures) {
-            sb.append(failure.getLineStart()).append(",").append(failure.getColumnStart()).append(": ")
-                    .append(failure.getMessage()).append('\n');
+            sb.append(failure.getLocation().getLine()).append(",").append(failure.getLocation().getColumn())
+                    .append(": ").append(failure.getMessage()).append('\n');
         }
         return sb.toString();
     }
