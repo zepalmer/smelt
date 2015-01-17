@@ -1,6 +1,7 @@
 package com.bahj.smelt.plugin.builtin.basegui;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import com.bahj.smelt.util.event.TypedEventListener;
 
 public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implements SmeltPlugin {
     @Override
-    public void registeredToApplicationModel(SmeltApplicationModel model) {
+    public void registeredToApplicationModel(final SmeltApplicationModel model) {
         model.addListener(new TypedEventListener<>(SmeltApplicationPluginsConfiguredEvent.class,
                 new EventListener<SmeltApplicationPluginsConfiguredEvent>() {
                     @Override
@@ -32,11 +33,37 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         // Once the plugins are configured, initialize the GUI window.
                         GUIConstructionContextImpl guiContext = new GUIConstructionContextImpl();
 
+                        // Add options to open and close Smelt descriptor files (triggering the parsing of the AST and
+                        // the configuration of the application metastate.
+                        guiContext.addMenuItemGroup("File",
+                                Arrays.asList(new SmeltBasicMenuItem("Open Smelt Specification", new AbstractAction() {
+                                    private static final long serialVersionUID = 1L;
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        // TODO
+                                    }
+                                }), new SmeltBasicMenuItem("Close Smelt Specification", new AbstractAction() {
+                                    private static final long serialVersionUID = 1L;
+
+                                    @Override
+                                    public void actionPerformed(ActionEvent e) {
+                                        // TODO
+                                    }
+
+                                    @Override
+                                    public boolean isEnabled() {
+                                        return model.isApplicationMetaStateLoaded();
+                                    }
+
+                                    // TODO: only enabled if a specification is open.
+                                })));
+
                         // Tell all of the plugins that we're currently gathering contributions for the GUI. It's now or
                         // never for them.
                         fireEvent(new BaseGUIInitializingEvent(guiContext));
 
-                        // Add the traditional "Exit" option to the "File" menu.
+                        // Add the traditional "Exit" option to the end of the "File" menu.
                         guiContext.addMenuItemGroup("File",
                                 Collections.singletonList(new SmeltBasicMenuItem("Exit", new AbstractAction() {
                                     private static final long serialVersionUID = 1L;
@@ -55,7 +82,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
 
                         // Let everyone know the GUI's finished.
                         fireEvent(new BaseGUIInitializedEvent());
-                        
+
                         // And now show it.
                         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         frame.pack();
