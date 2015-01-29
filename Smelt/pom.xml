@@ -5,7 +5,7 @@
 	<artifactId>Smelt</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -28,12 +28,17 @@
 							<goal>antlr4</goal>
 						</goals>
 						<configuration>
-							<sourceDirectory>${basedir}/parser-src/</sourceDirectory>
+							<sourceDirectory>${basedir}/src/parser/java/</sourceDirectory>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>target/generated-sources/antlr4</directory>
+			</resource>
+		</resources>
 	</build>
 	<dependencies>
 		<dependency>
