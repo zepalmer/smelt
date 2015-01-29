@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.bahj.smelt.category.wizards"
+            name="Smelt">
+      </category>
+      <wizard
+            category="com.bahj.smelt.category.wizards"
+            class="com.bahj.smelt.wizard.NewProjectWizard"
+            id="com.bahj.smelt.wizard.project"
+            name="Smelt Project"
+            project="true">
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="com.bahj.smelt.view.ObjectsByTypeView"
+            icon="resources/icons/smelt-icon-16.png"
+            id="com.bahj.smelt.view.ObjectsByTypeView"
+            name="Objects by Type"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="com.bahj.smelt.perspective.SmeltPerspectiveFactory"
+            icon="resources/icons/smelt-icon-16.png"
+            id="com.bahj.smelt.perspective"
+            name="Smelt">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="com.bahj.smelt.perspective">
+         <view
+               id="com.bahj.smelt.view.ObjectsByTypeView"
+               minimized="false"
+               ratio="0.25"
+               relationship="left"
+               relative="org.eclipse.ui.editorss">
+         </view>
+      </perspectiveExtension>
+   </extension>
+
+</plugin>
