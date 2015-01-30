@@ -24,6 +24,7 @@ public class GUIExecutionContext {
      * @param component The body of the tab.
      */
     public void ensureTab(GUITabKey key, JComponent contents) {
+        
         // TODO
     }
 }
