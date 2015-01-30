@@ -5,31 +5,57 @@
          point="org.eclipse.ui.newWizards">
       <category
             id="com.bahj.smelt.category.wizards"
-            name="Smelt">
+            name="Smelt Wizards">
       </category>
       <wizard
             category="com.bahj.smelt.category.wizards"
-            class="com.bahj.smelt.wizard.NewProjectWizard"
-            id="com.bahj.smelt.wizard.project"
-            name="Smelt Project"
-            project="true">
+            class="com.bahj.smelt.wizards.NewProjectWizard"
+            finalPerspective="com.bahj.smelt.perspective"
+            id="com.bahj.smelt.wizards.NewSmeltProjectWizard"
+            name="Smelt Project">
       </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <view
-            class="com.bahj.smelt.view.ObjectsByTypeView"
-            icon="resources/icons/smelt-icon-16.png"
-            id="com.bahj.smelt.view.ObjectsByTypeView"
-            name="Objects by Type"
-            restorable="true">
+            class="org.eclipse.ui.navigator.CommonNavigator"
+            icon="icons/sample.gif"
+            id="com.bahj.smelt.navigator"
+            name="Smelt Navigator">
       </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.navigator.viewer">
+      <viewerActionBinding
+            viewerId="com.bahj.smelt.navigator">
+         <includes>
+            <actionExtension
+                  pattern="org.eclipse.ui.navigator.resources.*">
+            </actionExtension>
+         </includes>
+      </viewerActionBinding>
+      <viewerContentBinding
+            viewerId="com.bahj.smelt.navigator">
+         <includes>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resourceContent">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.filters.*">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
+            </contentExtension>
+            <contentExtension
+                  pattern="org.eclipse.ui.navigator.resources.workingSets">
+            </contentExtension>
+         </includes>
+      </viewerContentBinding>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="com.bahj.smelt.perspective.SmeltPerspectiveFactory"
-            icon="resources/icons/smelt-icon-16.png"
+            class="com.bahj.smelt.perspective.PerspectiveFactory"
             id="com.bahj.smelt.perspective"
             name="Smelt">
       </perspective>
@@ -39,7 +65,7 @@
       <perspectiveExtension
             targetID="com.bahj.smelt.perspective">
          <view
-               id="com.bahj.smelt.view.ObjectsByTypeView"
+               id="com.bahj.smelt.navigator"
                minimized="false"
                ratio="0.25"
                relationship="left"
@@ -47,5 +73,14 @@
          </view>
       </perspectiveExtension>
    </extension>
-
+   <extension
+         id="com.bahj.smelt.projectNature"
+         name="Smelt Project"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="com.bahj.smelt.natures.ProjectNature">
+         </run>
+      </runtime>
+   </extension>
 </plugin>

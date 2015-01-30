@@ -3,11 +3,26 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.bahj</groupId>
 	<artifactId>smelt</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.0-SNAPSHOT</version>
 	<name>Smelt</name>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
+		<resources>
+			<resource>
+				<directory>src</directory>
+				<excludes>
+					<exclude>**/*.java</exclude>
+				</excludes>
+			</resource>
+		</resources>
 		<plugins>
+			<plugin>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<pde>true</pde>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -16,17 +31,6 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<pde>true</pde>
-				</configuration>
-			</plugin>
-			<!-- NOTE: there may be a problem with copying dependencies when the plugin 
-				is built from the headless PDE or exported (even though it works from within 
-				Eclipse). We found reports of this (2015-01-17: http://maven.apache.org/plugins/maven-eclipse-plugin/pde.html) 
-				but the suggested fix produced Maven errors in this file. -->
 		</plugins>
 	</build>
 </project>

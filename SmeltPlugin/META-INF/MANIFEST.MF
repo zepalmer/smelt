@@ -2,9 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Smelt
 Bundle-SymbolicName: Smelt;singleton:=true
-Bundle-Version: 0.0.1
+Bundle-Version: 0.1.0
 Bundle-Activator: com.bahj.smelt.Activator
-Bundle-Vendor: com.bahj
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.ide;bundle-version="3.10.1",
@@ -13,3 +12,5 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.navigator.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
+Export-Package: com.bahj.smelt.natures,
+ com.bahj.smelt.projects
