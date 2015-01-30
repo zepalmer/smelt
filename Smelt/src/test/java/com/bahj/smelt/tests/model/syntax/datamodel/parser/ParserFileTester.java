@@ -16,8 +16,8 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 
-import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRLexer;
-import com.bahj.smelt.model.syntax.datamodel.SmeltANTLRParser;
+import com.bahj.smelt.syntax.antlr.SmeltANTLRLexer;
+import com.bahj.smelt.syntax.antlr.SmeltANTLRParser;
 
 public class ParserFileTester {
     private File file;
