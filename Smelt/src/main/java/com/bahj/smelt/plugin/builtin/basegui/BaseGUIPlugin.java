@@ -12,17 +12,31 @@ import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
+import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContext;
 import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContextImpl;
 import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
-import com.bahj.smelt.plugin.builtin.basegui.context.SmeltBasicMenuItem;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
+import com.bahj.smelt.util.StrongReference;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
 
+/**
+ * This plugin provides a base GUI for the Smelt framework. It featues a menu bar and an (initially empty) tab pane.
+ * Menu items exist to open and close the Smelt specification as well as close the application.
+ * <p/>
+ * Other plugins may add content to the GUI by responding to the {@link BaseGUIInitializingEvent} that this plugin fires
+ * in response to the global {@link SmeltApplicationPluginsConfiguredEvent}. That object is useful in two ways: first,
+ * it allows the addition of menu items via the {@link GUIConstructionContext} contained in the event. Second, that
+ * {@link GUIConstructionContext} contains a {@link StrongReference} to a {@link GUIExecutionContext} (which may only be
+ * used <i>after</i> the {@link BaseGUIInitializedEvent} begins dispatch) which can be used to add tabs to the tab pane.
+ * 
+ * @author Zachary Palmer
+ */
 public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implements SmeltPlugin {
     @Override
     public void registeredToApplicationModel(final SmeltApplicationModel model) {

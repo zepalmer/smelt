@@ -1,9 +1,8 @@
 package com.bahj.smelt.plugin.builtin.basegui.context;
 
-import javax.swing.JComponent;
-
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
 import com.bahj.smelt.plugin.builtin.basegui.SmeltTabPanel;
+import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITab;
 
 /**
  * An object permitting other plugins to interface with the GUI created by the {@link BaseGUIPlugin} at runtime.
@@ -20,11 +19,9 @@ public class GUIExecutionContext {
     /**
      * Ensures that a tab identified by the provided key exists.  If no such tab exists, one is created with the provided
      * contents.  If such a tab already exists, it is focused.
-     * @param key The key to identify the tab.
-     * @param component The body of the tab.
+     * @param tab The tab in question.
      */
-    public void ensureTab(GUITabKey key, JComponent contents) {
-        
-        // TODO
+    public void ensureTab(GUITab tab) {
+        this.tabPanel.ensureTab(tab);
     }
 }

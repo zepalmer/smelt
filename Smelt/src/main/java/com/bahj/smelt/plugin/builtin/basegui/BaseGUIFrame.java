@@ -10,9 +10,9 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 
 import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContextImpl;
-import com.bahj.smelt.plugin.builtin.basegui.context.SmeltBasicMenuItem;
-import com.bahj.smelt.plugin.builtin.basegui.context.SmeltMenuItem;
-import com.bahj.smelt.plugin.builtin.basegui.context.SmeltNestedMenu;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltNestedMenu;
 
 /**
  * The frame used by Smelt's base GUI plugin.

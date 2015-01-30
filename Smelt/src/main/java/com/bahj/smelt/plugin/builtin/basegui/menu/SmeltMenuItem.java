@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.basegui.context;
+package com.bahj.smelt.plugin.builtin.basegui.menu;
 
 public interface SmeltMenuItem {
 

@@ -8,6 +8,8 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltNestedMenu;
 import com.bahj.smelt.util.StrongReference;
 
 /**

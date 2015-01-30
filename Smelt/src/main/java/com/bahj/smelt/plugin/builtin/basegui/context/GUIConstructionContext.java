@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 
 import javax.swing.Action;
 
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltMenuItem;
+
 /**
  * An interface for the context in which a Smelt GUI is constructed.
  * @author Zachary Palmer
