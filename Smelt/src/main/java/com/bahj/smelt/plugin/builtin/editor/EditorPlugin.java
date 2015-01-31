@@ -44,9 +44,12 @@ public class EditorPlugin implements SmeltPlugin {
                     public void eventOccurred(SmeltApplicationConfigurationLoadedEvent event) {
                         SmeltApplicationModel model = event.getApplicationModel();
 
+                        DataModelPlugin dataModelPlugin = model.getPluginRegistry().getPlugin(DataModelPlugin.class);
+                        BaseGUIPlugin guiPlugin = model.getPluginRegistry().getPlugin(BaseGUIPlugin.class);
+
                         // Create the editor and tab. We put a card panel between the tab and the editor panel so we
                         // can hide the editor when no database is loaded.
-                        final EditorPanel editorPanel = new EditorPanel();
+                        final EditorPanel editorPanel = new EditorPanel(guiPlugin.getBaseFrame());
                         final CardLayout cardLayout = new CardLayout(0, 0);
                         final JPanel containerPanel = new JPanel(cardLayout);
                         final String editorName = "editor";
@@ -57,7 +60,6 @@ public class EditorPlugin implements SmeltPlugin {
                                 containerPanel);
                         cardLayout.show(containerPanel, noEditorName);
 
-                        DataModelPlugin dataModelPlugin = model.getPluginRegistry().getPlugin(DataModelPlugin.class);
                         dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
                                 new EventListener<DatabaseOpenedEvent>() {
                                     @Override
@@ -75,7 +77,6 @@ public class EditorPlugin implements SmeltPlugin {
 
                         // Make sure we add the appropriate content to the Smelt GUI. This consists of the primary
                         // editor pane and a menu option to activate it.
-                        BaseGUIPlugin guiPlugin = model.getPluginRegistry().getPlugin(BaseGUIPlugin.class);
                         guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializingEvent.class,
                                 new EventListener<BaseGUIInitializingEvent>() {
                                     @Override
