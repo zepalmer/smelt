@@ -17,6 +17,7 @@ import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
 import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
+import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
@@ -45,7 +46,9 @@ public class DataGUIPlugin implements SmeltPlugin {
 
                                         final Action newDatabaseAction = event.getContext().constructExecutionAction(
                                                 (GUIExecutionContext context) -> {
-                                                    // TODO: create new in-memory database
+                                                    // TODO: appropriate confirmation prompts if a database is already
+                                                    //       loaded
+                                                    dataModelPlugin.setDatabase(new SmeltDatabase());
                                                 });
                                         final Action openDatabaseAction = event.getContext().constructExecutionAction(
                                                 (GUIExecutionContext context) -> {
@@ -61,7 +64,9 @@ public class DataGUIPlugin implements SmeltPlugin {
                                                     });
                                         final Action closeDatabaseAction = event.getContext().constructExecutionAction(
                                                 (GUIExecutionContext context) -> {
-                                                    // TODO: close file, probably with confirmation dialogs
+                                                    // TODO: appropriate confirmation prompts if a database is already
+                                                    //       loaded
+                                                    dataModelPlugin.setDatabase(null);
                                                 });
 
                                         newDatabaseAction.setEnabled(false);

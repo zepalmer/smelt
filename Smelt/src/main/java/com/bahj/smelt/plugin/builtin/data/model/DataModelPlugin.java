@@ -12,7 +12,10 @@ import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
+import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
 import com.bahj.smelt.plugin.builtin.data.model.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException;
 import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
@@ -30,8 +33,8 @@ import com.bahj.smelt.util.event.TypedEventListener;
 public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> implements SmeltPlugin {
     /** The model for this plugin. */
     private SmeltDataModel model = null;
-
-    // TODO: field for the database
+    /** The database for this plugin. */
+    private SmeltDatabase database = null;
 
     @Override
     public void registeredToApplicationModel(final SmeltApplicationModel model) {
@@ -44,9 +47,10 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
         // If the application specification is unloaded, we dump the database and the model.
         model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationUnloadedEvent.class, (
                 SmeltApplicationSpecificationUnloadedEvent event) -> {
-            // TODO: wipe database as well
-                DataModelPlugin.this.model = null;
-            }));
+            setDatabase(null);
+            DataModelPlugin.this.model = null;
+            return;
+        }));
     }
 
     @Override
@@ -183,9 +187,38 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
 
     /**
      * Retrieves the Smelt data model currently in use by this plugin.
-     * @return The data model in use by this plugin.
+     * 
+     * @return The data model in use (or <code>null</code> if no data model exists).
      */
     public SmeltDataModel getModel() {
         return model;
+    }
+
+    /**
+     * Retrieves the Smelt database currently in use by this plugin.
+     * 
+     * @return The database in use (or <code>null</code> if no database exists).
+     */
+    public SmeltDatabase getDatabase() {
+        return database;
+    }
+    
+    /**
+     * Changes the database in use by this plugin.
+     * @param database The database to use (or <code>null</code> simply to close any existing database).
+     * @throws IllegalStateException If no data model is loaded.
+     */
+    public void setDatabase(SmeltDatabase database) {
+        if (this.model == null) {
+            throw new IllegalStateException("Cannot modify database in use when no data model exists!");
+        }
+        if (this.database != null) {
+            this.database = null;
+            fireEvent(new DatabaseClosedEvent());
+        }
+        if (database != null) {
+            this.database = database;
+            fireEvent(new DatabaseOpenedEvent());
+        }
     }
 }

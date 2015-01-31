@@ -1,14 +1,16 @@
 package com.bahj.smelt.plugin.builtin.data.model.value;
 
-public class SmeltString implements SmeltValue {
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+
+public class SmeltString extends AbstractSmeltValue<SmeltString> {
 	private String value;
 
-	public SmeltString(String value) {
-		super();
-		this.value = value;
-	}
+	public SmeltString(SmeltType<SmeltString> type, String value) {
+        super(type);
+        this.value = value;
+    }
 
-	public String getValue() {
+    public String getValue() {
 		return value;
 	}
 

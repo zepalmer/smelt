@@ -1,14 +1,16 @@
 package com.bahj.smelt.plugin.builtin.data.model.value;
 
-public class SmeltEnumValue implements SmeltValue {
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+
+public class SmeltEnumValue extends AbstractSmeltValue<SmeltEnumValue> {
 	private String choice;
 
-	public SmeltEnumValue(String choice) {
-		super();
-		this.choice = choice;
-	}
+	public SmeltEnumValue(SmeltType<SmeltEnumValue> type, String choice) {
+        super(type);
+        this.choice = choice;
+    }
 
-	public String getChoice() {
+    public String getChoice() {
 		return choice;
 	}
 
