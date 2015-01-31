@@ -2,21 +2,25 @@ package com.bahj.smelt.plugin.builtin.basegui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import javax.swing.UIManager;
 
 import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITab;
 import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITabKey;
 import com.bahj.smelt.plugin.builtin.basegui.tabs.event.GUITabClosedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.tabs.event.GUITabClosingEvent;
+import com.bahj.smelt.util.swing.PaddingComponent;
 
 public class SmeltTabPanel extends JPanel {
     private static final long serialVersionUID = 1L;
@@ -56,6 +60,9 @@ public class SmeltTabPanel extends JPanel {
 
         // Change the header for the tab so that it has a closing button.
         this.tabbedPane.setTabComponentAt(this.tabbedPane.getTabCount() - 1, new TabComponent(tab));
+        
+        // Register that tab with our record.
+        this.tabs.add(tab);
     }
 
     /**
@@ -95,12 +102,18 @@ public class SmeltTabPanel extends JPanel {
 
             JButton closeButton = new JButton();
 
-            this.setLayout(new BorderLayout());
-            this.add(new JLabel(tab.getTitle()), BorderLayout.CENTER);
-            this.add(closeButton, BorderLayout.EAST);
+            this.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+            this.add(new JLabel(tab.getTitle()));
+            this.add(new PaddingComponent(5));
+            this.add(closeButton);
 
-            // TODO: icon instead
-            closeButton.setText("x");
+            Icon icon = UIManager.getIcon("InternalFrame.closeIcon");
+            if (icon == null) {
+                closeButton.setText("x");
+            } else {
+                closeButton.setIcon(icon);
+            }
+            closeButton.setBorder(null);
 
             closeButton.addActionListener(new ActionListener() {
                 @Override
