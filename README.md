@@ -5,8 +5,8 @@ This project is intended to provide an editor for structured data models and
 their instances.  Consider the following simple data model description:
 
     data: Person
-        text: Name
-        text: Age
+        Name: text
+        Age: text
         Employment
     enum: Employment
         Employed, Unemployed
