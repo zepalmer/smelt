@@ -14,9 +14,9 @@ import com.bahj.smelt.configuration.ApplicationModelCreationException;
 import com.bahj.smelt.configuration.Configuration;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateInitializedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateUnloadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationInitializedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
 import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.ReadOnlySmeltPluginRegistryProxy;
@@ -34,10 +34,6 @@ import com.bahj.smelt.util.partialorder.InconsistentPartialOrderException;
 import com.bahj.smelt.util.partialorder.PartialOrderConstraint;
 import com.bahj.smelt.util.partialorder.PartialOrderUtils;
 
-/*
- * TODO: naming consistency: "application meta-state" should be called "specification"  
- */
-
 /**
  * This class represents the overall state of the Smelt application. It includes state for both the UI and the data
  * model as well as the plugins which influence both.
@@ -46,7 +42,7 @@ import com.bahj.smelt.util.partialorder.PartialOrderUtils;
  */
 public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicationEvent> {
     private SmeltPluginRegistryImpl pluginRegistry;
-    private boolean applicationMetaStateLoaded;
+    private boolean applicationSpecificationLoaded;
 
     /**
      * Creates a new application model based on the provided configuration.
@@ -56,7 +52,7 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
      */
     public SmeltApplicationModel(Configuration configuration) throws ApplicationModelCreationException {
         this.pluginRegistry = new SmeltPluginRegistryImpl();
-        this.applicationMetaStateLoaded = false;
+        this.applicationSpecificationLoaded = false;
 
         for (Class<? extends SmeltPlugin> pluginClass : configuration.getPlugins()) {
             instantiateAndRegisterPlugin(pluginClass);
@@ -93,36 +89,36 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
     }
 
     /**
-     * Loads an application metadata state from a file. This function simply parses the contents of the file (expecting
-     * a Smelt specifciation) and calls {@link #loadApplicationMetaState(DocumentNode)} with the result. Any errors
+     * Loads an application specification from a file. This function simply parses the contents of the file (expecting
+     * a Smelt specifciation) and calls {@link #loadApplicationSpecification(DocumentNode)} with the result. Any errors
      * encountered during reading and parsing are reported.
      */
-    public void loadApplicationMetaState(File file) throws IOException, SmeltParseFailureException {
+    public void loadApplicationSpecification(File file) throws IOException, SmeltParseFailureException {
         DocumentNode node;
         try (FileInputStream fis = new FileInputStream(file)) {
             SmeltParser parser = new SmeltParser(file.getPath());
             node = parser.parse(fis);
         }
-        loadApplicationMetaState(node);
+        loadApplicationSpecification(node);
     }
 
     /**
-     * Loads an application metadata state (unloading any previous one if it exists). This creates fresh UI and logical
+     * Loads an application specification (unloading any previous one if it exists). This creates fresh UI and logical
      * models for the Smelt application and initializes them using the provided Smelt document.
      * 
      * @param document
      *            The document AST to use.
      */
-    public void loadApplicationMetaState(DocumentNode document) {
-        if (this.applicationMetaStateLoaded) {
-            unloadApplicationMetaState();
+    public void loadApplicationSpecification(DocumentNode document) {
+        if (this.applicationSpecificationLoaded) {
+            unloadApplicationSpecification();
         }
 
         try {
-            this.applicationMetaStateLoaded = true;
+            this.applicationSpecificationLoaded = true;
 
             // TODO: initialize UI model
-            fireEvent(new SmeltApplicationMetaStateInitializedEvent(this));
+            fireEvent(new SmeltApplicationSpecificationInitializedEvent(this));
 
             // Determine an order in which to process declarations.
             Set<PartialOrderConstraint<SmeltPlugin>> constraints = new HashSet<>();
@@ -195,23 +191,23 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
                 }
             }
 
-            fireEvent(new SmeltApplicationMetaStateLoadedEvent(this));
+            fireEvent(new SmeltApplicationSpecificationLoadedEvent(this));
         } catch (Throwable t) {
-            unloadApplicationMetaState();
+            unloadApplicationSpecification();
             throw t;
         }
     }
 
     /**
-     * Unloads the current application metadata state. This clears the current logical and UI models.
+     * Unloads the current application specification.
      */
-    public void unloadApplicationMetaState() {
-        this.applicationMetaStateLoaded = false;
-        fireEvent(new SmeltApplicationMetaStateUnloadedEvent(this));
+    public void unloadApplicationSpecification() {
+        this.applicationSpecificationLoaded = false;
+        fireEvent(new SmeltApplicationSpecificationUnloadedEvent(this));
     }
 
-    public boolean isApplicationMetaStateLoaded() {
-        return this.applicationMetaStateLoaded;
+    public boolean isApplicationSpecificationLoaded() {
+        return this.applicationSpecificationLoaded;
     }
 
     public SmeltPluginRegistry getPluginRegistry() {

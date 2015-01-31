@@ -3,7 +3,7 @@ package com.bahj.smelt.plugin;
 import java.util.Set;
 
 import com.bahj.smelt.SmeltApplicationModel;
-import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 
 /**
@@ -30,10 +30,10 @@ public interface SmeltPlugin {
      * @return The types on which this plugin depends.
      */
     public Set<Class<? extends SmeltPlugin>> getDeclarationDependencyTypes();
-    
+
     /**
-     * Determines the set of runtime dependencies for this plugin.  This method returns the set of plugin types which
-     * must be loaded by the time the {@link SmeltApplicationMetaStateLoadedEvent} is fired.
+     * Determines the set of runtime dependencies for this plugin. This method returns the set of plugin types which
+     * must be loaded by the time the {@link SmeltApplicationSpecificationLoadedEvent} is fired.
      */
     public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes();
 
@@ -52,9 +52,9 @@ public interface SmeltPlugin {
     /**
      * Processes the provided declarations. Callers guarantee that they will not provide declarations which are not
      * approved by the {@link SmeltPlugin#claimsDeclaration(SmeltPluginDeclarationHandlerContext, DeclarationNode)}
-     * predicate. This method may only be called once per load of the application meta state of an application model;
-     * that is, if the same declaration is passed to this function twice and a duplicate declaration error is raised,
-     * this plugin is not at fault.
+     * predicate. This method may only be called once per load of an application specification; that is, if the same
+     * declaration is passed to this function twice and a duplicate declaration error is raised, this plugin is not at
+     * fault.
      * 
      * @param context
      *            The context in which to process the declarations.

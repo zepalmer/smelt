@@ -11,9 +11,9 @@ import javax.swing.Action;
 
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateInitializedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateUnloadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationInitializedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
@@ -78,12 +78,13 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                                                         openDatabaseAction), new SmeltBasicMenuItem("Close Database",
                                                         closeDatabaseAction)));
 
-                                        // When the meta-state is loaded, the "open database" action can be taken.
+                                        // When the specification is loaded, the "open database" action can be taken.
                                         model.addListener(new TypedEventListener<>(
-                                                SmeltApplicationMetaStateLoadedEvent.class,
-                                                new EventListener<SmeltApplicationMetaStateLoadedEvent>() {
+                                                SmeltApplicationSpecificationLoadedEvent.class,
+                                                new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
                                                     @Override
-                                                    public void eventOccurred(SmeltApplicationMetaStateLoadedEvent event) {
+                                                    public void eventOccurred(
+                                                            SmeltApplicationSpecificationLoadedEvent event) {
                                                         openDatabaseAction.setEnabled(true);
                                                     }
                                                 }));
@@ -106,13 +107,14 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                                                     }
                                                 }));
 
-                                        // When the meta-state is unloaded, the "open database" action cannot be taken.
+                                        // When the specification is unloaded, the "open database" action cannot be
+                                        // taken.
                                         model.addListener(new TypedEventListener<>(
-                                                SmeltApplicationMetaStateUnloadedEvent.class,
-                                                new EventListener<SmeltApplicationMetaStateUnloadedEvent>() {
+                                                SmeltApplicationSpecificationUnloadedEvent.class,
+                                                new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
                                                     @Override
                                                     public void eventOccurred(
-                                                            SmeltApplicationMetaStateUnloadedEvent event) {
+                                                            SmeltApplicationSpecificationUnloadedEvent event) {
                                                         openDatabaseAction.setEnabled(false);
                                                     }
                                                 }));
@@ -121,15 +123,15 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                     }
                 }));
 
-        // Make sure we initialized the Smelt data model whenever the application meta-state is initialized.
-        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateInitializedEvent.class, (
-                SmeltApplicationMetaStateInitializedEvent event) -> {
+        // Make sure we initialized the Smelt data model whenever the application specification is initialized.
+        model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationInitializedEvent.class, (
+                SmeltApplicationSpecificationInitializedEvent event) -> {
             DataModelPlugin.this.model = new SmeltDataModel();
         }));
 
-        // If the application meta-state is unloaded, we dump the database and the model.
-        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateUnloadedEvent.class, (
-                SmeltApplicationMetaStateUnloadedEvent event) -> {
+        // If the application specification is unloaded, we dump the database and the model.
+        model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationUnloadedEvent.class, (
+                SmeltApplicationSpecificationUnloadedEvent event) -> {
             // TODO: wipe database as well
                 DataModelPlugin.this.model = null;
             }));

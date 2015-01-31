@@ -16,8 +16,8 @@ import org.apache.commons.io.filefilter.OrFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import com.bahj.smelt.SmeltApplicationModel;
-import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
-import com.bahj.smelt.event.SmeltApplicationMetaStateUnloadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
+import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
 import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
@@ -68,7 +68,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         GUIConstructionContextImpl guiContext = new GUIConstructionContextImpl();
 
                         // Add options to open and close Smelt descriptor files (triggering the parsing of the AST and
-                        // the configuration of the application metastate.
+                        // the configuration of the application specification.
                         final Action openSpecificationAction = new BasicAction(
                                 (ActionEvent e) -> performOpenSmeltSpecification());
                         final Action closeSpecificationAction = new BasicAction(
@@ -79,17 +79,17 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
 
                         // We can only close the Smelt specification if one has been opened.
                         closeSpecificationAction.setEnabled(false);
-                        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateLoadedEvent.class,
-                                new EventListener<SmeltApplicationMetaStateLoadedEvent>() {
+                        model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationLoadedEvent.class,
+                                new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
                                     @Override
-                                    public void eventOccurred(SmeltApplicationMetaStateLoadedEvent event) {
+                                    public void eventOccurred(SmeltApplicationSpecificationLoadedEvent event) {
                                         closeSpecificationAction.setEnabled(true);
                                     }
                                 }));
-                        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateUnloadedEvent.class,
-                                new EventListener<SmeltApplicationMetaStateUnloadedEvent>() {
+                        model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationUnloadedEvent.class,
+                                new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
                                     @Override
-                                    public void eventOccurred(SmeltApplicationMetaStateUnloadedEvent event) {
+                                    public void eventOccurred(SmeltApplicationSpecificationUnloadedEvent event) {
                                         closeSpecificationAction.setEnabled(false);
                                     }
                                 }));
@@ -172,7 +172,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
         int result = chooser.showOpenDialog(this.frame);
         if (result == JFileChooser.APPROVE_OPTION) {
             try {
-                this.model.loadApplicationMetaState(chooser.getSelectedFile());
+                this.model.loadApplicationSpecification(chooser.getSelectedFile());
             } catch (IOException e) {
                 throw new NotYetImplementedException(e);
             } catch (SmeltParseFailureException e) {
@@ -182,6 +182,6 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     }
 
     private void performCloseSmeltSpecification() {
-        this.model.unloadApplicationMetaState();
+        this.model.unloadApplicationSpecification();
     }
 }
