@@ -1,11 +1,11 @@
-package com.bahj.smelt.plugin.builtin.data.model;
+package com.bahj.smelt.plugin.builtin.data.model.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bahj.smelt.plugin.builtin.data.event.DataModelEvent;
-import com.bahj.smelt.plugin.builtin.data.type.SmeltType;
-import com.bahj.smelt.plugin.builtin.data.type.TextType;
+import com.bahj.smelt.plugin.builtin.data.model.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 
 /**

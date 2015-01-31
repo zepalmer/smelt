@@ -1,6 +1,6 @@
-package com.bahj.smelt.plugin.builtin.data.type;
+package com.bahj.smelt.plugin.builtin.data.model.type;
 
-import com.bahj.smelt.plugin.builtin.data.value.SmeltString;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltString;
 
 /**
  * The primitive Smelt type representing a textual value.

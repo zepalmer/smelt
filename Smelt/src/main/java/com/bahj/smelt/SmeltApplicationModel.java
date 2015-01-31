@@ -6,18 +6,20 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import com.bahj.smelt.configuration.ApplicationModelCreationException;
 import com.bahj.smelt.configuration.Configuration;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationEvent;
+import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationInitializedEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
-import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.ReadOnlySmeltPluginRegistryProxy;
 import com.bahj.smelt.plugin.SmeltPlugin;
@@ -53,29 +55,33 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
     public SmeltApplicationModel(Configuration configuration) throws ApplicationModelCreationException {
         this.pluginRegistry = new SmeltPluginRegistryImpl();
         this.applicationSpecificationLoaded = false;
-
-        for (Class<? extends SmeltPlugin> pluginClass : configuration.getPlugins()) {
-            instantiateAndRegisterPlugin(pluginClass);
-        }
-
-        // Check that all runtime dependencies are fulfilled.
-        // TODO: consider just grabbing all of the dependent classes as well.
-        // The only reason not to do that is to prevent confusion about why plugins are being loaded, and the GUI
-        // could easily provide a mechanism for ascertaining that.
-        for (SmeltPlugin plugin : this.pluginRegistry.asMap().values()) {
+        
+        Queue<Class<? extends SmeltPlugin>> desiredPluginClasses = new LinkedList<>(configuration.getPlugins());
+        
+        // As long as there are more classes the load, load a class.
+        while (!desiredPluginClasses.isEmpty()) {
+            // Grab a class to load.
+            Class<? extends SmeltPlugin> pluginClass = desiredPluginClasses.poll();
+            // If it already exists in the registry, skip it.
+            if (this.pluginRegistry.getPlugin(pluginClass) != null) {
+                continue;
+            }
+            // Instantiate and register it with the plugin registry.
+            SmeltPlugin plugin = instantiateAndRegisterPlugin(pluginClass);
+            // Ensure that all of its runtime dependencies will be fulfilled.
             for (Class<? extends SmeltPlugin> dependency : plugin.getRuntimeDependencyTypes()) {
-                if (this.pluginRegistry.getPlugin(dependency) == null) {
-                    throw new ApplicationModelCreationException("Plugin " + plugin.getClass() + " requires plugin "
-                            + dependency.getClass() + " but the latter was not to be loaded.");
-                }
+                desiredPluginClasses.offer(dependency);                
             }
         }
+        
+        // TODO: provide a mechanism somewhere for inspecting dependencies in the GUI
+        // the automatic loading above could get difficult to understand
 
         fireEvent(new SmeltApplicationConfigurationLoadedEvent(this, configuration));
         fireEvent(new SmeltApplicationPluginsConfiguredEvent(this));
     }
 
-    private <T extends SmeltPlugin> void instantiateAndRegisterPlugin(Class<T> pluginClass)
+    private <T extends SmeltPlugin> T instantiateAndRegisterPlugin(Class<T> pluginClass)
             throws ApplicationModelCreationException {
         T plugin;
         try {
@@ -86,6 +92,7 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
         }
         this.pluginRegistry.registerPlugin(pluginClass, plugin);
         plugin.registeredToApplicationModel(this);
+        return plugin;
     }
 
     /**

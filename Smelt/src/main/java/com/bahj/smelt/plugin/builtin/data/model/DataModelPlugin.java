@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.data;
+package com.bahj.smelt.plugin.builtin.data.model;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,13 +20,13 @@ import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
 import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
 import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
-import com.bahj.smelt.plugin.builtin.data.event.DataModelEvent;
-import com.bahj.smelt.plugin.builtin.data.event.DatabaseClosedEvent;
-import com.bahj.smelt.plugin.builtin.data.event.DatabaseOpenedEvent;
-import com.bahj.smelt.plugin.builtin.data.model.DuplicateTypeNameException;
-import com.bahj.smelt.plugin.builtin.data.model.SmeltDataModel;
-import com.bahj.smelt.plugin.builtin.data.type.DataType;
-import com.bahj.smelt.plugin.builtin.data.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException;
+import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
+import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;

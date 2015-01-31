@@ -1,9 +1,9 @@
-package com.bahj.smelt.plugin.builtin.data.value;
+package com.bahj.smelt.plugin.builtin.data.model.value;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bahj.smelt.plugin.builtin.data.type.DataType;
+import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 
 public class SmeltDatum implements SmeltValue {
 	private Map<String, SmeltValue> properties;

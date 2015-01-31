@@ -1,10 +1,10 @@
-package com.bahj.smelt.plugin.builtin.data.type;
+package com.bahj.smelt.plugin.builtin.data.model.type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.bahj.smelt.plugin.builtin.data.value.SmeltEnumValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltEnumValue;
 
 /**
  * Represents a structured enumerated type in a Smelt data model.

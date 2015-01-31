@@ -1,10 +1,10 @@
-package com.bahj.smelt.plugin.builtin.data.type;
+package com.bahj.smelt.plugin.builtin.data.model.type;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bahj.smelt.plugin.builtin.data.value.SmeltDatum;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
 
 /**
  * Represents a structured data type in Smelt.

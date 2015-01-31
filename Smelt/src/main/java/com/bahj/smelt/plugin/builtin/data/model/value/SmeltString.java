@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.data.value;
+package com.bahj.smelt.plugin.builtin.data.model.value;
 
 public class SmeltString implements SmeltValue {
 	private String value;

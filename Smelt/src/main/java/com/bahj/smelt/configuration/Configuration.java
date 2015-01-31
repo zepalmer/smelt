@@ -21,7 +21,7 @@ import com.bahj.smelt.serialization.SmeltStringSerializationStrategy;
 public class Configuration {
     // @formatter:off
     public static final String[] DEFAULT_PLUGIN_NAMES = new String[] {
-        "com.bahj.smelt.plugin.builtin.data.DataModelPlugin",
+        "com.bahj.smelt.plugin.builtin.data.DataPlugin",
         "com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin"
     };
     // @formatter:on

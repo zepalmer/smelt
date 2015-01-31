@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.data.event;
+package com.bahj.smelt.plugin.builtin.data.model.event;
 
 import com.bahj.smelt.util.event.Event;
 

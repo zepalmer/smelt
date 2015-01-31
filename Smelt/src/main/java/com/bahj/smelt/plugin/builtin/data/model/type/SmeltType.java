@@ -1,6 +1,6 @@
-package com.bahj.smelt.plugin.builtin.data.type;
+package com.bahj.smelt.plugin.builtin.data.model.type;
 
-import com.bahj.smelt.plugin.builtin.data.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
 /**
  * An interface representing a type in a Smelt data model.

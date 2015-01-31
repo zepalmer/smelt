@@ -1,6 +1,6 @@
-package com.bahj.smelt.plugin.builtin.data.model;
+package com.bahj.smelt.plugin.builtin.data.model.model;
 
-import com.bahj.smelt.plugin.builtin.data.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 
 /**
  * Raised when a type of a duplicate name is added to a Smelt data model.
