@@ -1,7 +1,9 @@
 package com.bahj.smelt.plugin.builtin.editor;
 
 import java.awt.CardLayout;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.Action;
@@ -99,8 +101,8 @@ public class EditorPlugin implements SmeltPlugin {
 
     @Override
     public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes() {
-        // Clearly, this plugin requires the base data model plugin to work.
-        return Collections.singleton(DataModelPlugin.class);
+        // Clearly, this plugin requires the base data model plugin to work.  It also requires the base GUI.
+        return new HashSet<>(Arrays.asList(BaseGUIPlugin.class, DataModelPlugin.class));
     }
 
     @Override
