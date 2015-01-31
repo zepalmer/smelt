@@ -3,6 +3,7 @@ package com.bahj.smelt.plugin.builtin.basegui.context;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -33,15 +34,10 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
     }
 
     @Override
-    public Action constructExecutionAction(final Consumer<? super GUIExecutionContext> actionFunction) {
-        return new AbstractAction() {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                actionFunction.accept(executionContextReference.getValue());
-            }
-        };
+    public Action constructExecutionAction(final Function<Action, Consumer<? super GUIExecutionContext>> actionFunction) {
+        GUIAction action = new GUIAction();
+        action.setBehavior(actionFunction.apply(action));
+        return action;
     }
 
     public StrongReference<GUIExecutionContext> getExecutionContextReference() {
@@ -50,5 +46,20 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
 
     public SmeltNestedMenu getMenuBar() {
         return menuBar;
+    }
+
+    private class GUIAction extends AbstractAction {
+        private static final long serialVersionUID = 1L;
+        
+        private Consumer<? super GUIExecutionContext> behavior = null;
+
+        public void setBehavior(Consumer<? super GUIExecutionContext> behavior) {
+            this.behavior = behavior;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            this.behavior.accept(executionContextReference.getValue());
+        }
     }
 }

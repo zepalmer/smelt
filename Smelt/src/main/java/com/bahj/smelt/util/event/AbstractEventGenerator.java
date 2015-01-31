@@ -1,5 +1,6 @@
 package com.bahj.smelt.util.event;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,7 +33,8 @@ public abstract class AbstractEventGenerator<T extends Event> implements EventGe
      */
     protected <U extends T> void fireEvent(U event) {
         // NOTE: The type parameter on this function wouldn't be strictly necessary but helps the type inference engine.
-        for (EventListener<? super T> listener : listeners) {
+        // NOTE: The copy is created below to allow listeners to add listeners (usually for other event types).
+        for (EventListener<? super T> listener : new ArrayList<EventListener<? super T>>(listeners)) {
             listener.eventOccurred(event);
         }
     }

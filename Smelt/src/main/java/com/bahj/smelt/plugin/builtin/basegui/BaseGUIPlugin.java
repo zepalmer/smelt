@@ -112,6 +112,11 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     }
 
     @Override
+    public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes() {
+        return Collections.emptySet();
+    }
+
+    @Override
     public boolean claimsDeclaration(SmeltPluginDeclarationHandlerContext context, DeclarationNode declarationNode) {
         // This plugin claims no declarations.
         return false;

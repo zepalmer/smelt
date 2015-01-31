@@ -1,17 +1,29 @@
 package com.bahj.smelt.plugin.builtin.data;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.Action;
+
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
-import com.bahj.smelt.event.SmeltApplicationEvent;
+import com.bahj.smelt.event.SmeltApplicationMetaStateInitializedEvent;
+import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
+import com.bahj.smelt.event.SmeltApplicationMetaStateUnloadedEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
+import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
+import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
+import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
+import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
+import com.bahj.smelt.plugin.builtin.data.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.event.DatabaseClosedEvent;
+import com.bahj.smelt.plugin.builtin.data.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.DuplicateTypeNameException;
 import com.bahj.smelt.plugin.builtin.data.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.type.DataType;
@@ -23,16 +35,20 @@ import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
 import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
 import com.bahj.smelt.syntax.ast.impl.MessageNodeImpl;
 import com.bahj.smelt.util.NotYetImplementedException;
+import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
 
-public class DataModelPlugin implements SmeltPlugin {
-    private SmeltDataModel model = new SmeltDataModel();
+public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> implements SmeltPlugin {
+    /** The model for this plugin. */
+    private SmeltDataModel model = null;
+
+    // TODO: field for the database
 
     @Override
-    public void registeredToApplicationModel(SmeltApplicationModel model) {
-        // Time to add the appropriate listener to the application model so that we can add components to the GUI.
-        EventListener<SmeltApplicationEvent> listener = new TypedEventListener<>(
+    public void registeredToApplicationModel(final SmeltApplicationModel model) {
+        // Make sure that we add components to the GUI after the configuration is loaded.
+        model.addListener(new TypedEventListener<>(
                 SmeltApplicationConfigurationLoadedEvent.class,
                 new EventListener<SmeltApplicationConfigurationLoadedEvent>() {
                     @Override
@@ -40,10 +56,84 @@ public class DataModelPlugin implements SmeltPlugin {
                         // Make sure we add the appropriate content to the Smelt GUI. This consists of the menu
                         // items necessary to activate the opening and closing of databases.
                         SmeltApplicationModel model = event.getApplicationModel();
-                        // TODO
+                        BaseGUIPlugin guiPlugin = model.getPluginRegistry().getPlugin(BaseGUIPlugin.class);
+                        guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializingEvent.class,
+                                new EventListener<BaseGUIInitializingEvent>() {
+                                    @Override
+                                    public void eventOccurred(BaseGUIInitializingEvent event) {
+                                        final Action openDatabaseAction = event.getContext().constructExecutionAction(
+                                                (Action action) -> (GUIExecutionContext context) -> {
+                                                    // TODO: present GUI, then open file
+                                                });
+                                        final Action closeDatabaseAction = event.getContext().constructExecutionAction(
+                                                (Action action) -> (GUIExecutionContext context) -> {
+                                                    // TODO: close file, probably with confirmation dialogs
+                                                });
+
+                                        openDatabaseAction.setEnabled(false);
+                                        closeDatabaseAction.setEnabled(false);
+
+                                        event.getContext().addMenuItemGroup(
+                                                "File",
+                                                Arrays.asList(new SmeltBasicMenuItem("Open Database",
+                                                        openDatabaseAction), new SmeltBasicMenuItem("Close Database",
+                                                        closeDatabaseAction)));
+
+                                        // When the meta-state is loaded, the "open database" action can be taken.
+                                        model.addListener(new TypedEventListener<>(
+                                                SmeltApplicationMetaStateLoadedEvent.class,
+                                                new EventListener<SmeltApplicationMetaStateLoadedEvent>() {
+                                                    @Override
+                                                    public void eventOccurred(SmeltApplicationMetaStateLoadedEvent event) {
+                                                        openDatabaseAction.setEnabled(true);
+                                                    }
+                                                }));
+
+                                        // When a database is opened, the "close database" action can be taken.
+                                        DataModelPlugin.this.addListener(new TypedEventListener<>(
+                                                DatabaseOpenedEvent.class, new EventListener<DatabaseOpenedEvent>() {
+                                                    @Override
+                                                    public void eventOccurred(DatabaseOpenedEvent event) {
+                                                        closeDatabaseAction.setEnabled(true);
+                                                    }
+                                                }));
+
+                                        // When the database is closed, the "close database" action cannot be taken.
+                                        DataModelPlugin.this.addListener(new TypedEventListener<>(
+                                                DatabaseClosedEvent.class, new EventListener<DatabaseClosedEvent>() {
+                                                    @Override
+                                                    public void eventOccurred(DatabaseClosedEvent event) {
+                                                        closeDatabaseAction.setEnabled(false);
+                                                    }
+                                                }));
+
+                                        // When the meta-state is unloaded, the "open database" action cannot be taken.
+                                        model.addListener(new TypedEventListener<>(
+                                                SmeltApplicationMetaStateUnloadedEvent.class,
+                                                new EventListener<SmeltApplicationMetaStateUnloadedEvent>() {
+                                                    @Override
+                                                    public void eventOccurred(
+                                                            SmeltApplicationMetaStateUnloadedEvent event) {
+                                                        openDatabaseAction.setEnabled(false);
+                                                    }
+                                                }));
+                                    }
+                                }));
                     }
-                });
-        model.addListener(listener);
+                }));
+
+        // Make sure we initialized the Smelt data model whenever the application meta-state is initialized.
+        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateInitializedEvent.class, (
+                SmeltApplicationMetaStateInitializedEvent event) -> {
+            DataModelPlugin.this.model = new SmeltDataModel();
+        }));
+
+        // If the application meta-state is unloaded, we dump the database and the model.
+        model.addListener(new TypedEventListener<>(SmeltApplicationMetaStateUnloadedEvent.class, (
+                SmeltApplicationMetaStateUnloadedEvent event) -> {
+            // TODO: wipe database as well
+                DataModelPlugin.this.model = null;
+            }));
     }
 
     @Override
@@ -51,6 +141,11 @@ public class DataModelPlugin implements SmeltPlugin {
         // While the data declaration plugin does depend on the GUI plugin for GUI layout, it does not have any
         // dependency in terms of declaration handling order.
         return Collections.emptySet();
+    }
+
+    @Override
+    public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes() {
+        return Collections.singleton(BaseGUIPlugin.class);
     }
 
     @Override
@@ -68,7 +163,7 @@ public class DataModelPlugin implements SmeltPlugin {
     public void processDeclarations(final SmeltPluginDeclarationHandlerContext context,
             Set<DeclarationNode> declarationNodes) throws DeclarationProcessingException {
         // This process is sort of non-trivial. We want to allow the declarations to be provided unordered, but there
-        // must be a DAG of dependencies in their definitions. (All data types are embedded -- there is no indirection
+        // must be a DAG of dependencies in their definitions. All data types are embedded -- there is no indirection
         // -- so no cyclic types need be created, but we might need to initialize a new data type during the middle of
         // initializing another. We accomplish this by keeping a dictionary of unhandled declarations and gradually
         // (and statefully) consuming them, raising the appropriate exceptions in the case of a problem.

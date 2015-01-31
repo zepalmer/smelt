@@ -3,6 +3,7 @@ package com.bahj.smelt.plugin;
 import java.util.Set;
 
 import com.bahj.smelt.SmeltApplicationModel;
+import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 
 /**
@@ -29,6 +30,12 @@ public interface SmeltPlugin {
      * @return The types on which this plugin depends.
      */
     public Set<Class<? extends SmeltPlugin>> getDeclarationDependencyTypes();
+    
+    /**
+     * Determines the set of runtime dependencies for this plugin.  This method returns the set of plugin types which
+     * must be loaded by the time the {@link SmeltApplicationMetaStateLoadedEvent} is fired.
+     */
+    public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes();
 
     /**
      * Determines whether this plugin is responsible for the provided declaration in a Smelt configuration file.

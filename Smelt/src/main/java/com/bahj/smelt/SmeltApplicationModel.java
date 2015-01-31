@@ -15,9 +15,11 @@ import com.bahj.smelt.event.SmeltApplicationMetaStateLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationMetaStateUnloadedEvent;
 import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
+import com.bahj.smelt.plugin.ReadOnlySmeltPluginRegistryProxy;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.SmeltPluginRegistry;
+import com.bahj.smelt.plugin.SmeltPluginRegistryImpl;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.DocumentNode;
 import com.bahj.smelt.util.NotYetImplementedException;
@@ -33,7 +35,7 @@ import com.bahj.smelt.util.partialorder.PartialOrderUtils;
  * @author Zachary Palmer
  */
 public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicationEvent> {
-    private SmeltPluginRegistry pluginRegistry;
+    private SmeltPluginRegistryImpl pluginRegistry;
     private boolean applicationMetaStateLoaded;
 
     /**
@@ -43,12 +45,26 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
      *            The configuration to load.
      */
     public SmeltApplicationModel(Configuration configuration) throws ApplicationModelCreationException {
-        this.pluginRegistry = new SmeltPluginRegistry();
+        this.pluginRegistry = new SmeltPluginRegistryImpl();
         this.applicationMetaStateLoaded = false;
 
         for (Class<? extends SmeltPlugin> pluginClass : configuration.getPlugins()) {
             instantiateAndRegisterPlugin(pluginClass);
         }
+
+        // Check that all runtime dependencies are fulfilled.
+        // TODO: consider just grabbing all of the dependent classes as well.
+        // The only reason not to do that is to prevent confusion about why plugins are being loaded, and the GUI
+        // could easily provide a mechanism for ascertaining that.
+        for (SmeltPlugin plugin : this.pluginRegistry.asMap().values()) {
+            for (Class<? extends SmeltPlugin> dependency : plugin.getRuntimeDependencyTypes()) {
+                if (this.pluginRegistry.getPlugin(dependency) == null) {
+                    throw new ApplicationModelCreationException("Plugin " + plugin.getClass() + " requires plugin "
+                            + dependency.getClass() + " but the latter was not to be loaded.");
+                }
+            }
+        }
+
         fireEvent(new SmeltApplicationConfigurationLoadedEvent(this, configuration));
         fireEvent(new SmeltApplicationPluginsConfiguredEvent(this));
     }
@@ -105,8 +121,7 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
 
             // For each node in the document, determine how it is to be handled.
             // TODO: consider: can this logic be abstracted and reused when we start handling the extra attributes of
-            // data
-            // declarations (e.g. the LaTeX plugin)?
+            // data declarations (e.g. the LaTeX plugin)?
             SmeltPluginDeclarationHandlerContext context = new SmeltPluginDeclarationHandlerContext(this);
             Map<SmeltPlugin, Set<DeclarationNode>> declarationMapping = new HashMap<>();
             for (DeclarationNode declarationNode : document.getDeclarations()) {
@@ -174,4 +189,9 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
     public boolean isApplicationMetaStateLoaded() {
         return this.applicationMetaStateLoaded;
     }
+
+    public SmeltPluginRegistry getPluginRegistry() {
+        return new ReadOnlySmeltPluginRegistryProxy(pluginRegistry);
+    }
+
 }
