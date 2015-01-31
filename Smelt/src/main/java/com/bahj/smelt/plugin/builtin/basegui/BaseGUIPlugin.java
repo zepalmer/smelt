@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.basegui;
 
+import java.awt.Dimension;
+import java.awt.DisplayMode;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.Arrays;
@@ -16,9 +18,9 @@ import org.apache.commons.io.filefilter.OrFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import com.bahj.smelt.SmeltApplicationModel;
+import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
-import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContext;
@@ -56,6 +58,8 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     private BaseGUIFrame frame;
     /** The model to which this plugin is registered. */
     private SmeltApplicationModel model;
+    
+    private static final double FRAME_DISPLAY_RATIO = 0.6;
 
     @Override
     public void registeredToApplicationModel(final SmeltApplicationModel model) {
@@ -118,9 +122,13 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         // Let everyone know the GUI's finished.
                         fireEvent(new BaseGUIInitializedEvent());
 
-                        // And now show it.
+                        // And now show it.  (We can't just pack the frame 
+                        // TODO: change to dispatching a closing event for the GUI plugin so other plugins have a chance
+                        //       to persist data, prompt the user, or even object to closing.
                         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                        frame.pack();
+                        DisplayMode displayMode = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
+                        frame.setSize(new Dimension((int)(displayMode.getWidth()*FRAME_DISPLAY_RATIO),
+                                (int)(displayMode.getHeight()*FRAME_DISPLAY_RATIO)));
                         frame.setLocationRelativeTo(null);
                         frame.setVisible(true);
                     }
