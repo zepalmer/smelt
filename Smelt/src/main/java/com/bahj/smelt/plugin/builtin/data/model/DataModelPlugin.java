@@ -180,4 +180,12 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
             processor.processDeclaration(name);
         }
     }
+
+    /**
+     * Retrieves the Smelt data model currently in use by this plugin.
+     * @return The data model in use by this plugin.
+     */
+    public SmeltDataModel getModel() {
+        return model;
+    }
 }
