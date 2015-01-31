@@ -15,6 +15,11 @@ public class SmeltBasicMenuItem extends SmeltAbstractMenuItem {
         this.action = action;
     }
 
+    public SmeltBasicMenuItem(String name, Integer suggestedMnemonic, Action action) {
+        super(name, suggestedMnemonic);
+        this.action = action;
+    }
+
     /**
      * The action to take when the menu item is selected.
      * @return The action to take.
