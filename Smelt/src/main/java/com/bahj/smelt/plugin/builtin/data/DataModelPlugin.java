@@ -61,11 +61,11 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                                     @Override
                                     public void eventOccurred(BaseGUIInitializingEvent event) {
                                         final Action openDatabaseAction = event.getContext().constructExecutionAction(
-                                                (Action action) -> (GUIExecutionContext context) -> {
+                                                (GUIExecutionContext context) -> {
                                                     // TODO: present GUI, then open file
                                                 });
                                         final Action closeDatabaseAction = event.getContext().constructExecutionAction(
-                                                (Action action) -> (GUIExecutionContext context) -> {
+                                                (GUIExecutionContext context) -> {
                                                     // TODO: close file, probably with confirmation dialogs
                                                 });
 

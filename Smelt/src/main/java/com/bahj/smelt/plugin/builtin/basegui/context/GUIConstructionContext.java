@@ -2,7 +2,6 @@ package com.bahj.smelt.plugin.builtin.basegui.context;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.swing.Action;
 
@@ -36,5 +35,5 @@ public interface GUIConstructionContext {
      *            consumer which should be executed when the action is taken.
      * @return The resulting action.
      */
-    public Action constructExecutionAction(Function<Action, Consumer<? super GUIExecutionContext>> actionFunction);
+    public Action constructExecutionAction(Consumer<? super GUIExecutionContext> actionFunction);
 }

@@ -3,7 +3,6 @@ package com.bahj.smelt.plugin.builtin.basegui.context;
 import java.awt.event.ActionEvent;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -34,10 +33,8 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
     }
 
     @Override
-    public Action constructExecutionAction(final Function<Action, Consumer<? super GUIExecutionContext>> actionFunction) {
-        GUIAction action = new GUIAction();
-        action.setBehavior(actionFunction.apply(action));
-        return action;
+    public Action constructExecutionAction(Consumer<? super GUIExecutionContext> actionFunction) {
+        return new GUIAction(actionFunction);
     }
 
     public StrongReference<GUIExecutionContext> getExecutionContextReference() {
@@ -50,10 +47,11 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
 
     private class GUIAction extends AbstractAction {
         private static final long serialVersionUID = 1L;
-        
-        private Consumer<? super GUIExecutionContext> behavior = null;
 
-        public void setBehavior(Consumer<? super GUIExecutionContext> behavior) {
+        private Consumer<? super GUIExecutionContext> behavior;
+
+        public GUIAction(Consumer<? super GUIExecutionContext> behavior) {
+            super();
             this.behavior = behavior;
         }
 
