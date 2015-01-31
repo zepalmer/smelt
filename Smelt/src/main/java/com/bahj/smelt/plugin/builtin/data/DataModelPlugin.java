@@ -1,6 +1,5 @@
 package com.bahj.smelt.plugin.builtin.data;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,61 +59,82 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                                 new EventListener<BaseGUIInitializingEvent>() {
                                     @Override
                                     public void eventOccurred(BaseGUIInitializingEvent event) {
+                                        final Action newDatabaseAction = event.getContext().constructExecutionAction(
+                                                (GUIExecutionContext context) -> {
+                                                    // TODO: create new in-memory database
+                                                });
                                         final Action openDatabaseAction = event.getContext().constructExecutionAction(
                                                 (GUIExecutionContext context) -> {
                                                     // TODO: present GUI, then open file
                                                 });
+                                        final Action saveDatabaseAction = event.getContext().constructExecutionAction(
+                                                (GUIExecutionContext context) -> {
+                                                    // TODO: save file to known filename (or present GUI if necessary)
+                                                });
+                                        final Action saveDatabaseAsAction = event.getContext()
+                                                .constructExecutionAction((GUIExecutionContext context) -> {
+                                                    // TODO: present GUI, then save file
+                                                    });
                                         final Action closeDatabaseAction = event.getContext().constructExecutionAction(
                                                 (GUIExecutionContext context) -> {
                                                     // TODO: close file, probably with confirmation dialogs
                                                 });
 
+                                        newDatabaseAction.setEnabled(false);
                                         openDatabaseAction.setEnabled(false);
+                                        saveDatabaseAction.setEnabled(false);
+                                        saveDatabaseAsAction.setEnabled(false);
                                         closeDatabaseAction.setEnabled(false);
 
-                                        event.getContext().addMenuItemGroup(
-                                                "File",
-                                                Arrays.asList(new SmeltBasicMenuItem("Open Database",
-                                                        openDatabaseAction), new SmeltBasicMenuItem("Close Database",
-                                                        closeDatabaseAction)));
+                                        event.getContext().addMenuItemGroup("File",
+                                                new SmeltBasicMenuItem("New Database", newDatabaseAction),
+                                                new SmeltBasicMenuItem("Open Database", openDatabaseAction),
+                                                new SmeltBasicMenuItem("Save Database", saveDatabaseAction),
+                                                new SmeltBasicMenuItem("Save Database As...", saveDatabaseAsAction),
+                                                new SmeltBasicMenuItem("Close Database", closeDatabaseAction));
 
-                                        // When the specification is loaded, the "open database" action can be taken.
+                                        // When the specification is loaded, databases can be opened.
                                         model.addListener(new TypedEventListener<>(
                                                 SmeltApplicationSpecificationLoadedEvent.class,
                                                 new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
                                                     @Override
                                                     public void eventOccurred(
                                                             SmeltApplicationSpecificationLoadedEvent event) {
+                                                        newDatabaseAction.setEnabled(true);
                                                         openDatabaseAction.setEnabled(true);
                                                     }
                                                 }));
 
-                                        // When a database is opened, the "close database" action can be taken.
+                                        // When a database is opened, it can be saved or closed.
                                         DataModelPlugin.this.addListener(new TypedEventListener<>(
                                                 DatabaseOpenedEvent.class, new EventListener<DatabaseOpenedEvent>() {
                                                     @Override
                                                     public void eventOccurred(DatabaseOpenedEvent event) {
+                                                        saveDatabaseAction.setEnabled(true);
+                                                        saveDatabaseAsAction.setEnabled(true);
                                                         closeDatabaseAction.setEnabled(true);
                                                     }
                                                 }));
 
-                                        // When the database is closed, the "close database" action cannot be taken.
+                                        // When the database is closed, it can no longer be saved or closed.
                                         DataModelPlugin.this.addListener(new TypedEventListener<>(
                                                 DatabaseClosedEvent.class, new EventListener<DatabaseClosedEvent>() {
                                                     @Override
                                                     public void eventOccurred(DatabaseClosedEvent event) {
+                                                        saveDatabaseAction.setEnabled(false);
+                                                        saveDatabaseAsAction.setEnabled(false);
                                                         closeDatabaseAction.setEnabled(false);
                                                     }
                                                 }));
 
-                                        // When the specification is unloaded, the "open database" action cannot be
-                                        // taken.
+                                        // When the specification is unloaded, databases can no longer be opened.
                                         model.addListener(new TypedEventListener<>(
                                                 SmeltApplicationSpecificationUnloadedEvent.class,
                                                 new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
                                                     @Override
                                                     public void eventOccurred(
                                                             SmeltApplicationSpecificationUnloadedEvent event) {
+                                                        newDatabaseAction.setEnabled(false);
                                                         openDatabaseAction.setEnabled(false);
                                                     }
                                                 }));

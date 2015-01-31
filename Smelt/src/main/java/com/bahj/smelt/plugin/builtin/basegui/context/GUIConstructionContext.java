@@ -1,5 +1,6 @@
 package com.bahj.smelt.plugin.builtin.basegui.context;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -25,6 +26,20 @@ public interface GUIConstructionContext {
      */
     public void addMenuItemGroup(String menuName, List<? extends SmeltMenuItem> items);
 
+    /**
+     * Adds a group of menu items to the menu bar of the Smelt GUI. If the menu does not yet exist, it is created.
+     * Mnemonics are assigned automatically based on the keys which are currently available. The group will be separated
+     * from other groups by standard menu separators.
+     * 
+     * @param menuName
+     *            The name of the menu to which to add the item.
+     * @param items
+     *            The items to add.
+     */
+    default public void addMenuItemGroup(String menuName, SmeltMenuItem... items) {
+        addMenuItemGroup(menuName, Arrays.asList(items));
+    }
+    
     /**
      * Creates an {@link Action} based on a {@link GUIExecutionContext}. This allows the behavior of plugins' GUI
      * components to be defined independent of the concrete GUI but in reference to GUI-related functionality exposed
