@@ -16,11 +16,19 @@ import com.bahj.smelt.util.NotYetImplementedException;
  *
  */
 public class Smelt {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassCastException {
         Configuration configuration = null;
         try {
             configuration = SerializationUtils.readFile(FileUtils.CONFIGURATION_FILE,
-                    Configuration.SerializationStrategy.INSTANCE, () -> new Configuration());
+                    Configuration.SerializationStrategy.INSTANCE, () -> {
+                        try {
+                            return Configuration.createDefaultConfiguration();
+                        } catch (ClassCastException e) {
+                            throw new IllegalStateException("Default plugin class is not a plugin type!", e);
+                        } catch (ClassNotFoundException e) {
+                            throw new IllegalStateException("Default plugin class not found!", e);
+                        }
+                    });
         } catch (DeserializationException e) {
             throw new NotYetImplementedException(e);
         } catch (IOException e) {
