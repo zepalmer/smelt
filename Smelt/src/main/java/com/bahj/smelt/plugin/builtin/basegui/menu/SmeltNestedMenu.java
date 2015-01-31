@@ -40,6 +40,7 @@ public class SmeltNestedMenu extends SmeltAbstractMenuItem {
                 .map(List::stream)
                 .reduce(Stream::concat)
                 .orElse(Stream.empty())
+                .filter((SmeltMenuItem item) -> item.getName().equals(name))
                 .findFirst()
                 .orElse(null);
         // @formatter:on

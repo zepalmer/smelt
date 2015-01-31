@@ -55,7 +55,7 @@ public class SmeltTabPanel extends JPanel {
         this.tabbedPane.insertTab(tab.getTitle(), null, tab.getContents(), null, this.tabbedPane.getTabCount());
 
         // Change the header for the tab so that it has a closing button.
-        this.tabbedPane.setTabComponentAt(this.tabbedPane.getTabCount(), new TabComponent(tab));
+        this.tabbedPane.setTabComponentAt(this.tabbedPane.getTabCount() - 1, new TabComponent(tab));
     }
 
     /**
@@ -97,7 +97,7 @@ public class SmeltTabPanel extends JPanel {
 
             this.setLayout(new BorderLayout());
             this.add(new JLabel(tab.getTitle()), BorderLayout.CENTER);
-            this.add(closeButton);
+            this.add(closeButton, BorderLayout.EAST);
 
             // TODO: icon instead
             closeButton.setText("x");
