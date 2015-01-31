@@ -36,6 +36,7 @@ import com.bahj.smelt.util.StrongReference;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
+import com.bahj.smelt.util.swing.BasicAction;
 import com.bahj.smelt.util.swing.SwingFileFilterWrapper;
 
 /**
@@ -68,22 +69,10 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
 
                         // Add options to open and close Smelt descriptor files (triggering the parsing of the AST and
                         // the configuration of the application metastate.
-                        final Action openSpecificationAction = new AbstractAction() {
-                            private static final long serialVersionUID = 1L;
-
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                performOpenSmeltSpecification();
-                            }
-                        };
-                        final Action closeSpecificationAction = new AbstractAction() {
-                            private static final long serialVersionUID = 1L;
-
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                performCloseSmeltSpecification();
-                            }
-                        };
+                        final Action openSpecificationAction = new BasicAction(
+                                (ActionEvent e) -> performOpenSmeltSpecification());
+                        final Action closeSpecificationAction = new BasicAction(
+                                (ActionEvent e) -> performCloseSmeltSpecification());
                         guiContext.addMenuItemGroup("File", Arrays.asList(new SmeltBasicMenuItem(
                                 "Open Smelt Specification", openSpecificationAction), new SmeltBasicMenuItem(
                                 "Close Smelt Specification", closeSpecificationAction)));
@@ -191,7 +180,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
             }
         }
     }
-    
+
     private void performCloseSmeltSpecification() {
         this.model.unloadApplicationMetaState();
     }
