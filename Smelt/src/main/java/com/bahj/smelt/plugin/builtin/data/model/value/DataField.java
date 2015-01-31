@@ -1,6 +1,6 @@
-package com.bahj.smelt.plugin.builtin.data.model.type;
+package com.bahj.smelt.plugin.builtin.data.model.value;
 
-import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 
 public class DataField<V extends SmeltValue<V>> {
 	private SmeltType<V> fieldType;

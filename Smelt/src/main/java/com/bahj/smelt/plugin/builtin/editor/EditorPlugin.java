@@ -49,7 +49,7 @@ public class EditorPlugin implements SmeltPlugin {
 
                         // Create the editor and tab. We put a card panel between the tab and the editor panel so we
                         // can hide the editor when no database is loaded.
-                        final EditorPanel editorPanel = new EditorPanel(guiPlugin.getBaseFrame());
+                        final EditorPanel editorPanel = new EditorPanel(guiPlugin.getBaseFrame(), dataModelPlugin);
                         final CardLayout cardLayout = new CardLayout(0, 0);
                         final JPanel containerPanel = new JPanel(cardLayout);
                         final String editorName = "editor";
