@@ -8,6 +8,9 @@ public class FileUtils {
     /** The file containing the serialized Smelt {@link Configuration}. */
     public static final File CONFIGURATION_FILE = FileUtils.getConfigFile("smelt.cfg");
     
+    /** The file extension for Smelt specification files.  (Does not include the leading dot.) */
+    public static final String SMELT_SPEC_EXTENSION = "spec.smelt";
+    
     /**
      * Creates a {@link File} object representing the location of a Smelt configuration file.
      * 

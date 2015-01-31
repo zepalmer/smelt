@@ -1,5 +1,9 @@
 package com.bahj.smelt;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +24,8 @@ import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.SmeltPluginRegistry;
 import com.bahj.smelt.plugin.SmeltPluginRegistryImpl;
+import com.bahj.smelt.syntax.SmeltParseFailureException;
+import com.bahj.smelt.syntax.SmeltParser;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.DocumentNode;
 import com.bahj.smelt.util.NotYetImplementedException;
@@ -27,6 +33,10 @@ import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.partialorder.InconsistentPartialOrderException;
 import com.bahj.smelt.util.partialorder.PartialOrderConstraint;
 import com.bahj.smelt.util.partialorder.PartialOrderUtils;
+
+/*
+ * TODO: naming consistency: "application meta-state" should be called "specification"  
+ */
 
 /**
  * This class represents the overall state of the Smelt application. It includes state for both the UI and the data
@@ -80,6 +90,20 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
         }
         this.pluginRegistry.registerPlugin(pluginClass, plugin);
         plugin.registeredToApplicationModel(this);
+    }
+
+    /**
+     * Loads an application metadata state from a file. This function simply parses the contents of the file (expecting
+     * a Smelt specifciation) and calls {@link #loadApplicationMetaState(DocumentNode)} with the result. Any errors
+     * encountered during reading and parsing are reported.
+     */
+    public void loadApplicationMetaState(File file) throws IOException, SmeltParseFailureException {
+        DocumentNode node;
+        try (FileInputStream fis = new FileInputStream(file)) {
+            SmeltParser parser = new SmeltParser(file.getPath());
+            node = parser.parse(fis);
+        }
+        loadApplicationMetaState(node);
     }
 
     /**
@@ -165,7 +189,7 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
             // warnings
             for (SmeltPlugin plugin : pluginProcessingOrder) {
                 try {
-                    plugin.processDeclarations(context, declarationMapping.get(plugin));
+                    plugin.processDeclarations(context, declarationMapping.getOrDefault(plugin, Collections.emptySet()));
                 } catch (DeclarationProcessingException e) {
                     throw new NotYetImplementedException(e);
                 }

@@ -55,11 +55,13 @@ public class PartialOrderUtils {
         StrongConnectivityInspector<T, DefaultEdge> strongConnectivityInspector = new StrongConnectivityInspector<>(
                 partialOrderGraph);
         List<Set<T>> components = strongConnectivityInspector.stronglyConnectedSets();
-        if (components.size()>0) {
-            throw new InconsistentPartialOrderException(components.get(0));
+        for (Set<T> stronglyConnectedComponent : components) {
+            if (stronglyConnectedComponent.size() > 1) {
+                throw new InconsistentPartialOrderException(components.get(0));
+            }
         }
-        
-        // Otherwise, there is no cycle in the graph.  That means we can just iterate a tie-breaking topological sort
+
+        // Otherwise, there is no cycle in the graph. That means we can just iterate a tie-breaking topological sort
         // to get our ordering.
         TopologicalOrderIterator<T, DefaultEdge> iterator = new TopologicalOrderIterator<T, DefaultEdge>(
                 partialOrderGraph, new PriorityQueue<T>(elements.size(), tieBreaker));

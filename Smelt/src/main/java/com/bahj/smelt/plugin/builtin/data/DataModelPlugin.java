@@ -48,8 +48,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
     @Override
     public void registeredToApplicationModel(final SmeltApplicationModel model) {
         // Make sure that we add components to the GUI after the configuration is loaded.
-        model.addListener(new TypedEventListener<>(
-                SmeltApplicationConfigurationLoadedEvent.class,
+        model.addListener(new TypedEventListener<>(SmeltApplicationConfigurationLoadedEvent.class,
                 new EventListener<SmeltApplicationConfigurationLoadedEvent>() {
                     @Override
                     public void eventOccurred(SmeltApplicationConfigurationLoadedEvent event) {
@@ -232,9 +231,9 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
                         MessageNodeDecorator fieldMessage = (MessageNodeDecorator) node;
                         fieldMessage.getHeader().insistNoNamedArguments();
                         fieldMessage.insistNoChildren();
-                        SmeltType<?> fieldType = getTypeForTypeName(fieldMessage.getHeader().getName());
-                        String fieldName = fieldMessage.getHeader().insistSinglePositionalArgument("field name")
-                                .insistSingleComponent();
+                        SmeltType<?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
+                                .insistSinglePositionalArgument("field name").insistSingleComponent());
+                        String fieldName = fieldMessage.getHeader().getName();
                         fields.put(fieldName, fieldType);
                     } else {
                         // TODO: report syntax error via appropriate exception
