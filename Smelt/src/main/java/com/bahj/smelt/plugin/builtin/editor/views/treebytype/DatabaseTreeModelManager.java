@@ -41,7 +41,7 @@ public class DatabaseTreeModelManager {
     public DatabaseTreeModelManager(DataModelPlugin plugin) {
         super();
         this.plugin = plugin;
-        this.treeModel = new DefaultTreeModel(null);
+        this.treeModel = new DefaultTreeModel(null, true);
 
         this.plugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
                 new EventListener<DatabaseOpenedEvent>() {
@@ -88,6 +88,7 @@ public class DatabaseTreeModelManager {
     private DefaultMutableTreeNode buildRootNode() {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode();
         // The contents of the root node are the types of the data model.
+        node.setAllowsChildren(true);
         Collection<SmeltType<?>> types = this.plugin.getModel().getTypes().values();
         // Remove types which cannot be edited.
         List<SmeltType<?>> editableTypes = types.stream()
@@ -112,6 +113,7 @@ public class DatabaseTreeModelManager {
     private <T extends SmeltType<V>, V extends SmeltValue<V>> DefaultMutableTreeNode buildTypeNode(T type) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject(type));
         // The contents of the type node are the values of this type in the database.
+        node.setAllowsChildren(true);
         List<V> values = new ArrayList<V>(this.plugin.getDatabase().getAllOfType(type));
         // Sort these values in some nice order.
         values.sort(SMELT_VALUE_COMPARATOR);
@@ -132,6 +134,7 @@ public class DatabaseTreeModelManager {
     private <V extends SmeltValue<V>> DefaultMutableTreeNode buildValueNode(V value) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject(value));
         // The value node has no children.
+        node.setAllowsChildren(false);
         return node;
     }
 
