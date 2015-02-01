@@ -86,7 +86,7 @@ public class DatabaseTreeModelManager {
      * @return A node representing the type.
      */
    private <T extends SmeltType<V>, V extends SmeltValue<V>> MutableTreeNode buildTypeNode(T type) {
-       MutableTreeNode node = new DefaultMutableTreeNode(type);
+       MutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject(type));
        // The contents of the type node are the values of this type in the database.
        List<V> values = new ArrayList<V>(this.plugin.getDatabase().getAllOfType(type));
        // Sort these values in some nice order.
@@ -105,7 +105,7 @@ public class DatabaseTreeModelManager {
     * @return A node representing the value.
     */
    private <V extends SmeltValue<V>> MutableTreeNode buildValueNode(V value) {
-       MutableTreeNode node = new DefaultMutableTreeNode(value);
+       MutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject(value));
        // The value node has no children.
        return node;
    }
