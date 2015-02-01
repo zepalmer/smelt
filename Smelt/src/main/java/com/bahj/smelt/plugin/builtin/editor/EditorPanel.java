@@ -46,6 +46,7 @@ public class EditorPanel extends JPanel {
         DefaultSingleCDockable treeViewByTypeDock = new DefaultSingleCDockable(TREE_VIEW_BY_TYPE_KEY,
                 treeViewByTypePanel);
         treeViewByTypeDock.setTitleText("View by Type");
+        treeViewByTypeDock.setExternalizable(false); // TODO: this feature is broken -- why?
 
         // Create the working area where editors will appear.
         CWorkingArea work = control.createWorkingArea(EDITOR_WORKING_AREA_KEY);
