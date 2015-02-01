@@ -28,10 +28,13 @@ import com.bahj.smelt.util.NotYetImplementedException;
 public class DatabaseTreeViewByTypePanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
+    /** The data model plugin which contains the data for this panel. */
+    private DataModelPlugin plugin;
     /** The tree displayed by this panel. */
     private JTree tree;
 
     public DatabaseTreeViewByTypePanel(DataModelPlugin dataModelPlugin) {
+        this.plugin = dataModelPlugin;
         DatabaseTreeModelManager modelManager = new DatabaseTreeModelManager(dataModelPlugin);
         tree = new JTree(modelManager.getTreeModel());
 
@@ -89,8 +92,11 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
                 JMenuItem createItem = new JMenuItem("New");
                 createItem.setMnemonic(KeyEvent.VK_N);
                 createItem.addActionListener((ActionEvent e) -> {
-                    throw new NotYetImplementedException();
-                });
+                    // Create a new instance of this type and add it to the database.
+                        if (plugin.getDatabase() != null) {
+                            plugin.getDatabase().add(obj.getType().instantiate());
+                        }
+                    });
 
                 popupMenu.add(createItem);
 

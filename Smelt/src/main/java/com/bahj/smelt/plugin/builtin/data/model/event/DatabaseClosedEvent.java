@@ -1,5 +1,9 @@
 package com.bahj.smelt.plugin.builtin.data.model.event;
 
-public class DatabaseClosedEvent extends DataModelEvent {
+/**
+ * An event which is dispatched whenever the database is closed.
+ * @author Zachary Palmer
+ */
+public class DatabaseClosedEvent extends DataModelPluginEvent {
     // TODO
 }

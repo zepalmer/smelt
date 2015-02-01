@@ -13,4 +13,11 @@ public interface SmeltType<V extends SmeltValue<V>> {
      * @return The name of this Smelt type.
      */
     public String getName();
+    
+    /**
+     * Instantiates a default value for this type.  Callers should bear in mind that the resulting {@link SmeltValue}
+     * may be <code>null</code>.
+     * @return A default value for this type.
+     */
+    public V instantiate();
 }

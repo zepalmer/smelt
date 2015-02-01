@@ -8,9 +8,10 @@ import java.util.stream.Collectors;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
+import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseObjectAddedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseObjectRemovedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.EnumType;
@@ -28,6 +29,12 @@ import com.bahj.smelt.util.event.TypedEventListener;
  * @author Zachary Palmer
  */
 public class DatabaseTreeModelManager {
+    private static final Comparator<SmeltType<?>> SMELT_TYPE_COMPARATOR = new MappedComparator<SmeltType<?>, String>(
+            SmeltType::getName, Comparator.naturalOrder());
+    // TODO: something better for the value comparator
+    private static final Comparator<SmeltValue<?>> SMELT_VALUE_COMPARATOR = new MappedComparator<SmeltValue<?>, String>(
+            SmeltValue::toString, Comparator.naturalOrder());
+
     private DataModelPlugin plugin;
     private DefaultTreeModel treeModel;
 
@@ -42,15 +49,31 @@ public class DatabaseTreeModelManager {
                     public void eventOccurred(DatabaseOpenedEvent event) {
                         treeModel.setRoot(buildRootNode());
                     }
-        }));
+                }));
         this.plugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
                 new EventListener<DatabaseClosedEvent>() {
                     @Override
                     public void eventOccurred(DatabaseClosedEvent event) {
                         treeModel.setRoot(null);
                     }
-        }));
-        // TODO: listeners that will update the tree model incrementally
+                }));
+        this.plugin.addListener(new TypedEventListener<>(DatabaseObjectAddedEvent.class,
+                new EventListener<DatabaseObjectAddedEvent>() {
+                    @Override
+                    public void eventOccurred(DatabaseObjectAddedEvent event) {
+                        DefaultMutableTreeNode valueNode = buildValueNode(event.getWrapper().getSmeltValue());
+                        insertValueIntoTree(valueNode);
+                    }
+                }));
+        this.plugin.addListener(new TypedEventListener<>(DatabaseObjectRemovedEvent.class,
+                new EventListener<DatabaseObjectRemovedEvent>() {
+                    @Override
+                    public void eventOccurred(DatabaseObjectRemovedEvent event) {
+                        removeValueFromTree(event.getWrapper().getSmeltValue());
+                    }
+                }));
+        // TODO: listeners that will reposition values in the tree -- this is necessary once the data on which the
+        // object's comparator is based will change
     }
 
     public DefaultTreeModel getTreeModel() {
@@ -62,8 +85,8 @@ public class DatabaseTreeModelManager {
      * 
      * @return A new root node.
      */
-    private MutableTreeNode buildRootNode() {
-        MutableTreeNode node = new DefaultMutableTreeNode();
+    private DefaultMutableTreeNode buildRootNode() {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode();
         // The contents of the root node are the types of the data model.
         Collection<SmeltType<?>> types = this.plugin.getModel().getTypes().values();
         // Remove types which cannot be edited.
@@ -71,42 +94,130 @@ public class DatabaseTreeModelManager {
                 .filter((SmeltType<?> type) -> (!(type instanceof PrimitiveType) && !(type instanceof EnumType)))
                 .collect(Collectors.toList());
         // Let's sort these types in a nice order.
-        editableTypes.sort(new MappedComparator<SmeltType<?>, String>(SmeltType::getName, Comparator.naturalOrder()));
+        editableTypes.sort(SMELT_TYPE_COMPARATOR);
         // Now create a node for each of them and add it to the root node.
         for (SmeltType<?> type : editableTypes) {
             node.insert(buildTypeNode(type), node.getChildCount());
         }
         return node;
     }
-    
+
     /**
      * Creates a fresh type node based on the contents of the data model plugin.
      * 
-     * @param type The type for which to create a node.
+     * @param type
+     *            The type for which to create a node.
      * @return A node representing the type.
      */
-   private <T extends SmeltType<V>, V extends SmeltValue<V>> MutableTreeNode buildTypeNode(T type) {
-       MutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject(type));
-       // The contents of the type node are the values of this type in the database.
-       List<V> values = new ArrayList<V>(this.plugin.getDatabase().getAllOfType(type));
-       // Sort these values in some nice order.
-       // TODO
-       // Add each value node to the type node.
-       for (V value : values) {
-           node.insert(buildValueNode(value), node.getChildCount());
-       }
-       return node;
-   }
-   
-   /**
-    * Creates a fresh value node based on the contents of the data model plugin.
-    * 
-    * @param The value for which to create a node.
-    * @return A node representing the value.
-    */
-   private <V extends SmeltValue<V>> MutableTreeNode buildValueNode(V value) {
-       MutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject(value));
-       // The value node has no children.
-       return node;
-   }
+    private <T extends SmeltType<V>, V extends SmeltValue<V>> DefaultMutableTreeNode buildTypeNode(T type) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject(type));
+        // The contents of the type node are the values of this type in the database.
+        List<V> values = new ArrayList<V>(this.plugin.getDatabase().getAllOfType(type));
+        // Sort these values in some nice order.
+        values.sort(SMELT_VALUE_COMPARATOR);
+        // Add each value node to the type node.
+        for (V value : values) {
+            node.insert(buildValueNode(value), node.getChildCount());
+        }
+        return node;
+    }
+
+    /**
+     * Creates a fresh value node based on the contents of the data model plugin.
+     * 
+     * @param The
+     *            value for which to create a node.
+     * @return A node representing the value.
+     */
+    private <V extends SmeltValue<V>> DefaultMutableTreeNode buildValueNode(V value) {
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject(value));
+        // The value node has no children.
+        return node;
+    }
+
+    /**
+     * Finds the tree node for the provided type.
+     * 
+     * @param type
+     *            The type for which to find a node.
+     * @return The node in question.
+     */
+    public DefaultMutableTreeNode getTypeNode(SmeltType<?> type) {
+        if (this.getTreeModel().getRoot() == null) {
+            return null;
+        }
+        DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getTreeModel().getRoot();
+        for (int i = 0; i < root.getChildCount(); i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
+            SmeltType<?> childType = ((TreeTypeObject) child.getUserObject()).getType();
+            if (childType.equals(type)) {
+                return (DefaultMutableTreeNode) root.getChildAt(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds a tree node for the provided value.
+     * 
+     * @param value
+     *            The value for which to find a node.
+     * @return The node in question.
+     */
+    public DefaultMutableTreeNode getValueNode(SmeltValue<?> value) {
+        DefaultMutableTreeNode typeNode = getTypeNode(value.getType());
+        if (typeNode == null) {
+            return null;
+        }
+        for (int i = 0; i < typeNode.getChildCount(); i++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(i);
+            SmeltValue<?> childValue = ((TreeValueObject) child.getUserObject()).getValue();
+            if (childValue.equals(value)) {
+                return (DefaultMutableTreeNode) typeNode.getChildAt(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Inserts a value node into the tree.
+     * 
+     * @param valueNode
+     *            The value node to insert.
+     */
+    public void insertValueIntoTree(DefaultMutableTreeNode valueNode) {
+        // Search for the position at which to insert the value.
+        SmeltValue<?> value = ((TreeValueObject) valueNode.getUserObject()).getValue();
+        DefaultMutableTreeNode typeNode = getTypeNode(value.getType());
+        int index;
+        for (index = 0; index < typeNode.getChildCount(); index++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(index);
+            SmeltValue<?> childValue = ((TreeValueObject) child.getUserObject()).getValue();
+            // If the value at this position is greater, then we've found our location.
+            if (SMELT_VALUE_COMPARATOR.compare(childValue, value) > 0) {
+                break;
+            }
+        }
+        treeModel.insertNodeInto(valueNode, typeNode, index);
+    }
+
+    /**
+     * Removes a value from the tree.
+     * 
+     * @param value
+     *            The value to remove.
+     */
+    public void removeValueFromTree(SmeltValue<?> value) {
+        DefaultMutableTreeNode typeNode = getTypeNode(value.getType());
+        if (typeNode == null) {
+            return;
+        }
+        for (int index = 0; index < typeNode.getChildCount(); index++) {
+            DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(index);
+            if (((TreeValueObject) child.getUserObject()).getValue().equals(value)) {
+                treeModel.removeNodeFromParent(child);
+                return;
+            }
+        }
+    }
 }

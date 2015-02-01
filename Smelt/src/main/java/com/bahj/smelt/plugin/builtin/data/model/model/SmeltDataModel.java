@@ -3,7 +3,7 @@ package com.bahj.smelt.plugin.builtin.data.model.model;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.bahj.smelt.plugin.builtin.data.model.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
@@ -13,7 +13,7 @@ import com.bahj.smelt.util.event.AbstractEventGenerator;
  * 
  * @author Zachary Palmer
  */
-public class SmeltDataModel extends AbstractEventGenerator<DataModelEvent> {
+public class SmeltDataModel extends AbstractEventGenerator<DataModelPluginEvent> {
     private Map<String, SmeltType<?>> types;
 
     public SmeltDataModel() {

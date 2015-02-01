@@ -13,7 +13,8 @@ import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
-import com.bahj.smelt.plugin.builtin.data.model.event.DataModelEvent;
+import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException;
@@ -28,13 +29,16 @@ import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
 import com.bahj.smelt.syntax.ast.impl.MessageNodeImpl;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
+import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
 
-public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> implements SmeltPlugin {
+public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent> implements SmeltPlugin {
     /** The model for this plugin. */
     private SmeltDataModel model = null;
     /** The database for this plugin. */
     private SmeltDatabase database = null;
+    /** The relay listener we attach to the database. */
+    private EventListener<DatabaseEvent> relayListener = new DatabaseEventRelayListener();
 
     @Override
     public void registeredToApplicationModel(final SmeltApplicationModel model) {
@@ -213,12 +217,21 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelEvent> impl
             throw new IllegalStateException("Cannot modify database in use when no data model exists!");
         }
         if (this.database != null) {
+            this.database.removeListener(this.relayListener);
             this.database = null;
             fireEvent(new DatabaseClosedEvent());
         }
         if (database != null) {
             this.database = database;
+            this.database.addListener(this.relayListener);
             fireEvent(new DatabaseOpenedEvent());
+        }
+    }
+    
+    private class DatabaseEventRelayListener implements EventListener<DatabaseEvent> {
+        @Override
+        public void eventOccurred(DatabaseEvent event) {
+            fireEvent(event);
         }
     }
 }

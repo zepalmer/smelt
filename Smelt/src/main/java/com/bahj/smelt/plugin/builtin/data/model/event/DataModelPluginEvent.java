@@ -4,6 +4,10 @@ import com.bahj.smelt.util.event.Event;
 
 // TODO: consider: should all of the plugin events have a common supertype?
 
-public abstract class DataModelEvent implements Event {
+/**
+ * The supertype of all events from the data model plugin.
+ * @author Zachary Palmer
+ */
+public abstract class DataModelPluginEvent implements Event {
 
 }

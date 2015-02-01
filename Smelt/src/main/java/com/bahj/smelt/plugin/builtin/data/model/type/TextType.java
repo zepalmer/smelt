@@ -15,4 +15,12 @@ public class TextType extends PrimitiveType<SmeltString> {
     public String getName() {
         return "text";
     }
+
+    /**
+     * Creates a new default string.
+     */
+    @Override
+    public SmeltString instantiate() {
+        return new SmeltString(this, "");
+    }
 }

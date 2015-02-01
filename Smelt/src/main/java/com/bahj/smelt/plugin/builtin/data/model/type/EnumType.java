@@ -31,4 +31,11 @@ public class EnumType implements SmeltType<SmeltEnumValue> {
 		return choices;
 	}
 
+	/**
+	 * Instantiates this enumerated type.  The default value for a Smelt enum is <code>null</code>.
+	 */
+    @Override
+    public SmeltEnumValue instantiate() {
+        return null;
+    }
 }
