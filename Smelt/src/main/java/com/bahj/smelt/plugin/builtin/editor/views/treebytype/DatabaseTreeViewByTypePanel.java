@@ -18,6 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
+import com.bahj.smelt.plugin.builtin.editor.EditorPanelContext;
 import com.bahj.smelt.util.NotYetImplementedException;
 
 /**
@@ -30,11 +31,14 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
 
     /** The data model plugin which contains the data for this panel. */
     private DataModelPlugin plugin;
+    /** The editor context for this panel. */
+    private EditorPanelContext context;
     /** The tree displayed by this panel. */
     private JTree tree;
 
-    public DatabaseTreeViewByTypePanel(DataModelPlugin dataModelPlugin) {
+    public DatabaseTreeViewByTypePanel(DataModelPlugin dataModelPlugin, EditorPanelContext context) {
         this.plugin = dataModelPlugin;
+        this.context = context;
         DatabaseTreeModelManager modelManager = new DatabaseTreeModelManager(dataModelPlugin);
         tree = new JTree(modelManager.getTreeModel());
 
@@ -48,7 +52,9 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 DefaultMutableTreeNode node = getTreeNodeAt(e.getPoint());
-                if (node != null && e.getClickCount() == 2 && (e.getModifiers() & MouseEvent.BUTTON1) != 0) {
+                System.out.println(e);
+                System.out.println(node);
+                if (node != null && e.getClickCount() == 2 && (e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
                     doubleClickOn(node);
                 }
             }
@@ -114,6 +120,19 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
     }
 
     private void doubleClickOn(DefaultMutableTreeNode node) {
-        // TODO
+        TreeObject obj = (TreeObject)node.getUserObject();
+        obj.visit(new TreeObjectVisitor<Void,Void,RuntimeException>() {
+            @Override
+            public Void visitType(TreeTypeObject obj, Void arg) throws RuntimeException {
+                // TODO: does anything belong here?
+                return null;
+            }
+
+            @Override
+            public Void visitValue(TreeValueObject obj, Void arg) throws RuntimeException {
+                context.openEditor(obj.getValue());
+                return null;
+            }
+        }, null);
     }
 }
