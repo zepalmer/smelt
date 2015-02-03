@@ -26,7 +26,6 @@ import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
 import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
-import com.bahj.smelt.syntax.ast.impl.MessageNodeImpl;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
@@ -69,7 +68,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
 
     @Override
     public boolean claimsDeclaration(SmeltPluginDeclarationHandlerContext context, DeclarationNode declarationNode) {
-        if (declarationNode instanceof MessageNodeImpl) {
+        if (declarationNode instanceof MessageNode) {
             MessageNode messageNode = (MessageNode) declarationNode;
             String name = messageNode.getHeader().getName();
             return name.equals("data"); // TODO: handle enum types as well
