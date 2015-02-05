@@ -1,15 +1,16 @@
 package com.bahj.smelt.plugin.builtin.data.model.type;
 
-import com.bahj.smelt.plugin.builtin.data.model.value.SmeltString;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltText;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
 /**
  * The primitive Smelt type representing a textual value.
  * @author Zachary Palmer
  */
-public class TextType extends PrimitiveType<SmeltString> {
+public class TextType extends PrimitiveType<SmeltText> {
     public static final TextType INSTANCE = new TextType();
     
-    public TextType() {
+    private TextType() {
     }
     
     public String getName() {
@@ -20,7 +21,16 @@ public class TextType extends PrimitiveType<SmeltString> {
      * Creates a new default string.
      */
     @Override
-    public SmeltString instantiate() {
-        return new SmeltString(this, "");
+    public SmeltText instantiate() {
+        return new SmeltText(this, "");
+    }
+
+    @Override
+    public SmeltText coerce(SmeltValue<?> value) throws SmeltTypeMismatchException {
+        if (value instanceof SmeltText) {
+            return (SmeltText)value;
+        } else {
+            throw new SmeltTypeMismatchException(this, value);
+        }
     }
 }

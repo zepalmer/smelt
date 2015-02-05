@@ -111,7 +111,7 @@ public class DatabaseTreeModelManager {
      * @return A node representing the type.
      */
     private <T extends SmeltType<V>, V extends SmeltValue<V>> DefaultMutableTreeNode buildTypeNode(T type) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject(type));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeTypeObject<T, V>(type));
         // The contents of the type node are the values of this type in the database.
         node.setAllowsChildren(true);
         List<V> values = new ArrayList<V>(this.plugin.getDatabase().getAllOfType(type));
@@ -132,7 +132,7 @@ public class DatabaseTreeModelManager {
      * @return A node representing the value.
      */
     private <V extends SmeltValue<V>> DefaultMutableTreeNode buildValueNode(V value) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject(value));
+        DefaultMutableTreeNode node = new DefaultMutableTreeNode(new TreeValueObject<V>(value));
         // The value node has no children.
         node.setAllowsChildren(false);
         return node;
@@ -152,7 +152,7 @@ public class DatabaseTreeModelManager {
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) this.getTreeModel().getRoot();
         for (int i = 0; i < root.getChildCount(); i++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) root.getChildAt(i);
-            SmeltType<?> childType = ((TreeTypeObject) child.getUserObject()).getType();
+            SmeltType<?> childType = ((TreeTypeObject<?, ?>) child.getUserObject()).getType();
             if (childType.equals(type)) {
                 return (DefaultMutableTreeNode) root.getChildAt(i);
             }
@@ -174,7 +174,7 @@ public class DatabaseTreeModelManager {
         }
         for (int i = 0; i < typeNode.getChildCount(); i++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(i);
-            SmeltValue<?> childValue = ((TreeValueObject) child.getUserObject()).getValue();
+            SmeltValue<?> childValue = ((TreeValueObject<?>) child.getUserObject()).getValue();
             if (childValue.equals(value)) {
                 return (DefaultMutableTreeNode) typeNode.getChildAt(i);
             }
@@ -190,12 +190,12 @@ public class DatabaseTreeModelManager {
      */
     public void insertValueIntoTree(DefaultMutableTreeNode valueNode) {
         // Search for the position at which to insert the value.
-        SmeltValue<?> value = ((TreeValueObject) valueNode.getUserObject()).getValue();
+        SmeltValue<?> value = ((TreeValueObject<?>) valueNode.getUserObject()).getValue();
         DefaultMutableTreeNode typeNode = getTypeNode(value.getType());
         int index;
         for (index = 0; index < typeNode.getChildCount(); index++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(index);
-            SmeltValue<?> childValue = ((TreeValueObject) child.getUserObject()).getValue();
+            SmeltValue<?> childValue = ((TreeValueObject<?>) child.getUserObject()).getValue();
             // If the value at this position is greater, then we've found our location.
             if (SMELT_VALUE_COMPARATOR.compare(childValue, value) > 0) {
                 break;
@@ -217,7 +217,7 @@ public class DatabaseTreeModelManager {
         }
         for (int index = 0; index < typeNode.getChildCount(); index++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) typeNode.getChildAt(index);
-            if (((TreeValueObject) child.getUserObject()).getValue().equals(value)) {
+            if (((TreeValueObject<?>) child.getUserObject()).getValue().equals(value)) {
                 treeModel.removeNodeFromParent(child);
                 return;
             }

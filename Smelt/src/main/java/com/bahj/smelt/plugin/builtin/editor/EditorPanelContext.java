@@ -11,5 +11,5 @@ public interface EditorPanelContext {
      * Opens an editor for the provided Smelt value.  If an editor already exists, it is focused.
      * @param value The value to edit.
      */
-    public void openEditor(SmeltValue<?> value);
+    public <V extends SmeltValue<V>> void openEditor(V value);
 }

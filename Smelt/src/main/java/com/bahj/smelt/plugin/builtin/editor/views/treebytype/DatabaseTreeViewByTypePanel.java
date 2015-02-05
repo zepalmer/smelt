@@ -52,8 +52,6 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 DefaultMutableTreeNode node = getTreeNodeAt(e.getPoint());
-                System.out.println(e);
-                System.out.println(node);
                 if (node != null && e.getClickCount() == 2 && (e.getModifiers() & MouseEvent.BUTTON1_MASK) != 0) {
                     doubleClickOn(node);
                 }
@@ -94,7 +92,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
         popupMenu.setLabel(obj.toString());
         obj.visit(new TreeObjectVisitor<JPopupMenu, Void, RuntimeException>() {
             @Override
-            public Void visitType(TreeTypeObject obj, JPopupMenu popupMenu) {
+            public Void visitType(TreeTypeObject<?,?> obj, JPopupMenu popupMenu) {
                 JMenuItem createItem = new JMenuItem("New");
                 createItem.setMnemonic(KeyEvent.VK_N);
                 createItem.addActionListener((ActionEvent e) -> {
@@ -110,7 +108,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
             }
 
             @Override
-            public Void visitValue(TreeValueObject obj, JPopupMenu popupMenu) {
+            public Void visitValue(TreeValueObject<?> obj, JPopupMenu popupMenu) {
                 // TODO Auto-generated method stub
                 throw new NotYetImplementedException();
             }
@@ -123,13 +121,13 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
         TreeObject obj = (TreeObject)node.getUserObject();
         obj.visit(new TreeObjectVisitor<Void,Void,RuntimeException>() {
             @Override
-            public Void visitType(TreeTypeObject obj, Void arg) throws RuntimeException {
+            public Void visitType(TreeTypeObject<?,?> obj, Void arg) throws RuntimeException {
                 // TODO: does anything belong here?
                 return null;
             }
 
             @Override
-            public Void visitValue(TreeValueObject obj, Void arg) throws RuntimeException {
+            public Void visitValue(TreeValueObject<?> obj, Void arg) throws RuntimeException {
                 context.openEditor(obj.getValue());
                 return null;
             }

@@ -2,15 +2,15 @@ package com.bahj.smelt.plugin.builtin.editor.views.treebytype;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
-public class TreeValueObject implements TreeObject {
-    private SmeltValue<?> value;
+public class TreeValueObject<V extends SmeltValue<V>> implements TreeObject {
+    private V value;
 
-    public TreeValueObject(SmeltValue<?> value) {
+    public TreeValueObject(V value) {
         super();
         this.value = value;
     }
 
-    public SmeltValue<?> getValue() {
+    public V getValue() {
         return value;
     }
 

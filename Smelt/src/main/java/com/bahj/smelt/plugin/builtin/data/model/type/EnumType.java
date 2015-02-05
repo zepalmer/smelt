@@ -5,37 +5,47 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltEnumValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
 /**
  * Represents a structured enumerated type in a Smelt data model.
  * 
  * @author Zachary Palmer
  */
-public class EnumType implements SmeltType<SmeltEnumValue> {
+public class EnumType extends AbstractSmeltType<SmeltEnumValue> {
     private String name;
-	private List<String> choices;
+    private List<String> choices;
 
-	public EnumType(String name, String... choices) {
-		this(Arrays.asList(choices));
-	}
+    public EnumType(String name, String... choices) {
+        this(Arrays.asList(choices));
+    }
 
-	public String getName() {
+    public String getName() {
         return name;
     }
 
     public EnumType(List<String> choices) {
-		this.choices = new ArrayList<>(choices);
-	}
+        this.choices = new ArrayList<>(choices);
+    }
 
-	public List<String> getChoices() {
-		return choices;
-	}
+    public List<String> getChoices() {
+        return choices;
+    }
 
-	/**
-	 * Instantiates this enumerated type.  The default value for a Smelt enum is <code>null</code>.
-	 */
+    /**
+     * Instantiates this enumerated type. The default value for a Smelt enum is <code>null</code>.
+     */
     @Override
     public SmeltEnumValue instantiate() {
         return null;
+    }
+
+    @Override
+    public SmeltEnumValue coerce(SmeltValue<?> value) throws SmeltTypeMismatchException {
+        if (value instanceof SmeltEnumValue && value.getType().equals(this)) {
+            return (SmeltEnumValue) value;
+        } else {
+            throw new SmeltTypeMismatchException(this, value);
+        }
     }
 }

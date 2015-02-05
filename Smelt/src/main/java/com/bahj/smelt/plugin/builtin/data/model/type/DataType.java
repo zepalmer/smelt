@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
 /**
  * Represents a structured data type in Smelt.
  * 
  * @author Zachary Palmer
  */
-public class DataType implements SmeltType<SmeltDatum> {
+public class DataType extends AbstractSmeltType<SmeltDatum> {
     private String name;
     private Map<String, SmeltType<?>> properties;
 
@@ -36,8 +37,17 @@ public class DataType implements SmeltType<SmeltDatum> {
     public SmeltDatum instantiate() {
         SmeltDatum datum = new SmeltDatum(this);
         for (Map.Entry<String, SmeltType<?>> property : properties.entrySet()) {
-            datum.getProperties().put(property.getKey(), property.getValue().instantiate());
+            datum.set(property.getKey(), property.getValue().instantiate());
         }
         return datum;
+    }
+
+    @Override
+    public SmeltDatum coerce(SmeltValue<?> value) throws SmeltTypeMismatchException {
+        if (value instanceof SmeltDatum && (value.getType().equals(this))) {
+            return (SmeltDatum) value;
+        } else {
+            throw new SmeltTypeMismatchException(this, value);
+        }
     }
 }

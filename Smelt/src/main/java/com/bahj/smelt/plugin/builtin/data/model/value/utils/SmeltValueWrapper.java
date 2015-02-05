@@ -2,6 +2,8 @@ package com.bahj.smelt.plugin.builtin.data.model.value.utils;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
+// TODO: deprecate?  This seems like a silly idea; the generics system is better than this.
+
 /**
  * This wrapper object exists solely for the sake of the Java generics system. It allows a wildcard to be captured and
  * used in two locations. A client can create a <code>SmeltValueWrapper&lt;?&gt;</code> in order to represent a Smelt

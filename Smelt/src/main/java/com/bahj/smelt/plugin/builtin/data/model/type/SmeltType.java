@@ -20,4 +20,12 @@ public interface SmeltType<V extends SmeltValue<V>> {
      * @return A default value for this type.
      */
     public V instantiate();
+    
+    /**
+     * Coerces the provided value to the data type for this {@link SmeltType}.
+     * @param value The value to coerce.
+     * @return The coerced value, if its runtime type matches the data representation of this {@link SmeltType}.
+     * @throws SmeltTypeMismatchException If the provided value cannot be coerced to this type.
+     */
+    public V coerce(SmeltValue<?> value) throws SmeltTypeMismatchException;
 }
