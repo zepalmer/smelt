@@ -5,5 +5,5 @@ package com.bahj.smelt.plugin.builtin.data.model.event;
  * @author Zachary Palmer
  */
 public class DatabaseOpenedEvent extends DataModelPluginEvent {
-    // TODO
+
 }

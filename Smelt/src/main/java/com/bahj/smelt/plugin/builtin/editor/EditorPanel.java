@@ -13,7 +13,9 @@ import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.CWorkingArea;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITabKey;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
@@ -110,10 +112,20 @@ public class EditorPanel extends JPanel {
                 editorDockable.setRemoveOnClose(true);
                 editorDockable.setExternalizable(false); // TODO: this feature is broken -- why?
                 editorDockable.add(editorScrollPane);
-
-                // TODO: add listener to destroy form when window is closed
                 
-                // TODO: add listener to close editor when database is closed
+                // Add listener to destroy form when window is closed
+                editorDockable.addCDockableStateListener(new CDockableStateListener() {                    
+                    @Override
+                    public void visibilityChanged(CDockable dockable) {
+                        form.destroy();
+                    }
+                    
+                    @Override
+                    public void extendedModeChanged(CDockable dockable, ExtendedMode mode) {
+                    }
+                });
+                
+                // TODO: add listener to close editor when database is closed or the object is removed from it
 
                 // Present it
                 EditorPanel.this.editorWorkingArea.show(editorDockable);

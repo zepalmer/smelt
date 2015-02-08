@@ -109,7 +109,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
 
             @Override
             public Void visitValue(TreeValueObject<?> obj, JPopupMenu popupMenu) {
-                // TODO Auto-generated method stub
+                // TODO: options for edit, delete, etc.
                 throw new NotYetImplementedException();
             }
         }, popupMenu);
