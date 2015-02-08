@@ -1,6 +1,8 @@
 package com.bahj.smelt.plugin.builtin.editor;
 
 import java.awt.BorderLayout;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -19,6 +21,7 @@ import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITabKey;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltTypeMismatchException;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 import com.bahj.smelt.plugin.builtin.editor.forms.Form;
@@ -26,6 +29,8 @@ import com.bahj.smelt.plugin.builtin.editor.forms.FormFactory;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactoryRegistry;
 import com.bahj.smelt.plugin.builtin.editor.views.treebytype.DatabaseTreeViewByTypePanel;
 import com.bahj.smelt.util.NotYetImplementedException;
+import com.bahj.smelt.util.event.EventListener;
+import com.bahj.smelt.util.event.TypedEventListener;
 import com.bahj.smelt.util.swing.WidthStretchPanel;
 
 /**
@@ -56,8 +61,13 @@ public class EditorPanel extends JPanel {
     /** The working area in which editor panels will appear. */
     private CWorkingArea editorWorkingArea;
 
+    /** The set of editors to close if the database is closed. */
+    private Set<DefaultMultipleCDockable> toCloseOnDatabaseClose;
+
     public EditorPanel(JFrame owner, DataModelPlugin dataModelPlugin, FormFactoryRegistry formFactoryRegistry) {
         this.formFactoryRegistry = formFactoryRegistry;
+
+        this.toCloseOnDatabaseClose = new HashSet<>();
 
         this.control = new CControl(owner);
         // TODO: call this.control.destroy() when appropriate (at least by the close of the application)?
@@ -79,6 +89,18 @@ public class EditorPanel extends JPanel {
         grid.add(0, 0, 1, 4, treeViewByTypeDock);
         grid.add(1, 0, 4, 4, editorWorkingArea);
         control.getContentArea().deploy(grid);
+
+        // Make sure that editor panels are properly destroyed if the database is closed.
+        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
+                new EventListener<DatabaseClosedEvent>() {
+                    @Override
+                    public void eventOccurred(DatabaseClosedEvent event) {
+                        for (DefaultMultipleCDockable editorDockable : toCloseOnDatabaseClose) {
+                            control.removeDockable(editorDockable);
+                        }
+                        toCloseOnDatabaseClose.clear();
+                    }
+                }));
     }
 
     private class EditorPanelContextImpl implements EditorPanelContext {
@@ -90,7 +112,8 @@ public class EditorPanel extends JPanel {
                 FormFactory formFactory = EditorPanel.this.formFactoryRegistry.getFormFactory(value.getType());
                 if (formFactory == null) {
                     // TODO: generate some kind of panel indicating that no form was specified for this datum's type.
-                    throw new NotYetImplementedException("No form factory for provided value's type: " + value.getType());
+                    throw new NotYetImplementedException("No form factory for provided value's type: "
+                            + value.getType());
                 }
                 Form form;
                 try {
@@ -102,7 +125,7 @@ public class EditorPanel extends JPanel {
                 }
                 JComponent editor = form.getComponent();
                 WidthStretchPanel panel = new WidthStretchPanel(editor);
-                panel.setBorder(BorderFactory.createEmptyBorder(2,2,2,2)); // TODO: constant somewhere?
+                panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // TODO: constant somewhere?
                 JScrollPane editorScrollPane = new JScrollPane(panel);
 
                 // Set up a dockable for this editor
@@ -112,20 +135,25 @@ public class EditorPanel extends JPanel {
                 editorDockable.setRemoveOnClose(true);
                 editorDockable.setExternalizable(false); // TODO: this feature is broken -- why?
                 editorDockable.add(editorScrollPane);
-                
+
                 // Add listener to destroy form when window is closed
-                editorDockable.addCDockableStateListener(new CDockableStateListener() {                    
+                editorDockable.addCDockableStateListener(new CDockableStateListener() {
                     @Override
                     public void visibilityChanged(CDockable dockable) {
-                        form.destroy();
+                        if (!dockable.isVisible()) {
+                            form.destroy();
+                            control.removeDockable(editorDockable);
+                            EditorPanel.this.toCloseOnDatabaseClose.remove(editorDockable);
+                        }
                     }
-                    
+
                     @Override
                     public void extendedModeChanged(CDockable dockable, ExtendedMode mode) {
                     }
                 });
-                
-                // TODO: add listener to close editor when database is closed or the object is removed from it
+
+                // Add this form to the on-database-close set.
+                EditorPanel.this.toCloseOnDatabaseClose.add(editorDockable);
 
                 // Present it
                 EditorPanel.this.editorWorkingArea.show(editorDockable);
