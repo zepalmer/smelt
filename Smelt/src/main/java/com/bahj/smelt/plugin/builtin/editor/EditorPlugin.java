@@ -58,8 +58,6 @@ public class EditorPlugin implements SmeltPlugin {
 
     public EditorPlugin() {
         this.formFactoryRegistry = new FormFactoryRegistry();
-
-        // TODO: register basic form factories for e.g. primitives
     }
 
     @Override
