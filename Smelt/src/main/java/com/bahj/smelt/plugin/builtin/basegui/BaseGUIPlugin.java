@@ -13,10 +13,6 @@ import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.OrFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationPluginsConfiguredEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
@@ -32,14 +28,13 @@ import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
 import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
 import com.bahj.smelt.syntax.SmeltParseFailureException;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
-import com.bahj.smelt.util.FileUtils;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.StrongReference;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
 import com.bahj.smelt.util.swing.BasicAction;
-import com.bahj.smelt.util.swing.SwingFileFilterWrapper;
+import com.bahj.smelt.util.swing.FileFilterUtils;
 
 /**
  * This plugin provides a base GUI for the Smelt framework. It featues a menu bar and an (initially empty) tab pane.
@@ -174,8 +169,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     private void performOpenSmeltSpecification() {
         // TODO: file chooser should remember last directory in which a Smelt spec was opened
         JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new SwingFileFilterWrapper("Smelt specification", new OrFileFilter(new SuffixFileFilter(
-                FileUtils.SMELT_SPEC_EXTENSION), DirectoryFileFilter.INSTANCE)));
+        chooser.setFileFilter(FileFilterUtils.SMELT_SPEC_FILTER);
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
         int result = chooser.showOpenDialog(this.frame);
         if (result == JFileChooser.APPROVE_OPTION) {

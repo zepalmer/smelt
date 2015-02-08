@@ -19,7 +19,7 @@ public class Smelt {
     public static void main(String[] args) throws ClassCastException {
         Configuration configuration = null;
         try {
-            configuration = SerializationUtils.readFile(FileUtils.CONFIGURATION_FILE,
+            configuration = SerializationUtils.readFileWithDefault(FileUtils.CONFIGURATION_FILE,
                     Configuration.SerializationStrategy.INSTANCE, () -> {
                         try {
                             return Configuration.createDefaultConfiguration();

@@ -28,6 +28,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltDatumSe
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltEnumValueSerializationStrategy;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltTextSerializationStrategy;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltValueSerializationStrategyRegistry;
+import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.serialization.SerializationUtils;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
@@ -245,16 +246,28 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
             fireEvent(event);
         }
     }
+    
+    public void openDatabase(File selectedFile) throws IOException, DeserializationException {
+        SmeltDatabaseSerializationStrategy strategy = createDatabaseSerializationStrategy();
+        SmeltDatabase database = SerializationUtils.readFile(selectedFile, strategy);
+        setDatabase(database);
+    }
 
     public void saveDatabase(File selectedFile) throws IOException, SerializationException {
+        SmeltDatabaseSerializationStrategy strategy = createDatabaseSerializationStrategy();
+        SerializationUtils.writeFileSafely(selectedFile, strategy, this.database);
+    }
+    
+    private SmeltDatabaseSerializationStrategy createDatabaseSerializationStrategy() {
         SmeltValueSerializationStrategyRegistry registry = new SmeltValueSerializationStrategyRegistry();
         SmeltDatabaseSerializationStrategy databaseSerializationStrategy = new SmeltDatabaseSerializationStrategy(
                 registry);
+        
         // Add value serialization strategies to the registry.
         registry.registerSerializationStrategy(new SmeltTextSerializationStrategy());
         registry.registerSerializationStrategy(new SmeltEnumValueSerializationStrategy(this.model));
         registry.registerSerializationStrategy(new SmeltDatumSerializationStrategy(this.model, registry));
-        // Serialize and write the database.
-        SerializationUtils.writeFileSafely(selectedFile, databaseSerializationStrategy, this.database);
+        
+        return databaseSerializationStrategy;
     }
 }

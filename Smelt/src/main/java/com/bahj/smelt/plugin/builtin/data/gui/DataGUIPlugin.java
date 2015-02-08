@@ -9,10 +9,6 @@ import java.util.Set;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 
-import org.apache.commons.io.filefilter.DirectoryFileFilter;
-import org.apache.commons.io.filefilter.OrFileFilter;
-import org.apache.commons.io.filefilter.SuffixFileFilter;
-
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
@@ -28,13 +24,13 @@ import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
+import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
-import com.bahj.smelt.util.FileUtils;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
-import com.bahj.smelt.util.swing.SwingFileFilterWrapper;
+import com.bahj.smelt.util.swing.FileFilterUtils;
 
 public class DataGUIPlugin implements SmeltPlugin {
 
@@ -176,7 +172,19 @@ public class DataGUIPlugin implements SmeltPlugin {
 
         public void openDatabase(GUIExecutionContext context) {
             // TODO: appropriate confirmation prompts if a database is already loaded
-            // TODO: present GUI, then open file            
+            JFileChooser chooser = new JFileChooser(); // TODO: based on directory of known filename or last opened file
+            chooser.setFileFilter(FileFilterUtils.SMELT_DB_FILTER);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showOpenDialog(this.baseGUIPlugin.getBaseFrame());
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    dataModelPlugin.openDatabase(chooser.getSelectedFile());
+                } catch (IOException e) {
+                    throw new NotYetImplementedException(e);
+                } catch (DeserializationException e) {
+                    throw new NotYetImplementedException(e);
+                } 
+            }
         }
 
         public void saveDatabase(GUIExecutionContext context) {
@@ -185,8 +193,7 @@ public class DataGUIPlugin implements SmeltPlugin {
 
         public void saveDatabaseAs(GUIExecutionContext context) {
             JFileChooser chooser = new JFileChooser(); // TODO: based on directory of known filename or last opened file
-            chooser.setFileFilter(new SwingFileFilterWrapper("Smelt database", new OrFileFilter(new SuffixFileFilter(
-                    FileUtils.SMELT_DB_EXTENSION), DirectoryFileFilter.INSTANCE)));
+            chooser.setFileFilter(FileFilterUtils.SMELT_DB_FILTER);
             chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             int result = chooser.showSaveDialog(this.baseGUIPlugin.getBaseFrame());
             if (result == JFileChooser.APPROVE_OPTION) {

@@ -2,6 +2,7 @@ package com.bahj.smelt.serialization;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.function.Supplier;
@@ -12,6 +13,32 @@ import java.util.function.Supplier;
  * @author Zachary Palmer
  */
 public class SerializationUtils {
+    /**
+     * A utility function to open a file with the specified name and use the provided serialization strategy to read an
+     * object from it.
+     * 
+     * @param file
+     *            The file to open.
+     * @param strategy
+     *            The strategy to use.
+     * @param defaultSupplier
+     *            The default supplier.
+     * @return An object of the provided type.
+     * @throws FileNotFoundException
+     *             If the file does not exist.
+     * @throws IOException
+     *             If an I/O error occurs while reading the object.
+     * @throws DeserializationException
+     *             If a deserialization error occurs while reading the object.
+     */
+    public static <T> T readFile(File file, SmeltSerializationStrategy<T> strategy)
+            throws DeserializationException, IOException {
+        FileInputStream fis = new FileInputStream(file);
+        T ret = strategy.deserialize(fis);
+        fis.close();
+        return ret;
+    }
+
     /**
      * A utility function to open a file with the specified name and use the provided serialization strategy to read an
      * object from it. If the file does not exist, the provided supplier is used to create a default value. If the file
@@ -29,8 +56,8 @@ public class SerializationUtils {
      * @throws DeserializationException
      *             If a deserialization error occurs while reading the object.
      */
-    public static <T> T readFile(File file, SmeltSerializationStrategy<T> strategy, Supplier<T> defaultSupplier)
-            throws DeserializationException, IOException {
+    public static <T> T readFileWithDefault(File file, SmeltSerializationStrategy<T> strategy,
+            Supplier<T> defaultSupplier) throws DeserializationException, IOException {
         if (file.exists()) {
             FileInputStream fis = new FileInputStream(file);
             T ret = strategy.deserialize(fis);

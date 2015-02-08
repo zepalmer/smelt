@@ -54,8 +54,7 @@ public interface SmeltStringSerializationStrategy<T> extends SmeltSerializationS
         if (sb.length() > MAX_HEADER_DIGITS) {
             throw new DeserializationException("Could not find valid string length header in stream.");
         }
-        // Now read an expected period terminator.
-        byt = is.read();
+        // Check the most recent byte to ensure that it was the expected period terminator.
         if (byt != '.') {
             throw new DeserializationException("Could not find valid string length header in stream.");
         }

@@ -41,7 +41,7 @@ public class SmeltDatabaseSerializationStrategy implements SmeltJSONSerializatio
     public SmeltDatabase jsonToObject(JsonElement json) throws DeserializationException {
         try {
             JsonObjectWrapper databaseJson = JsonWrapper.wrap(json).asObject();
-            if (!databaseJson.getRequiredField(TYPE_FIELD).equals(TYPE_NAME)) {
+            if (!databaseJson.getRequiredField(TYPE_FIELD).asString().equals(TYPE_NAME)) {
                 throw new DeserializationException(
                         "Provided JSON object was not a database object: type tag incorrect.");
             }
