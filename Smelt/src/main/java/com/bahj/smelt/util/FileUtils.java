@@ -10,6 +10,8 @@ public class FileUtils {
     
     /** The file extension for Smelt specification files.  (Does not include the leading dot.) */
     public static final String SMELT_SPEC_EXTENSION = "spec.smelt";
+    /** The file extension for Smelt database files.  (Does not include the leading dot.) */
+    public static final String SMELT_DB_EXTENSION = "db.smelt";
     
     /**
      * Creates a {@link File} object representing the location of a Smelt configuration file.

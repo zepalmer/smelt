@@ -1,9 +1,17 @@
 package com.bahj.smelt.plugin.builtin.data.gui;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.Action;
+import javax.swing.JFileChooser;
+
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.OrFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
@@ -20,9 +28,13 @@ import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
+import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
+import com.bahj.smelt.util.FileUtils;
+import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
+import com.bahj.smelt.util.swing.SwingFileFilterWrapper;
 
 public class DataGUIPlugin implements SmeltPlugin {
 
@@ -43,31 +55,21 @@ public class DataGUIPlugin implements SmeltPlugin {
                                     public void eventOccurred(BaseGUIInitializingEvent event) {
                                         final DataModelPlugin dataModelPlugin = model.getPluginRegistry().getPlugin(
                                                 DataModelPlugin.class);
+                                        final BaseGUIPlugin baseGUIPlugin = model.getPluginRegistry().getPlugin(
+                                                BaseGUIPlugin.class);
+
+                                        MenuActions menuActions = new MenuActions(dataModelPlugin, baseGUIPlugin);
 
                                         final Action newDatabaseAction = event.getContext().constructExecutionAction(
-                                                (GUIExecutionContext context) -> {
-                                                    // TODO: appropriate confirmation prompts if a database is already
-                                                    //       loaded
-                                                    dataModelPlugin.setDatabase(new SmeltDatabase());
-                                                });
+                                                menuActions::newDatabase);
                                         final Action openDatabaseAction = event.getContext().constructExecutionAction(
-                                                (GUIExecutionContext context) -> {
-                                                    // TODO: present GUI, then open file
-                                                });
+                                                menuActions::openDatabase);
                                         final Action saveDatabaseAction = event.getContext().constructExecutionAction(
-                                                (GUIExecutionContext context) -> {
-                                                    // TODO: save file to known filename (or present GUI if necessary)
-                                                });
+                                                menuActions::saveDatabase);
                                         final Action saveDatabaseAsAction = event.getContext()
-                                                .constructExecutionAction((GUIExecutionContext context) -> {
-                                                    // TODO: present GUI, then save file
-                                                    });
+                                                .constructExecutionAction(menuActions::saveDatabaseAs);
                                         final Action closeDatabaseAction = event.getContext().constructExecutionAction(
-                                                (GUIExecutionContext context) -> {
-                                                    // TODO: appropriate confirmation prompts if a database is already
-                                                    //       loaded
-                                                    dataModelPlugin.setDatabase(null);
-                                                });
+                                                menuActions::closeDatabase);
 
                                         newDatabaseAction.setEnabled(false);
                                         openDatabaseAction.setEnabled(false);
@@ -95,8 +97,8 @@ public class DataGUIPlugin implements SmeltPlugin {
                                                 }));
 
                                         // When a database is opened, it can be saved or closed.
-                                        dataModelPlugin.addListener(new TypedEventListener<>(
-                                                DatabaseOpenedEvent.class, new EventListener<DatabaseOpenedEvent>() {
+                                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
+                                                new EventListener<DatabaseOpenedEvent>() {
                                                     @Override
                                                     public void eventOccurred(DatabaseOpenedEvent event) {
                                                         saveDatabaseAction.setEnabled(true);
@@ -106,8 +108,8 @@ public class DataGUIPlugin implements SmeltPlugin {
                                                 }));
 
                                         // When the database is closed, it can no longer be saved or closed.
-                                        dataModelPlugin.addListener(new TypedEventListener<>(
-                                                DatabaseClosedEvent.class, new EventListener<DatabaseClosedEvent>() {
+                                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
+                                                new EventListener<DatabaseClosedEvent>() {
                                                     @Override
                                                     public void eventOccurred(DatabaseClosedEvent event) {
                                                         saveDatabaseAction.setEnabled(false);
@@ -143,7 +145,7 @@ public class DataGUIPlugin implements SmeltPlugin {
 
     @Override
     public Set<Class<? extends SmeltPlugin>> getRuntimeDependencyTypes() {
-        return Collections.singleton(BaseGUIPlugin.class);
+        return new HashSet<>(Arrays.asList(DataModelPlugin.class, BaseGUIPlugin.class));
     }
 
     @Override
@@ -155,5 +157,52 @@ public class DataGUIPlugin implements SmeltPlugin {
     public void processDeclarations(SmeltPluginDeclarationHandlerContext context, Set<DeclarationNode> declarationNodes)
             throws DeclarationProcessingException {
 
+    }
+
+    private static class MenuActions {
+        private DataModelPlugin dataModelPlugin;
+        private BaseGUIPlugin baseGUIPlugin;
+
+        public MenuActions(DataModelPlugin dataModelPlugin, BaseGUIPlugin baseGUIPlugin) {
+            super();
+            this.dataModelPlugin = dataModelPlugin;
+            this.baseGUIPlugin = baseGUIPlugin;
+        }
+
+        public void newDatabase(GUIExecutionContext context) {
+            // TODO: appropriate confirmation prompts if a database is already loaded
+            dataModelPlugin.setDatabase(new SmeltDatabase());
+        }
+
+        public void openDatabase(GUIExecutionContext context) {
+            // TODO: appropriate confirmation prompts if a database is already loaded
+            // TODO: present GUI, then open file            
+        }
+
+        public void saveDatabase(GUIExecutionContext context) {
+            // TODO: save file to known filename (or present GUI if necessary)
+        }
+
+        public void saveDatabaseAs(GUIExecutionContext context) {
+            JFileChooser chooser = new JFileChooser(); // TODO: based on directory of known filename or last opened file
+            chooser.setFileFilter(new SwingFileFilterWrapper("Smelt database", new OrFileFilter(new SuffixFileFilter(
+                    FileUtils.SMELT_DB_EXTENSION), DirectoryFileFilter.INSTANCE)));
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showSaveDialog(this.baseGUIPlugin.getBaseFrame());
+            if (result == JFileChooser.APPROVE_OPTION) {
+                try {
+                    dataModelPlugin.saveDatabase(chooser.getSelectedFile());
+                } catch (IOException e) {
+                    throw new NotYetImplementedException(e);
+                } catch (SerializationException e) {
+                    throw new NotYetImplementedException(e);
+                } 
+            }
+        }
+
+        public void closeDatabase(GUIExecutionContext context) {
+            // TODO: appropriate confirmation prompts
+            dataModelPlugin.setDatabase(null);
+        }
     }
 }

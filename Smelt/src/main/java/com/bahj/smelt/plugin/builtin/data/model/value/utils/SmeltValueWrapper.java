@@ -2,16 +2,15 @@ package com.bahj.smelt.plugin.builtin.data.model.value.utils;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 
-// TODO: deprecate?  This seems like a silly idea; the generics system is better than this.
-
 /**
- * This wrapper object exists solely for the sake of the Java generics system. It allows a wildcard to be captured and
- * used in two locations. A client can create a <code>SmeltValueWrapper&lt;?&gt;</code> in order to represent a Smelt
- * value of some unknown type. This is necessary because there is no guarantee (from a typing perspective) that some
- * value of type <code>SmeltValue&lt;?&gt;</code> has its own type in its type parameter.
+ * This wrapper object exists solely for the sake of the Java generics system. It allows the self-extending property of
+ * the {@link SmeltValue} type parameter to be captured in the object. Thus, in a case where a user wants a
+ * {@link SmeltValue} type parameterized specifically by itself but does not know specifically what type of
+ * {@link SmeltValue} applies, a {@link SmeltValueWrapper}<code>&lt;?&gt;</code> can be used instead.
  * 
  * @author Zachary Palmer
  * @param <V>
+ *            The type of value stored in this wrapper.
  */
 public class SmeltValueWrapper<V extends SmeltValue<V>> {
     private V smeltValue;
@@ -25,4 +24,28 @@ public class SmeltValueWrapper<V extends SmeltValue<V>> {
         return smeltValue;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((smeltValue == null) ? 0 : smeltValue.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SmeltValueWrapper<?> other = (SmeltValueWrapper<?>) obj;
+        if (smeltValue == null) {
+            if (other.smeltValue != null)
+                return false;
+        } else if (!smeltValue.equals(other.smeltValue))
+            return false;
+        return true;
+    }
 }

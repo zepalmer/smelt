@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.data.model;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +15,7 @@ import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
+import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabaseSerializationStrategy;
 import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
@@ -21,6 +24,12 @@ import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException
 import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltDatumSerializationStrategy;
+import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltEnumValueSerializationStrategy;
+import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltTextSerializationStrategy;
+import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltValueSerializationStrategyRegistry;
+import com.bahj.smelt.serialization.SerializationException;
+import com.bahj.smelt.serialization.SerializationUtils;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
@@ -205,11 +214,14 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
     public SmeltDatabase getDatabase() {
         return database;
     }
-    
+
     /**
      * Changes the database in use by this plugin.
-     * @param database The database to use (or <code>null</code> simply to close any existing database).
-     * @throws IllegalStateException If no data model is loaded.
+     * 
+     * @param database
+     *            The database to use (or <code>null</code> simply to close any existing database).
+     * @throws IllegalStateException
+     *             If no data model is loaded.
      */
     public void setDatabase(SmeltDatabase database) {
         if (this.model == null) {
@@ -226,11 +238,23 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
             fireEvent(new DatabaseOpenedEvent());
         }
     }
-    
+
     private class DatabaseEventRelayListener implements EventListener<DatabaseEvent> {
         @Override
         public void eventOccurred(DatabaseEvent event) {
             fireEvent(event);
         }
+    }
+
+    public void saveDatabase(File selectedFile) throws IOException, SerializationException {
+        SmeltValueSerializationStrategyRegistry registry = new SmeltValueSerializationStrategyRegistry();
+        SmeltDatabaseSerializationStrategy databaseSerializationStrategy = new SmeltDatabaseSerializationStrategy(
+                registry);
+        // Add value serialization strategies to the registry.
+        registry.registerSerializationStrategy(new SmeltTextSerializationStrategy());
+        registry.registerSerializationStrategy(new SmeltEnumValueSerializationStrategy(this.model));
+        registry.registerSerializationStrategy(new SmeltDatumSerializationStrategy(this.model, registry));
+        // Serialize and write the database.
+        SerializationUtils.writeFileSafely(selectedFile, databaseSerializationStrategy, this.database);
     }
 }
