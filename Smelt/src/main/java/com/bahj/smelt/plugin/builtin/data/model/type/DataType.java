@@ -15,14 +15,26 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 public class DataType extends AbstractSmeltType<SmeltDatum> {
     private String name;
     private Map<String, SmeltType<?>> properties;
+    private String titleFieldName;
 
-    public DataType(String name, Map<String, SmeltType<?>> properties) {
+    /**
+     * Creates a new record-like data type.
+     * @param name The unique name of this data type.
+     * @param properties The dictionary of properties for this data type.
+     * @param titleFieldName The name of the property which serves as the "title" for this data type.
+     */
+    public DataType(String name, Map<String, SmeltType<?>> properties, String titleFieldName) {
         this.name = name;
         this.properties = new HashMap<>(properties);
+        this.titleFieldName = titleFieldName;
     }
 
     public String getName() {
         return name;
+    }
+
+    public String getTitleFieldName() {
+        return titleFieldName;
     }
 
     public Map<String, SmeltType<?>> getProperties() {

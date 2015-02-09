@@ -24,6 +24,7 @@ import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException
 import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltDatumSerializationStrategy;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltEnumValueSerializationStrategy;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltTextSerializationStrategy;
@@ -155,6 +156,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
             private DataType constructDataTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
                     throws DeclarationProcessingException {
                 Map<String, SmeltType<?>> fields = new HashMap<>();
+                String firstTextFieldName = null;
                 for (DeclarationNodeDecorator<?> node : messageNode.getChildren()) {
                     if (node instanceof MessageNodeDecorator) {
                         MessageNodeDecorator fieldMessage = (MessageNodeDecorator) node;
@@ -163,13 +165,16 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                         SmeltType<?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
                                 .insistSinglePositionalArgument("field name").insistSingleComponent());
                         String fieldName = fieldMessage.getHeader().getName();
+                        if (firstTextFieldName==null && fieldType.equals(TextType.INSTANCE)) {
+                            firstTextFieldName = fieldName;
+                        }
                         fields.put(fieldName, fieldType);
                     } else {
                         // TODO: report syntax error via appropriate exception
                         throw new NotYetImplementedException();
                     }
                 }
-                return new DataType(typeName, fields);
+                return new DataType(typeName, fields, firstTextFieldName);
             }
 
             private SmeltType<?> getTypeForTypeName(String name) throws DeclarationProcessingException {

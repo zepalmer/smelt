@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyChangeEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 
 /**
@@ -16,7 +17,6 @@ import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
  * should be prepared to deal with the discrepancy.
  * 
  * @author Zachary Palmer
- *
  */
 public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> {
     private Map<String, SmeltValueWrapper<?>> properties;
@@ -62,10 +62,12 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      *            The new value for that field (or <code>null</code> to delete it).
      */
     public <V extends SmeltValue<V>> void set(String fieldName, V value) {
+        SmeltValue<?> oldValue = this.properties.get(fieldName).getSmeltValue();
         if (value == null) {
             this.properties.remove(fieldName);
         } else {
             this.properties.put(fieldName, new SmeltValueWrapper<>(value));
         }
+        fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, oldValue, value));
     }
 }

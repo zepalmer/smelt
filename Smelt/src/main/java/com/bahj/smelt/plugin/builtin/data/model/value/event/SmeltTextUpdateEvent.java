@@ -7,7 +7,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltText;
  * 
  * @author Zachary Palmer
  */
-public class SmeltTextUpdateEvent extends SmeltTextEvent {
+public class SmeltTextUpdateEvent extends SmeltTextEvent implements SmeltValueUpdateEvent<SmeltText, String> {
     private String oldValue;
     private String newValue;
 
@@ -24,5 +24,4 @@ public class SmeltTextUpdateEvent extends SmeltTextEvent {
     public String getNewValue() {
         return newValue;
     }
-
 }
