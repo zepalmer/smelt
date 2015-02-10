@@ -9,6 +9,7 @@ import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyChangeEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyInnerUpdateEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumTitlePropertyUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
@@ -23,10 +24,12 @@ import com.bahj.smelt.util.event.EventListener;
  * @author Zachary Palmer
  */
 public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> {
+    private DataType dataType;
     private Map<String, FieldEntry<?, ?>> properties;
 
     public SmeltDatum(DataType type) {
         super(type);
+        this.dataType = type;
         this.properties = new HashMap<>();
     }
 
@@ -79,6 +82,9 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
             newEntry.addPropagatingListenerToValue();
         }
         fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, entry.getValueWrapper().getSmeltValue(), value));
+        if (this.dataType.getTitleFieldName().equals(fieldName)) {
+            fireEvent(new SmeltDatumTitlePropertyUpdateEvent(this));
+        }
     }
 
     private class FieldEntry<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> {
@@ -119,6 +125,9 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
                 SmeltValueUpdateEvent<?, ?, ?> updateEvent = (SmeltValueUpdateEvent<?, ?, ?>) event;
                 fireEvent(new SmeltDatumPropertyInnerUpdateEvent(SmeltDatum.this, this.fieldName,
                         updateEvent.getValue(), updateEvent));
+                if (this.fieldName.equals(SmeltDatum.this.dataType.getTitleFieldName())) {
+                    fireEvent(new SmeltDatumTitlePropertyUpdateEvent(SmeltDatum.this));
+                }
             }
         }
     }
