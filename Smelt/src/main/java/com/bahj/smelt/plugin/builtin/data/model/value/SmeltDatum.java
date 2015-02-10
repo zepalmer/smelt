@@ -8,6 +8,7 @@ import java.util.Map;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyChangeEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 
 /**
@@ -19,7 +20,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
  * @author Zachary Palmer
  */
 public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> {
-    private Map<String, SmeltValueWrapper<?>> properties;
+    private Map<String, SmeltValueWrapper<?,?>> properties;
 
     public SmeltDatum(DataType type) {
         super(type);
@@ -37,8 +38,8 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      *            The name of the field in question.
      * @return The value of that field (or <code>null</code> if that field has no value).
      */
-    public SmeltValue<?> get(String fieldName) {
-        SmeltValueWrapper<?> wrapper = this.properties.get(fieldName);
+    public SmeltValue<?,?> get(String fieldName) {
+        SmeltValueWrapper<?,?> wrapper = this.properties.get(fieldName);
         return (wrapper == null) ? null : wrapper.getSmeltValue();
     }
 
@@ -49,7 +50,7 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      *            The name of the field in question.
      * @return The value of that field (or <code>null</code> if that field has no value).
      */
-    public SmeltValueWrapper<?> getWrapped(String fieldName) {
+    public SmeltValueWrapper<?,?> getWrapped(String fieldName) {
         return this.properties.get(fieldName);
     }
 
@@ -61,8 +62,8 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      * @param value
      *            The new value for that field (or <code>null</code> to delete it).
      */
-    public <V extends SmeltValue<V>> void set(String fieldName, V value) {
-        SmeltValue<?> oldValue = this.properties.get(fieldName).getSmeltValue();
+    public <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V, E>> void set(String fieldName, V value) {
+        SmeltValue<?,?> oldValue = this.properties.get(fieldName).getSmeltValue();
         if (value == null) {
             this.properties.remove(fieldName);
         } else {

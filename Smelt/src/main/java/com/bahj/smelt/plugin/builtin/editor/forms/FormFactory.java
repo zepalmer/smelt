@@ -22,5 +22,5 @@ public interface FormFactory {
      * @throws SmeltTypeMismatchException
      *             If the provided value is not of a type editable by this form.
      */
-    public Form createForm(SmeltValue<?> value) throws SmeltTypeMismatchException;
+    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException;
 }

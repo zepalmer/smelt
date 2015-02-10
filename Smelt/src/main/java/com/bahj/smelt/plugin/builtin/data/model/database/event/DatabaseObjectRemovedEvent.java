@@ -2,6 +2,7 @@ package com.bahj.smelt.plugin.builtin.data.model.database.event;
 
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 
 /**
@@ -9,14 +10,14 @@ import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
  * @author Zachary Palmer
  */
 public class DatabaseObjectRemovedEvent extends DatabaseEvent{
-    private SmeltValueWrapper<?> wrapper;
+    private SmeltValueWrapper<?,?> wrapper;
 
-    public <V extends SmeltValue<V>> DatabaseObjectRemovedEvent(SmeltDatabase database, V value) {
+    public <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V, E>> DatabaseObjectRemovedEvent(SmeltDatabase database, V value) {
         super(database);
-        this.wrapper = new SmeltValueWrapper<V>(value);
+        this.wrapper = new SmeltValueWrapper<V,E>(value);
     }
 
-    public SmeltValueWrapper<?> getWrapper() {
+    public SmeltValueWrapper<?,?> getWrapper() {
         return wrapper;
     }
 }

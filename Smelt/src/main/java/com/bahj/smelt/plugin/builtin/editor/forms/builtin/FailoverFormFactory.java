@@ -30,7 +30,7 @@ public class FailoverFormFactory implements FormFactory {
     }
 
     @Override
-    public Form createForm(SmeltValue<?> value) throws SmeltTypeMismatchException {
+    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
         SmeltTypeMismatchException exception = null;
         for (FormFactory factory : this.factories) {
             try {

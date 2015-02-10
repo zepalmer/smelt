@@ -9,5 +9,5 @@ import com.bahj.smelt.serialization.json.SmeltJSONSerializationStrategy;
  *
  * @param <V> The type of Smelt value serialized by this strategy.
  */
-public interface SmeltValueSerializationStrategy extends SmeltJSONSerializationStrategy<SmeltValueWrapper<?>> {
+public interface SmeltValueSerializationStrategy extends SmeltJSONSerializationStrategy<SmeltValueWrapper<?,?>> {
 }

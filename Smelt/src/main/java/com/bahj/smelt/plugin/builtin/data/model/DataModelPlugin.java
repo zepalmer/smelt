@@ -155,14 +155,14 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
 
             private DataType constructDataTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
                     throws DeclarationProcessingException {
-                Map<String, SmeltType<?>> fields = new HashMap<>();
+                Map<String, SmeltType<?,?>> fields = new HashMap<>();
                 String firstTextFieldName = null;
                 for (DeclarationNodeDecorator<?> node : messageNode.getChildren()) {
                     if (node instanceof MessageNodeDecorator) {
                         MessageNodeDecorator fieldMessage = (MessageNodeDecorator) node;
                         fieldMessage.getHeader().insistNoNamedArguments();
                         fieldMessage.insistNoChildren();
-                        SmeltType<?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
+                        SmeltType<?,?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
                                 .insistSinglePositionalArgument("field name").insistSingleComponent());
                         String fieldName = fieldMessage.getHeader().getName();
                         if (firstTextFieldName==null && fieldType.equals(TextType.INSTANCE)) {
@@ -177,9 +177,9 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                 return new DataType(typeName, fields, firstTextFieldName);
             }
 
-            private SmeltType<?> getTypeForTypeName(String name) throws DeclarationProcessingException {
+            private SmeltType<?,?> getTypeForTypeName(String name) throws DeclarationProcessingException {
                 // First try to look it up in the model.
-                SmeltType<?> type = model.getTypes().get(name);
+                SmeltType<?,?> type = model.getTypes().get(name);
                 if (type == null) {
                     // If that fails, let's try to process that name and then see if we can find anything.
                     processDeclaration(name);

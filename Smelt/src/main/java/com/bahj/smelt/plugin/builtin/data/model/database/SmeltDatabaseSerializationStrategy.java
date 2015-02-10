@@ -29,7 +29,7 @@ public class SmeltDatabaseSerializationStrategy implements SmeltJSONSerializatio
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty(TYPE_FIELD, TYPE_NAME);
         JsonArray valueArray = new JsonArray();
-        for (SmeltValueWrapper<?> valueWrapper : database.getAllWrapped()) {
+        for (SmeltValueWrapper<?,?> valueWrapper : database.getAllWrapped()) {
             JsonElement valueAsJson = this.registry.serializeValue(valueWrapper);
             valueArray.add(valueAsJson);
         }
@@ -49,7 +49,7 @@ public class SmeltDatabaseSerializationStrategy implements SmeltJSONSerializatio
 
             SmeltDatabase database = new SmeltDatabase();
             for (JsonElement element : valuesArray.getElement()) {
-                SmeltValueWrapper<?> valueWrapper = this.registry.deserializeValue(element);
+                SmeltValueWrapper<?,?> valueWrapper = this.registry.deserializeValue(element);
                 database.add(valueWrapper.getSmeltValue());
             }
             

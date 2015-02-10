@@ -24,6 +24,7 @@ import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltTypeMismatchException;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.editor.forms.Form;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactory;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactoryRegistry;
@@ -105,7 +106,7 @@ public class EditorPanel extends JPanel {
 
     private class EditorPanelContextImpl implements EditorPanelContext {
         @Override
-        public <V extends SmeltValue<V>> void openEditor(V value) {
+        public <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V, E>> void openEditor(V value) {
             DefaultMultipleCDockable dockable = findEditorFor(value);
             if (dockable == null) {
                 // The value does not currently have an editor. Create one.
@@ -166,7 +167,7 @@ public class EditorPanel extends JPanel {
         }
     }
 
-    private DefaultMultipleCDockable findEditorFor(SmeltValue<?> value) {
+    private DefaultMultipleCDockable findEditorFor(SmeltValue<?,?> value) {
         for (int i = 0; i < this.control.getCDockableCount(); i++) {
             CDockable dockable = this.control.getCDockable(i);
             if (dockable instanceof SmeltValueMultipleCDockable) {
@@ -180,14 +181,14 @@ public class EditorPanel extends JPanel {
     }
 
     private static class SmeltValueMultipleCDockable extends DefaultMultipleCDockable {
-        private SmeltValue<?> value;
+        private SmeltValue<?,?> value;
 
-        public SmeltValueMultipleCDockable(SmeltValue<?> value) {
+        public SmeltValueMultipleCDockable(SmeltValue<?,?> value) {
             super(null);
             this.value = value;
         }
 
-        public SmeltValue<?> getValue() {
+        public SmeltValue<?,?> getValue() {
             return value;
         }
     }

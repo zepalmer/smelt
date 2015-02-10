@@ -7,6 +7,7 @@ import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 
 /**
@@ -15,7 +16,7 @@ import com.bahj.smelt.util.event.AbstractEventGenerator;
  * @author Zachary Palmer
  */
 public class SmeltDataModel extends AbstractEventGenerator<DataModelPluginEvent> {
-    private Map<String, SmeltType<?>> types;
+    private Map<String, SmeltType<?,?>> types;
 
     public SmeltDataModel() {
         super();
@@ -29,15 +30,15 @@ public class SmeltDataModel extends AbstractEventGenerator<DataModelPluginEvent>
         }
     }
 
-    public <T extends SmeltType<V>, V extends SmeltValue<V>> void addType(T type) throws DuplicateTypeNameException {
-        SmeltType<?> existing = this.types.get(type.getName());
+    public <T extends SmeltType<V,E>, V extends SmeltValue<V,E>, E extends SmeltValueEvent<V,E>> void addType(T type) throws DuplicateTypeNameException {
+        SmeltType<?,?> existing = this.types.get(type.getName());
         if (existing != null) {
             throw new DuplicateTypeNameException(existing.getName(), existing, type);
         }
         this.types.put(type.getName(), type);
     }
 
-    public Map<String, SmeltType<?>> getTypes() {
+    public Map<String, SmeltType<?,?>> getTypes() {
         return types;
     }
 }

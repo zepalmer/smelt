@@ -11,18 +11,18 @@ import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
  * @author Zachary Palmer
  */
 public class FormFactoryRegistry {
-    private Map<SmeltType<?>, FormFactory> map;
+    private Map<SmeltType<?,?>, FormFactory> map;
 
     public FormFactoryRegistry() {
         super();
         this.map = new HashMap<>();
     }
 
-    public FormFactory getFormFactory(SmeltType<?> type) {
+    public FormFactory getFormFactory(SmeltType<?,?> type) {
         return map.get(type);
     }
 
-    public void registerFormFactory(SmeltType<?> type, FormFactory factory) {
+    public void registerFormFactory(SmeltType<?,?> type, FormFactory factory) {
         this.map.put(type, factory);
     }
     

@@ -9,13 +9,13 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
  * @author Zachary Palmer
  */
 public class SmeltDatumPropertyChangeEvent extends SmeltDatumEvent implements
-        SmeltValueUpdateEvent<SmeltDatum, SmeltValue<?>> {
+        SmeltValueUpdateEvent<SmeltDatum, SmeltDatumEvent, SmeltValue<?,?>> {
     private String fieldName;
-    private SmeltValue<?> oldValue;
-    private SmeltValue<?> newValue;
+    private SmeltValue<?,?> oldValue;
+    private SmeltValue<?,?> newValue;
 
-    public SmeltDatumPropertyChangeEvent(SmeltDatum value, String fieldName, SmeltValue<?> oldValue,
-            SmeltValue<?> newValue) {
+    public SmeltDatumPropertyChangeEvent(SmeltDatum value, String fieldName, SmeltValue<?,?> oldValue,
+            SmeltValue<?,?> newValue) {
         super(value);
         this.fieldName = fieldName;
         this.oldValue = oldValue;
@@ -26,11 +26,11 @@ public class SmeltDatumPropertyChangeEvent extends SmeltDatumEvent implements
         return fieldName;
     }
 
-    public SmeltValue<?> getOldValue() {
+    public SmeltValue<?,?> getOldValue() {
         return oldValue;
     }
 
-    public SmeltValue<?> getNewValue() {
+    public SmeltValue<?,?> getNewValue() {
         return newValue;
     }
 }

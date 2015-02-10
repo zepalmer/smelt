@@ -19,11 +19,11 @@ import com.bahj.smelt.util.NotYetImplementedException;
 
 public class DatumFieldFormFactory implements FormFactory {
     private FormFactoryRegistry formFactoryRegistry;
-    private SmeltType<?> fieldType;
+    private SmeltType<?,?> fieldType;
     private String fieldName;
     private int labelSpacing;
     
-    public DatumFieldFormFactory(FormFactoryRegistry formFactoryRegistry, SmeltType<?> fieldType,
+    public DatumFieldFormFactory(FormFactoryRegistry formFactoryRegistry, SmeltType<?,?> fieldType,
             String fieldName, int labelSpacing) {
         super();
         this.formFactoryRegistry = formFactoryRegistry;
@@ -33,7 +33,7 @@ public class DatumFieldFormFactory implements FormFactory {
     }
 
     @Override
-    public Form createForm(SmeltValue<?> value) throws SmeltTypeMismatchException {
+    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
         // If the value is not a datum, we should provide an initialization form.
         if (!(value instanceof SmeltDatum)) {
             // TODO: an initialization form (similar to above in the container logic)
@@ -43,7 +43,7 @@ public class DatumFieldFormFactory implements FormFactory {
         SmeltDatum datum = (SmeltDatum) value;
 
         // Fetch the value currently contained in that field.
-        SmeltValue<?> fieldValue = datum.get(fieldName);
+        SmeltValue<?,?> fieldValue = datum.get(fieldName);
 
         // Fetch the form factory for this field's type. (This will exist because the plugin has already
         // treated the field type as required.)

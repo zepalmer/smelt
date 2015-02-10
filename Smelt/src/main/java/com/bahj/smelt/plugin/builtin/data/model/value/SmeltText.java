@@ -1,13 +1,13 @@
 package com.bahj.smelt.plugin.builtin.data.model.value;
 
-import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltTextEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltTextUpdateEvent;
 
 public class SmeltText extends AbstractSmeltValue<SmeltText, SmeltTextEvent> {
 	private String value;
 
-	public SmeltText(SmeltType<SmeltText> type, String value) {
+	public SmeltText(TextType type, String value) {
         super(type);
         this.value = value;
     }

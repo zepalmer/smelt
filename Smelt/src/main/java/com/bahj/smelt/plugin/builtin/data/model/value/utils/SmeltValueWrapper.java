@@ -1,6 +1,7 @@
 package com.bahj.smelt.plugin.builtin.data.model.value.utils;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 
 /**
  * This wrapper object exists solely for the sake of the Java generics system. It allows the self-extending property of
@@ -12,7 +13,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
  * @param <V>
  *            The type of value stored in this wrapper.
  */
-public class SmeltValueWrapper<V extends SmeltValue<V>> {
+public class SmeltValueWrapper<V extends SmeltValue<V,E>, E extends SmeltValueEvent<V,E>> {
     private V smeltValue;
 
     public SmeltValueWrapper(V smeltValue) {
@@ -40,7 +41,7 @@ public class SmeltValueWrapper<V extends SmeltValue<V>> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SmeltValueWrapper<?> other = (SmeltValueWrapper<?>) obj;
+        SmeltValueWrapper<?,?> other = (SmeltValueWrapper<?,?>) obj;
         if (smeltValue == null) {
             if (other.smeltValue != null)
                 return false;

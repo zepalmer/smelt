@@ -1,6 +1,7 @@
 package com.bahj.smelt.plugin.builtin.data.model.value.serialization;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
@@ -16,8 +17,8 @@ import com.google.gson.JsonObject;
  * 
  * @author Zachary Palmer
  */
-public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltValue<V>> implements
-        SmeltValueSerializationStrategy {
+public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>>
+        implements SmeltValueSerializationStrategy {
     private static final String CLASS_KEY = "smeltValueClass";
     private static final String VALUE_KEY = "smeltValue";
 
@@ -33,9 +34,9 @@ public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltVal
         super();
         this.valueClass = valueClass;
     }
-    
+
     @Override
-    public JsonElement objectToJson(SmeltValueWrapper<?> obj) throws SerializationException {
+    public JsonElement objectToJson(SmeltValueWrapper<?, ?> obj) throws SerializationException {
         if (this.valueClass.isInstance(obj.getSmeltValue())) {
             V value = this.valueClass.cast(obj.getSmeltValue());
             JsonObject wrapperObject = new JsonObject();
@@ -50,14 +51,14 @@ public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltVal
     }
 
     @Override
-    public SmeltValueWrapper<?> jsonToObject(JsonElement jsonElement) throws DeserializationException {
+    public SmeltValueWrapper<?, ?> jsonToObject(JsonElement jsonElement) throws DeserializationException {
         try {
             JsonWrapper<?> json = JsonWrapper.wrap(jsonElement);
-            JsonObjectWrapper wrapperObject = json.asObject();        
+            JsonObjectWrapper wrapperObject = json.asObject();
             String className = wrapperObject.getRequiredField(CLASS_KEY).asString();
             if (!this.valueClass.getName().equals(className)) {
-                throw new DeserializationException("This deserializer handles objects of type " + this.valueClass.getName()
-                        + "; the provided object is a serialized " + className);
+                throw new DeserializationException("This deserializer handles objects of type "
+                        + this.valueClass.getName() + "; the provided object is a serialized " + className);
             }
             JsonWrapper<?> valueJson = wrapperObject.getRequiredField(VALUE_KEY);
             return new SmeltValueWrapper<>(jsonToValue(valueJson));

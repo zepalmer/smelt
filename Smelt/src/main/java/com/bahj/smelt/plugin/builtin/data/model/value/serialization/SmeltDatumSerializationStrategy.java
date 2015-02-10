@@ -7,6 +7,7 @@ import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
 import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.util.NotYetImplementedException;
@@ -16,7 +17,7 @@ import com.bahj.smelt.util.json.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class SmeltDatumSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltDatum> {
+public class SmeltDatumSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltDatum,SmeltDatumEvent> {
     private static final String TYPE_NAME_KEY = "typeName";
     private static final String PROPERTY_MAP_KEY = "propertyMap";
 
@@ -49,7 +50,7 @@ public class SmeltDatumSerializationStrategy extends AbstractSmeltValueSerializa
     protected SmeltDatum jsonToValue(JsonWrapper<?> json) throws DeserializationException, JsonFormatException {
         JsonObjectWrapper datumObject = json.asObject();
         String typeName = datumObject.getField(TYPE_NAME_KEY).asString();
-        SmeltType<?> smeltType = this.dataModel.getTypes().get(typeName);
+        SmeltType<?,?> smeltType = this.dataModel.getTypes().get(typeName);
         if (!(smeltType instanceof DataType)) {
             throw new NotYetImplementedException();
         }

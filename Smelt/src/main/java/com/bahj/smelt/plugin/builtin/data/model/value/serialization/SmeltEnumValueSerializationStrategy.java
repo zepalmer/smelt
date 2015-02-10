@@ -4,6 +4,7 @@ import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.EnumType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltEnumValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltEnumEvent;
 import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.util.NotYetImplementedException;
@@ -13,7 +14,7 @@ import com.bahj.smelt.util.json.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class SmeltEnumValueSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltEnumValue> {
+public class SmeltEnumValueSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltEnumValue,SmeltEnumEvent> {
     private static final String TYPE_NAME_KEY = "typeName";
     private static final String CHOICE_KEY = "choice";
 
@@ -37,7 +38,7 @@ public class SmeltEnumValueSerializationStrategy extends AbstractSmeltValueSeria
         JsonObjectWrapper enumValueObject = json.asObject();
         String typeName = enumValueObject.getRequiredField(TYPE_NAME_KEY).asString();
         String choice = enumValueObject.getField(CHOICE_KEY).asString();
-        SmeltType<?> smeltType = dataModel.getTypes().get(typeName);
+        SmeltType<?,?> smeltType = dataModel.getTypes().get(typeName);
         if (smeltType == null || !(smeltType instanceof EnumType)) {
             throw new NotYetImplementedException(); // TODO
         }

@@ -39,7 +39,7 @@ public class ContainerFormFactory implements FormFactory {
     }
 
     @Override
-    public Form createForm(SmeltValue<?> value) throws SmeltTypeMismatchException {
+    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
         // There are two types of containers: horizontal and vertical. Build an appropriate component to
         // host the children based on this.
         JPanel panel = new JPanel();

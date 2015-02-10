@@ -10,10 +10,10 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 public class SmeltTypeMismatchException extends Exception {
     private static final long serialVersionUID = 1L;
 
-    private SmeltType<?> type;
-    private SmeltValue<?> value;
+    private SmeltType<?,?> type;
+    private SmeltValue<?,?> value;
 
-    public SmeltTypeMismatchException(SmeltType<?> type, SmeltValue<?> value) {
+    public SmeltTypeMismatchException(SmeltType<?,?> type, SmeltValue<?,?> value) {
         super();
         this.type = type;
         this.value = value;
@@ -23,11 +23,11 @@ public class SmeltTypeMismatchException extends Exception {
         return serialVersionUID;
     }
 
-    public SmeltType<?> getType() {
+    public SmeltType<?,?> getType() {
         return type;
     }
 
-    public SmeltValue<?> getValue() {
+    public SmeltValue<?,?> getValue() {
         return value;
     }
 }

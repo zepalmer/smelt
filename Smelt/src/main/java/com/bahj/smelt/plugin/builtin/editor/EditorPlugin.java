@@ -167,7 +167,7 @@ public class EditorPlugin implements SmeltPlugin {
                 MessageNodeDecorator messageNode = new MessageNodeDecorator((MessageNode) node, decoratorNodeContext);
                 String typeName = messageNode.getHeader().insistSinglePositionalArgument("type name")
                         .insistSingleComponent();
-                SmeltType<?> type = dataModelPlugin.getModel().getTypes().get(typeName);
+                SmeltType<?,?> type = dataModelPlugin.getModel().getTypes().get(typeName);
                 if (type == null) {
                     // TODO: raise an exception for referring to a missing type
                     throw new NotYetImplementedException();
@@ -278,7 +278,7 @@ public class EditorPlugin implements SmeltPlugin {
                 messageNodeDecorator.insistNoChildren();
 
                 // Next, ensure that the type in question has a field by that name. If it does not, eagerly fail.
-                SmeltType<?> fieldType = type.getProperties().get(fieldName);
+                SmeltType<?,?> fieldType = type.getProperties().get(fieldName);
                 if (fieldType == null) {
                     // TODO: appropriate error
                     throw new NotYetImplementedException();

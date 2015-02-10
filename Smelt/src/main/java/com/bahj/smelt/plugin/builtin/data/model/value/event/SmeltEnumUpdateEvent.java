@@ -7,7 +7,8 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltEnumValue;
  * 
  * @author Zachary Palmer
  */
-public class SmeltEnumUpdateEvent extends SmeltEnumEvent implements SmeltValueUpdateEvent<SmeltEnumValue, String>{
+public class SmeltEnumUpdateEvent extends SmeltEnumEvent implements
+        SmeltValueUpdateEvent<SmeltEnumValue, SmeltEnumEvent, String> {
     private String oldChoice;
     private String newChoice;
 
