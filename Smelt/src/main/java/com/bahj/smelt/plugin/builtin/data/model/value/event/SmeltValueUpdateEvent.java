@@ -1,6 +1,8 @@
 package com.bahj.smelt.plugin.builtin.data.model.value.event;
 
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltText;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.util.event.Event;
 
 /**
  * An interface which should be implemented by any {@link SmeltValueEvent} representing a value update.
@@ -14,7 +16,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
  * @param <P>
  *            The type of the property being updated (e.g. {@link String} for a {@link SmeltText}).
  */
-public interface SmeltValueUpdateEvent<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>, P> {
+public interface SmeltValueUpdateEvent<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>, P> extends Event {
     public V getValue();
 
     public P getOldValue();

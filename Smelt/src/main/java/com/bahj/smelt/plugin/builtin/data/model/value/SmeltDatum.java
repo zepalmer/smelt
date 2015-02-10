@@ -8,8 +8,11 @@ import java.util.Map;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyChangeEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyInnerUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
+import com.bahj.smelt.util.event.EventListener;
 
 /**
  * Represents an instance of a Smelt data type. Because the schema for a datum can change after the datum is created, we
@@ -20,7 +23,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
  * @author Zachary Palmer
  */
 public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> {
-    private Map<String, SmeltValueWrapper<?,?>> properties;
+    private Map<String, FieldEntry<?, ?>> properties;
 
     public SmeltDatum(DataType type) {
         super(type);
@@ -38,8 +41,8 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      *            The name of the field in question.
      * @return The value of that field (or <code>null</code> if that field has no value).
      */
-    public SmeltValue<?,?> get(String fieldName) {
-        SmeltValueWrapper<?,?> wrapper = this.properties.get(fieldName);
+    public SmeltValue<?, ?> get(String fieldName) {
+        SmeltValueWrapper<?, ?> wrapper = this.properties.get(fieldName).getValueWrapper();
         return (wrapper == null) ? null : wrapper.getSmeltValue();
     }
 
@@ -50,8 +53,8 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      *            The name of the field in question.
      * @return The value of that field (or <code>null</code> if that field has no value).
      */
-    public SmeltValueWrapper<?,?> getWrapped(String fieldName) {
-        return this.properties.get(fieldName);
+    public SmeltValueWrapper<?, ?> getWrapped(String fieldName) {
+        return this.properties.get(fieldName).getValueWrapper();
     }
 
     /**
@@ -62,13 +65,61 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      * @param value
      *            The new value for that field (or <code>null</code> to delete it).
      */
-    public <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V, E>> void set(String fieldName, V value) {
-        SmeltValue<?,?> oldValue = this.properties.get(fieldName).getSmeltValue();
+    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void set(String fieldName, V value) {
+        FieldEntry<?, ?> entry = this.properties.get(fieldName);
+        if (entry != null) {
+            entry.removePropagatingListenerFromValue();
+        }
         if (value == null) {
             this.properties.remove(fieldName);
         } else {
-            this.properties.put(fieldName, new SmeltValueWrapper<>(value));
+            FieldEntry<V, E> newEntry = new FieldEntry<>(new SmeltValueWrapper<>(value),
+                    new FieldUpdatePropagatingListener<>(fieldName));
+            this.properties.put(fieldName, newEntry);
+            newEntry.addPropagatingListenerToValue();
         }
-        fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, oldValue, value));
+        fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, entry.getValueWrapper().getSmeltValue(), value));
+    }
+
+    private class FieldEntry<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> {
+        private SmeltValueWrapper<V, E> valueWrapper;
+        private EventListener<E> propagatingListener;
+
+        public FieldEntry(SmeltValueWrapper<V, E> valueWrapper, EventListener<E> propagatingListener) {
+            super();
+            this.valueWrapper = valueWrapper;
+            this.propagatingListener = propagatingListener;
+        }
+
+        public SmeltValueWrapper<V, E> getValueWrapper() {
+            return valueWrapper;
+        }
+
+        public void addPropagatingListenerToValue() {
+            this.valueWrapper.getSmeltValue().addListener(this.propagatingListener);
+        }
+
+        public void removePropagatingListenerFromValue() {
+            this.valueWrapper.getSmeltValue().removeListener(this.propagatingListener);
+        }
+    }
+
+    private class FieldUpdatePropagatingListener<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>>
+            implements EventListener<E> {
+        private String fieldName;
+
+        public FieldUpdatePropagatingListener(String fieldName) {
+            super();
+            this.fieldName = fieldName;
+        }
+
+        @Override
+        public void eventOccurred(E event) {
+            if (event instanceof SmeltValueUpdateEvent) {
+                SmeltValueUpdateEvent<?, ?, ?> updateEvent = (SmeltValueUpdateEvent<?, ?, ?>) event;
+                fireEvent(new SmeltDatumPropertyInnerUpdateEvent(SmeltDatum.this, this.fieldName,
+                        updateEvent.getValue(), updateEvent));
+            }
+        }
     }
 }
