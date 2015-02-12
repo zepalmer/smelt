@@ -10,18 +10,19 @@ import com.bahj.smelt.util.json.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 
-public class SmeltTextSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltText,SmeltTextEvent> {
+public class SmeltTextSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltText, SmeltTextEvent> {
     public SmeltTextSerializationStrategy() {
         super(SmeltText.class);
     }
 
     @Override
-    protected JsonElement valueToJson(SmeltText value) throws SerializationException {
+    protected JsonElement valueToJson(ValueSerializationContext context, SmeltText value) throws SerializationException {
         return new JsonPrimitive(value.getValue());
     }
 
     @Override
-    protected SmeltText jsonToValue(JsonWrapper<?> json) throws DeserializationException, JsonFormatException {
+    protected SmeltText jsonToValue(ValueDeserializationContext context, JsonWrapper<?> json)
+            throws DeserializationException, JsonFormatException {
         return new SmeltText(TextType.INSTANCE, json.asString());
     }
 }
