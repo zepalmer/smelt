@@ -23,4 +23,9 @@ public class SmeltText extends AbstractSmeltValue<SmeltText, SmeltTextEvent> {
             fireEvent(new SmeltTextUpdateEvent(this, oldValue, this.value));
         }
     }
+
+    @Override
+    public String getDescription() {
+        return this.value;
+    }    
 }

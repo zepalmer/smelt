@@ -10,4 +10,10 @@ public interface SmeltValue<V extends SmeltValue<V,E>, E extends SmeltValueEvent
      * @return The type of this value.
      */
     public SmeltType<V,E> getType();
+    
+    /**
+     * Retrieves a human-readable description of this Smelt value.
+     * @return A string summarizing this Smelt value.
+     */
+    public String getDescription();
 }

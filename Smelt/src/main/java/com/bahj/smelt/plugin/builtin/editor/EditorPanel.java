@@ -25,6 +25,7 @@ import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltTypeMismatchException;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueDescriptionUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.editor.forms.Form;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactory;
@@ -133,11 +134,22 @@ public class EditorPanel extends JPanel {
 
                 // Set up a dockable for this editor
                 DefaultMultipleCDockable editorDockable = new SmeltValueMultipleCDockable(value);
-                editorDockable.setTitleText(value.toString()); // TODO: actual title text, and keep it in sync
+                editorDockable.setTitleText(value.getDescription());
                 editorDockable.setCloseable(true);
                 editorDockable.setRemoveOnClose(true);
                 editorDockable.setExternalizable(false); // TODO: this feature is broken -- why?
                 editorDockable.add(editorScrollPane);
+                
+                // Keep dockable title text in sync.
+                EventListener<SmeltValueEvent<?, ?>> descriptionUpdateListener = new EventListener<SmeltValueEvent<?, ?>>() {
+                    @Override
+                    public void eventOccurred(SmeltValueEvent<?, ?> event) {
+                        if (event instanceof SmeltValueDescriptionUpdateEvent) {
+                            editorDockable.setTitleText(value.getDescription());
+                        }
+                    }
+                };
+                value.addListener(descriptionUpdateListener);
 
                 // Add listener to destroy form when window is closed
                 editorDockable.addCDockableStateListener(new CDockableStateListener() {
@@ -145,6 +157,7 @@ public class EditorPanel extends JPanel {
                     public void visibilityChanged(CDockable dockable) {
                         if (!dockable.isVisible()) {
                             form.destroy();
+                            value.removeListener(descriptionUpdateListener);
                             control.removeDockable(editorDockable);
                             EditorPanel.this.toCloseOnDatabaseClose.remove(editorDockable);
                         }

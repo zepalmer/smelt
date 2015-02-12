@@ -89,6 +89,21 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
         }
     }
 
+    @Override
+    public String getDescription() {
+        FieldEntry<?, ?> entry = this.properties.get(this.dataType.getTitleFieldName());
+        if (entry == null || entry.getValueWrapper() == null || entry.getValueWrapper().getSmeltValue() == null) {
+            return "<datum>";
+        } else {
+            String description = entry.getValueWrapper().getSmeltValue().getDescription();
+            if (description == null || description.trim().length() == 0) {
+                return "<new " + this.dataType.getName() + ">";
+            } else {
+                return description;
+            }
+        }
+    }
+
     private class FieldEntry<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> {
         private SmeltValueWrapper<V, E> valueWrapper;
         private EventListener<E> propagatingListener;

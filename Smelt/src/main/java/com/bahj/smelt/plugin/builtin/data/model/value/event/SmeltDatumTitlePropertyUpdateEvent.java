@@ -8,7 +8,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
  * property.
  * @author Zachary Palmer
  */
-public class SmeltDatumTitlePropertyUpdateEvent extends SmeltDatumEvent {
+public class SmeltDatumTitlePropertyUpdateEvent extends SmeltDatumEvent implements SmeltValueDescriptionUpdateEvent<SmeltDatum, SmeltDatumEvent> {
     public SmeltDatumTitlePropertyUpdateEvent(SmeltDatum value) {
         super(value);
     }
