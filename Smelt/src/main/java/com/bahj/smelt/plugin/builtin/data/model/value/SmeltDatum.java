@@ -81,7 +81,9 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
             this.properties.put(fieldName, newEntry);
             newEntry.addPropagatingListenerToValue();
         }
-        fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, entry.getValueWrapper().getSmeltValue(), value));
+        SmeltValue<?, ?> oldValue = entry == null || entry.getValueWrapper() == null ? null : entry.getValueWrapper()
+                .getSmeltValue();
+        fireEvent(new SmeltDatumPropertyChangeEvent(this, fieldName, oldValue, value));
         if (this.dataType.getTitleFieldName().equals(fieldName)) {
             fireEvent(new SmeltDatumTitlePropertyUpdateEvent(this));
         }
