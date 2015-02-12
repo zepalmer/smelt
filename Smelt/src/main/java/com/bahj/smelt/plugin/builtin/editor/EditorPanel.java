@@ -18,6 +18,7 @@ import bibliothek.gui.dock.common.DefaultSingleCDockable;
 import bibliothek.gui.dock.common.event.CDockableStateListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.common.mode.ExtendedMode;
+import bibliothek.gui.dock.common.theme.ThemeMap;
 
 import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITabKey;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
@@ -74,6 +75,7 @@ public class EditorPanel extends JPanel {
         // TODO: call this.control.destroy() when appropriate (at least by the close of the application)?
         this.setLayout(new BorderLayout());
         this.add(control.getContentArea(), BorderLayout.CENTER);
+        this.control.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
 
         // Create the database browsing panel.
         EditorPanelContext context = new EditorPanelContextImpl();
