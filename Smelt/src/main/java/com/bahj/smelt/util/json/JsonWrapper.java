@@ -52,10 +52,6 @@ public class JsonWrapper<T extends JsonElement> {
         return this.asPrimitive().asString();
     }
     
-    public int asInt() throws JsonFormatException {
-        return this.asPrimitive().asInt();
-    }
-    
     protected JsonFormatException failureByMismatch(String expectation) {
         return failureWithMessage("Expected " + expectation + " but found " + getJsonTypeDescription());
     }

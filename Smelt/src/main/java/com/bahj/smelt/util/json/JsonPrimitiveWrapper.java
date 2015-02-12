@@ -14,16 +14,4 @@ public class JsonPrimitiveWrapper extends JsonWrapper<JsonPrimitive> {
             throw failureByMismatch("string");
         }
     }
-    
-    public int asInt() throws JsonFormatException {
-        if (this.element.isNumber()) {
-            try {
-                return this.element.getAsInt();
-            } catch (NumberFormatException e) {
-                throw failureByMismatch("int");
-            }
-        } else {
-            throw failureByMismatch("int");
-        }
-    }
 }

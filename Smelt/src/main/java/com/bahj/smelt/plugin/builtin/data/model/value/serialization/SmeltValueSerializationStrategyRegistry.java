@@ -32,20 +32,19 @@ public class SmeltValueSerializationStrategyRegistry {
     public Set<SmeltValueSerializationStrategy> getStrategies() {
         return Collections.unmodifiableSet(strategies);
     }
-
+    
     private void checkNonEmpty() {
         if (this.strategies.size() == 0) {
             throw new IllegalStateException("Cannot serialize a database with zero value strategies.");
-        }
+        }        
     }
 
-    public JsonElement serializeValue(ValueSerializationContext context, SmeltValueWrapper<?, ?> valueWrapper)
-            throws SerializationException {
+    public JsonElement serializeValue(SmeltValueWrapper<?,?> valueWrapper) throws SerializationException {
         checkNonEmpty();
         SerializationException exception = null;
         for (SmeltValueSerializationStrategy strategy : this.strategies) {
             try {
-                return strategy.objectToJson(context, valueWrapper);
+                return strategy.objectToJson(valueWrapper);
             } catch (SerializationException e) {
                 exception = e;
             }
@@ -53,13 +52,12 @@ public class SmeltValueSerializationStrategyRegistry {
         throw exception;
     }
 
-    public SmeltValueWrapper<?, ?> deserializeValue(ValueDeserializationContext context, JsonElement json)
-            throws DeserializationException {
+    public SmeltValueWrapper<?,?> deserializeValue(JsonElement json) throws DeserializationException {
         checkNonEmpty();
         DeserializationException exception = null;
         for (SmeltValueSerializationStrategy strategy : this.strategies) {
             try {
-                return strategy.jsonToObject(context, json);
+                return strategy.jsonToObject(json);
             } catch (DeserializationException e) {
                 exception = e;
             }

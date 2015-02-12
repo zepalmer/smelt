@@ -26,7 +26,7 @@ public class SmeltEnumValueSerializationStrategy extends AbstractSmeltValueSeria
     }
 
     @Override
-    protected JsonElement valueToJson(ValueSerializationContext context, SmeltEnumValue value) throws SerializationException {
+    protected JsonElement valueToJson(SmeltEnumValue value) throws SerializationException {
         JsonObject enumValueObject = new JsonObject();
         enumValueObject.addProperty(TYPE_NAME_KEY, value.getType().getName());
         enumValueObject.addProperty(CHOICE_KEY, value.getChoice());
@@ -34,7 +34,7 @@ public class SmeltEnumValueSerializationStrategy extends AbstractSmeltValueSeria
     }
 
     @Override
-    protected SmeltEnumValue jsonToValue(ValueDeserializationContext context, JsonWrapper<?> json) throws DeserializationException, JsonFormatException {
+    protected SmeltEnumValue jsonToValue(JsonWrapper<?> json) throws DeserializationException, JsonFormatException {
         JsonObjectWrapper enumValueObject = json.asObject();
         String typeName = enumValueObject.getRequiredField(TYPE_NAME_KEY).asString();
         String choice = enumValueObject.getField(CHOICE_KEY).asString();
