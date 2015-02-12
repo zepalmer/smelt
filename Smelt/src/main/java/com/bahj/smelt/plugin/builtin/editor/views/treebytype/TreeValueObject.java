@@ -22,7 +22,6 @@ public class TreeValueObject<V extends SmeltValue<V, E>, E extends SmeltValueEve
 
     @Override
     public String toString() {
-        // TODO: something smarter than this
-        return super.toString();
+        return this.value.getDescription();
     }
 }
