@@ -7,7 +7,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
  * A context object provided to clients of the {@link EditorPanel} to allow them to issue instructions.
  * @author Zachary Palmer
  */
-public interface EditorPanelContext {
+public interface EditorModel {
     /**
      * Opens an editor for the provided Smelt value.  If an editor already exists, it is focused.
      * @param value The value to edit.

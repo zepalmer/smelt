@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.basegui.context;
+package com.bahj.smelt.plugin.builtin.basegui.construction;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,7 +6,8 @@ import java.util.function.Consumer;
 
 import javax.swing.Action;
 
-import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.execution.GUIExecutionContext;
 
 /**
  * An interface for the context in which a Smelt GUI is constructed.

@@ -23,7 +23,8 @@ public class Configuration {
     public static final String[] DEFAULT_PLUGIN_NAMES = new String[] {
         "com.bahj.smelt.plugin.builtin.data.DataPlugin",
         "com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin",
-        "com.bahj.smelt.plugin.builtin.editor.EditorPlugin"
+        "com.bahj.smelt.plugin.builtin.editor.EditorPlugin",
+        "com.bahj.smelt.plugin.builtin.viewbytype.ViewByTypePlugin"
     };
     // @formatter:on
 

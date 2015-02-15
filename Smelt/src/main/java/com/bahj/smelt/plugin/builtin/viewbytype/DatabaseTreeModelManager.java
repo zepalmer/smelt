@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.editor.views.treebytype;
+package com.bahj.smelt.plugin.builtin.viewbytype;
 
 import java.util.ArrayList;
 import java.util.Collection;

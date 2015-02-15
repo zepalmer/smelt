@@ -1,23 +1,15 @@
 package com.bahj.smelt.util;
 
 /**
- * An object simply defining an indirection.
+ * An object simply defining a mutable indirection.
+ * 
  * @author Zachary Palmer
  *
- * @param <T> The type of indirection.
+ * @param <T>
+ *            The type of indirection.
  */
-public class StrongReference<T> {
-    private T value;
+public interface StrongReference<T> extends ReadableStrongReference<T> {
 
-    public StrongReference(T value) {
-        super();
-        this.value = value;
-    }
+    public void setValue(T value);
 
-    public T getValue() {
-        return value;
-    }
-
-    public void setValue(T value) {
-        this.value = value;
-    }}
+}

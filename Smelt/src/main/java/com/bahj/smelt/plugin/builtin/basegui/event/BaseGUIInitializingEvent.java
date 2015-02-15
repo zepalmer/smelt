@@ -1,7 +1,7 @@
 package com.bahj.smelt.plugin.builtin.basegui.event;
 
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
-import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContext;
+import com.bahj.smelt.plugin.builtin.basegui.construction.GUIConstructionContext;
 
 /**
  * An event indicating that the base GUI plugin is intializing. When this is event is transmitted, the GUI has been

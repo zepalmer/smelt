@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.basegui.event;
 
+import com.bahj.smelt.plugin.builtin.basegui.execution.GUIExecutionContext;
+import com.bahj.smelt.util.ReadableStrongReference;
 
 /**
  * An event indicating that the base GUI plugin has finished initializing. When this is event is transmitted, the GUI
@@ -9,4 +11,14 @@ package com.bahj.smelt.plugin.builtin.basegui.event;
  * @author Zachary Palmer
  */
 public class BaseGUIInitializedEvent extends BaseGUIEvent {
+    private ReadableStrongReference<GUIExecutionContext> executionContextRef;
+
+    public BaseGUIInitializedEvent(ReadableStrongReference<GUIExecutionContext> executionContextRef) {
+        super();
+        this.executionContextRef = executionContextRef;
+    }
+
+    public ReadableStrongReference<GUIExecutionContext> getExecutionContextRef() {
+        return executionContextRef;
+    }
 }

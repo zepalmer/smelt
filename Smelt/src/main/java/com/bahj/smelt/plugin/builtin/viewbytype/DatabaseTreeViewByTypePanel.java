@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.editor.views.treebytype;
+package com.bahj.smelt.plugin.builtin.viewbytype;
 
 import java.awt.BorderLayout;
 import java.awt.Point;
@@ -18,7 +18,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
-import com.bahj.smelt.plugin.builtin.editor.EditorPanelContext;
+import com.bahj.smelt.plugin.builtin.editor.EditorModel;
 import com.bahj.smelt.util.NotYetImplementedException;
 
 /**
@@ -32,13 +32,13 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
     /** The data model plugin which contains the data for this panel. */
     private DataModelPlugin plugin;
     /** The editor context for this panel. */
-    private EditorPanelContext context;
+    private EditorModel editorModel;
     /** The tree displayed by this panel. */
     private JTree tree;
 
-    public DatabaseTreeViewByTypePanel(DataModelPlugin dataModelPlugin, EditorPanelContext context) {
+    public DatabaseTreeViewByTypePanel(DataModelPlugin dataModelPlugin, EditorModel editorModel) {
         this.plugin = dataModelPlugin;
-        this.context = context;
+        this.editorModel = editorModel;
         DatabaseTreeModelManager modelManager = new DatabaseTreeModelManager(dataModelPlugin);
         tree = new JTree(modelManager.getTreeModel());
 
@@ -128,7 +128,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
 
             @Override
             public Void visitValue(TreeValueObject<?,?> obj, Void arg) throws RuntimeException {
-                context.openEditor(obj.getValue());
+                editorModel.openEditor(obj.getValue());
                 return null;
             }
         }, null);

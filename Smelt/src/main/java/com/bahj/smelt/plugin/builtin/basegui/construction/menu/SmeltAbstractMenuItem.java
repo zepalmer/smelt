@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.basegui.menu;
+package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 
 /**
  * An abstract type which handles common attributes of menu items.

@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.editor.views.treebytype;
+package com.bahj.smelt.plugin.builtin.viewbytype;
 
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;

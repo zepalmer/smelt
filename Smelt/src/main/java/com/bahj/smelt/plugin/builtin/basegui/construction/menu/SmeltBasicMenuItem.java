@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.basegui.menu;
+package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 
 import javax.swing.Action;
 

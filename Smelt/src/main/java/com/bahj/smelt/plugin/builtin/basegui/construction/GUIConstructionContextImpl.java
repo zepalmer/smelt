@@ -1,4 +1,4 @@
-package com.bahj.smelt.plugin.builtin.basegui.context;
+package com.bahj.smelt.plugin.builtin.basegui.construction;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -8,9 +8,11 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
-import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltMenuItem;
-import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltNestedMenu;
+import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltNestedMenu;
+import com.bahj.smelt.plugin.builtin.basegui.execution.GUIExecutionContext;
 import com.bahj.smelt.util.StrongReference;
+import com.bahj.smelt.util.StrongReferenceImpl;
 
 /**
  * An object representing the form of the GUI as it is being created by the {@link BaseGUIPlugin}.
@@ -18,7 +20,7 @@ import com.bahj.smelt.util.StrongReference;
  * @author Zachary Palmer
  */
 public class GUIConstructionContextImpl implements GUIConstructionContext {
-    private StrongReference<GUIExecutionContext> executionContextReference = new StrongReference<GUIExecutionContext>(
+    private StrongReference<GUIExecutionContext> executionContextReference = new StrongReferenceImpl<GUIExecutionContext>(
             null);
     private SmeltNestedMenu menuBar = new SmeltNestedMenu(null);
 

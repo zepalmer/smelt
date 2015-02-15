@@ -1,17 +1,11 @@
 package com.bahj.smelt.plugin.builtin.editor;
 
-import java.awt.CardLayout;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.swing.Action;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingConstants;
 
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
@@ -20,14 +14,8 @@ import com.bahj.smelt.plugin.DeclarationProcessingException;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
-import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
-import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
-import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
-import com.bahj.smelt.plugin.builtin.basegui.tabs.DefaultGUITab;
-import com.bahj.smelt.plugin.builtin.basegui.tabs.GUITab;
+import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
-import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
-import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
@@ -55,6 +43,7 @@ public class EditorPlugin implements SmeltPlugin {
     private static final int MAJOR_SPACING = 20;
 
     private FormFactoryRegistry formFactoryRegistry;
+    private EditorModel editorModel;
 
     public EditorPlugin() {
         this.formFactoryRegistry = new FormFactoryRegistry();
@@ -62,7 +51,7 @@ public class EditorPlugin implements SmeltPlugin {
 
     @Override
     public void registeredToApplicationModel(SmeltApplicationModel model) {
-        // Make sure that we add components to the GUI after the configuration is loaded.
+        // Make sure that we attach to the GUI after it's loaded.
         model.addListener(new TypedEventListener<>(SmeltApplicationConfigurationLoadedEvent.class,
                 new EventListener<SmeltApplicationConfigurationLoadedEvent>() {
                     @Override
@@ -72,47 +61,12 @@ public class EditorPlugin implements SmeltPlugin {
                         DataModelPlugin dataModelPlugin = model.getPluginRegistry().getPlugin(DataModelPlugin.class);
                         BaseGUIPlugin guiPlugin = model.getPluginRegistry().getPlugin(BaseGUIPlugin.class);
 
-                        // Create the editor and tab. We put a card panel between the tab and the editor panel so we
-                        // can hide the editor when no database is loaded.
-                        final EditorPanel editorPanel = new EditorPanel(guiPlugin.getBaseFrame(), dataModelPlugin,
-                                formFactoryRegistry);
-                        final CardLayout cardLayout = new CardLayout(0, 0);
-                        final JPanel containerPanel = new JPanel(cardLayout);
-                        final String editorName = "editor";
-                        final String noEditorName = "no-editor";
-                        containerPanel.add(editorPanel, editorName);
-                        containerPanel.add(new JLabel("No Database Loaded", SwingConstants.CENTER), noEditorName);
-                        final GUITab tab = new DefaultGUITab(EditorPanel.Key.INSTANCE, "Database Editor",
-                                containerPanel);
-                        cardLayout.show(containerPanel, noEditorName);
-
-                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
-                                new EventListener<DatabaseOpenedEvent>() {
+                        guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializedEvent.class,
+                                new EventListener<BaseGUIInitializedEvent>() {
                                     @Override
-                                    public void eventOccurred(DatabaseOpenedEvent event) {
-                                        cardLayout.show(containerPanel, editorName);
-                                    }
-                                }));
-                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
-                                new EventListener<DatabaseClosedEvent>() {
-                                    @Override
-                                    public void eventOccurred(DatabaseClosedEvent event) {
-                                        cardLayout.show(containerPanel, noEditorName);
-                                    }
-                                }));
-
-                        // Make sure we add the appropriate content to the Smelt GUI. This consists of the primary
-                        // editor pane and a menu option to activate it.
-                        guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializingEvent.class,
-                                new EventListener<BaseGUIInitializingEvent>() {
-                                    @Override
-                                    public void eventOccurred(BaseGUIInitializingEvent event) {
-                                        Action showEditorAction = event.getContext().constructExecutionAction(
-                                                (GUIExecutionContext context) -> {
-                                                    context.ensureTab(tab);
-                                                });
-                                        event.getContext().addMenuItemGroup("View",
-                                                new SmeltBasicMenuItem("Editor", showEditorAction));
+                                    public void eventOccurred(BaseGUIInitializedEvent event) {
+                                        editorModel = new EditorModelImpl(dataModelPlugin, formFactoryRegistry, event
+                                                .getExecutionContextRef());
                                     }
                                 }));
                     }
@@ -167,7 +121,7 @@ public class EditorPlugin implements SmeltPlugin {
                 MessageNodeDecorator messageNode = new MessageNodeDecorator((MessageNode) node, decoratorNodeContext);
                 String typeName = messageNode.getHeader().insistSinglePositionalArgument("type name")
                         .insistSingleComponent();
-                SmeltType<?,?> type = dataModelPlugin.getModel().getTypes().get(typeName);
+                SmeltType<?, ?> type = dataModelPlugin.getModel().getTypes().get(typeName);
                 if (type == null) {
                     // TODO: raise an exception for referring to a missing type
                     throw new NotYetImplementedException();
@@ -212,7 +166,7 @@ public class EditorPlugin implements SmeltPlugin {
         private DataType type;
         private Set<String> requiredTypeNames;
 
-                /**
+        /**
          * Creates a form factory builder for a given type.
          * 
          * @param type
@@ -278,7 +232,7 @@ public class EditorPlugin implements SmeltPlugin {
                 messageNodeDecorator.insistNoChildren();
 
                 // Next, ensure that the type in question has a field by that name. If it does not, eagerly fail.
-                SmeltType<?,?> fieldType = type.getProperties().get(fieldName);
+                SmeltType<?, ?> fieldType = type.getProperties().get(fieldName);
                 if (fieldType == null) {
                     // TODO: appropriate error
                     throw new NotYetImplementedException();
@@ -304,5 +258,15 @@ public class EditorPlugin implements SmeltPlugin {
      */
     public FormFactoryRegistry getRegistry() {
         return formFactoryRegistry;
+    }
+
+    /**
+     * Retrieves the editor model for this plugin. Other plugins can use this object to trigger the presentation of
+     * editors for values in the database.
+     * 
+     * @return The editor model for this plugin.
+     */
+    public EditorModel getEditorModel() {
+        return editorModel;
     }
 }

@@ -19,17 +19,17 @@ import com.bahj.smelt.event.SmeltApplicationSpecificationLoadedEvent;
 import com.bahj.smelt.event.SmeltApplicationSpecificationUnloadedEvent;
 import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
-import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContext;
-import com.bahj.smelt.plugin.builtin.basegui.context.GUIConstructionContextImpl;
-import com.bahj.smelt.plugin.builtin.basegui.context.GUIExecutionContext;
+import com.bahj.smelt.plugin.builtin.basegui.construction.GUIConstructionContext;
+import com.bahj.smelt.plugin.builtin.basegui.construction.GUIConstructionContextImpl;
+import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltBasicMenuItem;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
-import com.bahj.smelt.plugin.builtin.basegui.menu.SmeltBasicMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.execution.GUIExecutionContext;
 import com.bahj.smelt.syntax.SmeltParseFailureException;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.util.NotYetImplementedException;
-import com.bahj.smelt.util.StrongReference;
+import com.bahj.smelt.util.StrongReferenceImpl;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
@@ -43,7 +43,7 @@ import com.bahj.smelt.util.swing.FileFilterUtils;
  * Other plugins may add content to the GUI by responding to the {@link BaseGUIInitializingEvent} that this plugin fires
  * in response to the global {@link SmeltApplicationPluginsConfiguredEvent}. That object is useful in two ways: first,
  * it allows the addition of menu items via the {@link GUIConstructionContext} contained in the event. Second, that
- * {@link GUIConstructionContext} contains a {@link StrongReference} to a {@link GUIExecutionContext} (which may only be
+ * {@link GUIConstructionContext} contains a {@link StrongReferenceImpl} to a {@link GUIExecutionContext} (which may only be
  * used <i>after</i> the {@link BaseGUIInitializedEvent} begins dispatch) which can be used to add tabs to the tab pane.
  * 
  * @author Zachary Palmer
@@ -53,7 +53,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     private BaseGUIFrame frame;
     /** The model to which this plugin is registered. */
     private SmeltApplicationModel model;
-    
+
     private static final double FRAME_DISPLAY_RATIO = 0.6;
 
     @Override
@@ -111,19 +111,19 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
 
                         // Now build the GUI.
                         frame = new BaseGUIFrame(guiContext);
-                        guiContext.getExecutionContextReference()
-                                .setValue(new GUIExecutionContext(frame.getTabPanel()));
+                        guiContext.getExecutionContextReference().setValue(
+                                new GUIExecutionContext(frame.getPlacementContext()));
 
                         // Let everyone know the GUI's finished.
-                        fireEvent(new BaseGUIInitializedEvent());
+                        fireEvent(new BaseGUIInitializedEvent(guiContext.getExecutionContextReference()));
 
-                        // And now show it.  (We can't just pack the frame 
+                        // And now show it. (We can't just pack the frame
                         // TODO: change to dispatching a closing event for the GUI plugin so other plugins have a chance
-                        //       to persist data, prompt the user, or even object to closing.
+                        // to persist data, prompt the user, or even object to closing.
                         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         DisplayMode displayMode = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
-                        frame.setSize(new Dimension((int)(displayMode.getWidth()*FRAME_DISPLAY_RATIO),
-                                (int)(displayMode.getHeight()*FRAME_DISPLAY_RATIO)));
+                        frame.setSize(new Dimension((int) (displayMode.getWidth() * FRAME_DISPLAY_RATIO),
+                                (int) (displayMode.getHeight() * FRAME_DISPLAY_RATIO)));
                         frame.setLocationRelativeTo(null);
                         frame.setVisible(true);
                     }
