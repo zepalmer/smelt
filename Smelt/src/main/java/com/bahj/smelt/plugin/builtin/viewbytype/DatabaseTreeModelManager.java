@@ -88,6 +88,9 @@ public class DatabaseTreeModelManager {
                         removeValueFromTree(event.getWrapper().getSmeltValue());
                     }
                 }));
+        
+        // Initialize the model
+        treeModel.setRoot(buildRootNode());
     }
 
     public DefaultTreeModel getTreeModel() {
@@ -100,6 +103,10 @@ public class DatabaseTreeModelManager {
      * @return A new root node.
      */
     private DefaultMutableTreeNode buildRootNode() {
+        if (this.plugin.getDatabase() == null) {
+            return null;
+        }
+        
         DefaultMutableTreeNode node = new DefaultMutableTreeNode();
         // The contents of the root node are the types of the data model.
         node.setAllowsChildren(true);
