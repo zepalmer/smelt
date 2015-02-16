@@ -109,7 +109,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
                         }
                     }
 
-                    // We extract this expression to its own method to give names to V and E.  This is not necessary
+                    // We extract this expression to its own method to give names to V and E. This is not necessary
                     // for Eclipse, but it's necessary for jdk1.8.0_20.
                     private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void addTypeToDatabase(
                             SmeltDatabase database, SmeltType<V, E> type) {
@@ -143,8 +143,15 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
 
             @Override
             public Void visitValue(TreeValueObject<?, ?> obj, Void arg) throws RuntimeException {
-                editorModel.openEditor(obj.getValue());
+                // editorModel.openEditor(obj.getValue());
+                doOpenEditor(obj);
                 return null;
+            }
+
+            // This function exists only to name V and E, which is unnecessary in Eclipse but required in jdk1.8.0_20.
+            private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void doOpenEditor(
+                    TreeValueObject<V, E> obj) {
+                editorModel.openEditor(obj.getValue());
             }
         }, null);
     }
