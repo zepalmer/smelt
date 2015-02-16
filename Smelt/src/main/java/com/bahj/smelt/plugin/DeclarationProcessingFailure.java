@@ -34,4 +34,8 @@ public class DeclarationProcessingFailure {
         return location;
     }
 
+    @Override
+    public String toString() {
+        return this.location + ": " + this.errorMessage;
+    }
 }

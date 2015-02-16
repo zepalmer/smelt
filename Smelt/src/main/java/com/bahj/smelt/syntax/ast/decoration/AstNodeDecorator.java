@@ -45,7 +45,7 @@ public class AstNodeDecorator<T extends AstNode> implements AstNode {
      *            The message to attach to the exception.
      * @return The exception which can be thrown.
      */
-    protected DeclarationProcessingException failureWithMessage(String message) {
+    public DeclarationProcessingException failureWithMessage(String message) {
         return failureWithMessage(message, this.getLocation());
     }
 
@@ -59,7 +59,7 @@ public class AstNodeDecorator<T extends AstNode> implements AstNode {
      *            The location reported by the exception.
      * @return The exception which can be thrown.
      */
-    protected DeclarationProcessingException failureWithMessage(String message, SourceLocation location) {
+    public DeclarationProcessingException failureWithMessage(String message, SourceLocation location) {
         return new DeclarationProcessingException(new DeclarationProcessingFailure(this.context.getPlugin(), message,
                 location));
     }

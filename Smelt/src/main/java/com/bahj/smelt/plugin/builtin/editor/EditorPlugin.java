@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.bahj.smelt.SmeltApplicationModel;
@@ -29,6 +30,7 @@ import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
 import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
+import com.bahj.smelt.syntax.ast.decoration.NamedArgumentNodeDecorator;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
@@ -196,8 +198,19 @@ public class EditorPlugin implements SmeltPlugin {
             MessageNodeDecorator messageNodeDecorator = node.insistMessageNode();
             // Each decorator is either a container or a base element. We build a factory appropriately.
             if (messageNodeDecorator.getHeader().getName().equals("container")) {
-                // First, do some sanity checking on the node.
-                messageNodeDecorator.getHeader().insistNoNamedArguments();
+                String name = null;
+                for (Map.Entry<String, ? extends NamedArgumentNodeDecorator> entry : messageNodeDecorator.getHeader()
+                        .getNamed().entrySet()) {
+                    NamedArgumentNodeDecorator namedArgumentNodeDecorator = entry.getValue();
+                    switch (namedArgumentNodeDecorator.getName()) {
+                        case "name":
+                            name = String.join(" ", namedArgumentNodeDecorator.getArgs());
+                            break;
+                        default:
+                            throw namedArgumentNodeDecorator.failureWithMessage("Named argument "
+                                    + namedArgumentNodeDecorator.getName() + " unrecognized here.");
+                    }
+                }
                 String orientationName = messageNodeDecorator.getHeader().insistSinglePositionalArgument("orientation")
                         .insistSingleComponent();
                 ContainerFormFactory.Orientation orientation;
@@ -222,7 +235,11 @@ public class EditorPlugin implements SmeltPlugin {
                 }
 
                 // Produce a factory which will build an appropriate container for all of the provided children.
-                return new ContainerFormFactory(factories, orientation, MAJOR_SPACING);
+                ContainerFormFactory factory = new ContainerFormFactory(factories, orientation, MAJOR_SPACING);
+                if (name != null) {
+                    factory.setGroupName(name);
+                }
+                return factory;
             } else {
                 String fieldName = messageNodeDecorator.getHeader().getName();
 

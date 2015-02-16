@@ -3,6 +3,7 @@ package com.bahj.smelt.plugin;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 /**
  * An exception which is raised when a Smelt plugin encounters a syntactic or semantic error when processing
@@ -20,7 +21,7 @@ public class DeclarationProcessingException extends Exception {
     }
 
     public DeclarationProcessingException(Collection<DeclarationProcessingFailure> failures) {
-        super();
+        super(String.join("\n", failures.stream().map(String::valueOf).collect(Collectors.toList())));
         this.failures = failures;
         if (this.failures.size() == 0) {
             throw new IllegalStateException("Cannot create a declaration processing exception with zero failures.");

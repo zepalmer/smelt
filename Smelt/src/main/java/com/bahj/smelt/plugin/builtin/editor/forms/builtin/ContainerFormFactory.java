@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltTypeMismatchException;
@@ -24,8 +25,8 @@ public class ContainerFormFactory implements FormFactory {
 
     private List<FormFactory> factories;
     private Orientation orientation;
-
     private int spacing;
+    private String groupName;
 
     /**
      * Creates a new container factory.
@@ -41,6 +42,11 @@ public class ContainerFormFactory implements FormFactory {
         this.factories = factories;
         this.orientation = orientation;
         this.spacing = spacing;
+        this.groupName = null;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     @Override
@@ -48,6 +54,9 @@ public class ContainerFormFactory implements FormFactory {
         // There are two types of containers: horizontal and vertical. Build an appropriate component to
         // host the children based on this.
         JPanel panel = new JPanel();
+        if (this.groupName != null) {
+            panel.setBorder(BorderFactory.createTitledBorder(this.groupName));
+        }
         switch (orientation) {
             case HORIZONTAL:
                 panel.setLayout(new GridLayout(1, factories.size(), spacing, 0));
