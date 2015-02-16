@@ -3,7 +3,7 @@ package com.bahj.smelt.plugin;
 import com.bahj.smelt.SmeltApplicationModel;
 
 /**
- * The context in which plugins handle declarations.  This object contains data that plugins may require when making
+ * The context in which plugins handle declarations. This object contains data that plugins may require when making
  * decisions regarding declarations or when processing them.
  * 
  * @author Zachary Palmer

@@ -11,37 +11,37 @@ public class DuplicateTypeNameException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private String name;
-    private SmeltType<?,?> type1;
-    private SmeltType<?,?> type2;
+    private SmeltType<?, ?> type1;
+    private SmeltType<?, ?> type2;
 
-    public DuplicateTypeNameException(String name, SmeltType<?,?> type1, SmeltType<?,?> type2) {
+    public DuplicateTypeNameException(String name, SmeltType<?, ?> type1, SmeltType<?, ?> type2) {
         super();
         initialize(name, type1, type2);
     }
 
     public DuplicateTypeNameException(String message, Throwable cause, boolean enableSuppression,
-            boolean writableStackTrace, String name, SmeltType<?,?> type1, SmeltType<?,?> type2) {
+            boolean writableStackTrace, String name, SmeltType<?, ?> type1, SmeltType<?, ?> type2) {
         super(message, cause, enableSuppression, writableStackTrace);
         initialize(name, type1, type2);
     }
 
-    public DuplicateTypeNameException(String message, Throwable cause, String name, SmeltType<?,?> type1,
-            SmeltType<?,?> type2) {
+    public DuplicateTypeNameException(String message, Throwable cause, String name, SmeltType<?, ?> type1,
+            SmeltType<?, ?> type2) {
         super(message, cause);
         initialize(name, type1, type2);
     }
 
-    public DuplicateTypeNameException(String message, String name, SmeltType<?,?> type1, SmeltType<?,?> type2) {
+    public DuplicateTypeNameException(String message, String name, SmeltType<?, ?> type1, SmeltType<?, ?> type2) {
         super(message);
         initialize(name, type1, type2);
     }
 
-    public DuplicateTypeNameException(Throwable cause, String name, SmeltType<?,?> type1, SmeltType<?,?> type2) {
+    public DuplicateTypeNameException(Throwable cause, String name, SmeltType<?, ?> type1, SmeltType<?, ?> type2) {
         super(cause);
         initialize(name, type1, type2);
     }
 
-    private void initialize(String name, SmeltType<?,?> type1, SmeltType<?,?> type2) {
+    private void initialize(String name, SmeltType<?, ?> type1, SmeltType<?, ?> type2) {
         this.name = name;
         this.type1 = type1;
         this.type2 = type2;
@@ -61,7 +61,7 @@ public class DuplicateTypeNameException extends Exception {
      * 
      * @return The first duplicate type.
      */
-    public SmeltType<?,?> getType1() {
+    public SmeltType<?, ?> getType1() {
         return type1;
     }
 
@@ -70,7 +70,7 @@ public class DuplicateTypeNameException extends Exception {
      * 
      * @return The second duplicate type.
      */
-    public SmeltType<?,?> getType2() {
+    public SmeltType<?, ?> getType2() {
         return type2;
     }
 }

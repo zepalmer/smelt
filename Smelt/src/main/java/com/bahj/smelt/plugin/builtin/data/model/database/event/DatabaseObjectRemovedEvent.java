@@ -7,17 +7,19 @@ import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 
 /**
  * Fired when an object is removed from a Smelt database.
+ * 
  * @author Zachary Palmer
  */
-public class DatabaseObjectRemovedEvent extends DatabaseEvent{
-    private SmeltValueWrapper<?,?> wrapper;
+public class DatabaseObjectRemovedEvent extends DatabaseEvent {
+    private SmeltValueWrapper<?, ?> wrapper;
 
-    public <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V, E>> DatabaseObjectRemovedEvent(SmeltDatabase database, V value) {
+    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> DatabaseObjectRemovedEvent(
+            SmeltDatabase database, V value) {
         super(database);
-        this.wrapper = new SmeltValueWrapper<V,E>(value);
+        this.wrapper = new SmeltValueWrapper<V, E>(value);
     }
 
-    public SmeltValueWrapper<?,?> getWrapper() {
+    public SmeltValueWrapper<?, ?> getWrapper() {
         return wrapper;
     }
 }

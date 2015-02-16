@@ -13,7 +13,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
  * @param <V>
  *            The type of value stored in this wrapper.
  */
-public class SmeltValueWrapper<V extends SmeltValue<V,E>, E extends SmeltValueEvent<V,E>> {
+public class SmeltValueWrapper<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> {
     private V smeltValue;
 
     public SmeltValueWrapper(V smeltValue) {
@@ -41,7 +41,7 @@ public class SmeltValueWrapper<V extends SmeltValue<V,E>, E extends SmeltValueEv
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SmeltValueWrapper<?,?> other = (SmeltValueWrapper<?,?>) obj;
+        SmeltValueWrapper<?, ?> other = (SmeltValueWrapper<?, ?>) obj;
         if (smeltValue == null) {
             if (other.smeltValue != null)
                 return false;

@@ -159,14 +159,14 @@ public class DataGUIPlugin implements SmeltPlugin {
     private static class MenuActions {
         private DataModelPlugin dataModelPlugin;
         private BaseGUIPlugin baseGUIPlugin;
-        
+
         private File currentFile;
 
         public MenuActions(DataModelPlugin dataModelPlugin, BaseGUIPlugin baseGUIPlugin) {
             super();
             this.dataModelPlugin = dataModelPlugin;
             this.baseGUIPlugin = baseGUIPlugin;
-            
+
             this.currentFile = null;
         }
 
@@ -192,7 +192,7 @@ public class DataGUIPlugin implements SmeltPlugin {
                     throw new NotYetImplementedException(e);
                 } catch (DeserializationException e) {
                     throw new NotYetImplementedException(e);
-                } 
+                }
             }
         }
 
@@ -224,7 +224,7 @@ public class DataGUIPlugin implements SmeltPlugin {
                     throw new NotYetImplementedException(e);
                 } catch (SerializationException e) {
                     throw new NotYetImplementedException(e);
-                } 
+                }
             }
         }
 

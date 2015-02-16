@@ -32,7 +32,7 @@ public class SmeltDatabase extends AbstractEventGenerator<DatabaseEvent> {
         this.valueWrappers = new HashSet<>();
     }
 
-    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>> Set<V> getValueSetByType(SmeltType<V, E> type) {
+    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> Set<V> getValueSetByType(SmeltType<V, E> type) {
         if (this.data.containsKey(type)) {
             @SuppressWarnings("unchecked")
             Set<V> objects = (Set<V>) this.data.get(type);
@@ -44,26 +44,26 @@ public class SmeltDatabase extends AbstractEventGenerator<DatabaseEvent> {
         }
     }
 
-    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>> void add(V value) {
+    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void add(V value) {
         getValueSetByType(value.getType()).add(value);
         this.valueWrappers.add(new SmeltValueWrapper<>(value));
         fireEvent(new DatabaseObjectAddedEvent(this, value));
     }
 
-    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>> void remove(V value) {
+    public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void remove(V value) {
         getValueSetByType(value.getType()).remove(value);
         this.valueWrappers.remove(new SmeltValueWrapper<>(value));
         fireEvent(new DatabaseObjectRemovedEvent(this, value));
     }
 
-    public <T extends SmeltType<V, E>, V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>> Set<V> getAllOfType(
+    public <T extends SmeltType<V, E>, V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> Set<V> getAllOfType(
             T type) {
         return Collections.unmodifiableSet(getValueSetByType(type));
     }
 
-    public Set<SmeltValue<?,?>> getAll() {
-        Set<SmeltValue<?,?>> values = new HashSet<>();
-        getAllWrapped().forEach((SmeltValueWrapper<?,?> w) -> {
+    public Set<SmeltValue<?, ?>> getAll() {
+        Set<SmeltValue<?, ?>> values = new HashSet<>();
+        getAllWrapped().forEach((SmeltValueWrapper<?, ?> w) -> {
             values.add(w.getSmeltValue());
         });
         return values;

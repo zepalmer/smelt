@@ -17,7 +17,8 @@ import com.bahj.smelt.util.json.JsonWrapper;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class SmeltDatumSerializationStrategy extends AbstractSmeltValueSerializationStrategy<SmeltDatum,SmeltDatumEvent> {
+public class SmeltDatumSerializationStrategy extends
+        AbstractSmeltValueSerializationStrategy<SmeltDatum, SmeltDatumEvent> {
     private static final String TYPE_NAME_KEY = "typeName";
     private static final String PROPERTY_MAP_KEY = "propertyMap";
 
@@ -50,12 +51,12 @@ public class SmeltDatumSerializationStrategy extends AbstractSmeltValueSerializa
     protected SmeltDatum jsonToValue(JsonWrapper<?> json) throws DeserializationException, JsonFormatException {
         JsonObjectWrapper datumObject = json.asObject();
         String typeName = datumObject.getField(TYPE_NAME_KEY).asString();
-        SmeltType<?,?> smeltType = this.dataModel.getTypes().get(typeName);
+        SmeltType<?, ?> smeltType = this.dataModel.getTypes().get(typeName);
         if (!(smeltType instanceof DataType)) {
             throw new NotYetImplementedException();
         }
-        SmeltDatum datum = new SmeltDatum((DataType)smeltType);
-                
+        SmeltDatum datum = new SmeltDatum((DataType) smeltType);
+
         JsonObjectWrapper propertyMap = datumObject.getField(PROPERTY_MAP_KEY).asObject();
         for (Map.Entry<String, JsonElement> entry : propertyMap.getElement().entrySet()) {
             String fieldName = entry.getKey();

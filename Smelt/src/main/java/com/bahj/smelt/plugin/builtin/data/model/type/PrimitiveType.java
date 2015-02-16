@@ -10,6 +10,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
  * @param <V>
  *            The Java representation of a value of this type.
  */
-public abstract class PrimitiveType<V extends SmeltValue<V,E>, E extends SmeltValueEvent<V,E>> extends AbstractSmeltType<V,E> {
+public abstract class PrimitiveType<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> extends
+        AbstractSmeltType<V, E> {
 
 }

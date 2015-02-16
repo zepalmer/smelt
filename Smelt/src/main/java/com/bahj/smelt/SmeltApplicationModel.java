@@ -55,9 +55,9 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
     public SmeltApplicationModel(Configuration configuration) throws ApplicationModelCreationException {
         this.pluginRegistry = new SmeltPluginRegistryImpl();
         this.applicationSpecificationLoaded = false;
-        
+
         Queue<Class<? extends SmeltPlugin>> desiredPluginClasses = new LinkedList<>(configuration.getPlugins());
-        
+
         // As long as there are more classes the load, load a class.
         while (!desiredPluginClasses.isEmpty()) {
             // Grab a class to load.
@@ -70,10 +70,10 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
             SmeltPlugin plugin = instantiateAndRegisterPlugin(pluginClass);
             // Ensure that all of its runtime dependencies will be fulfilled.
             for (Class<? extends SmeltPlugin> dependency : plugin.getRuntimeDependencyTypes()) {
-                desiredPluginClasses.offer(dependency);                
+                desiredPluginClasses.offer(dependency);
             }
         }
-        
+
         // TODO: provide a mechanism somewhere for inspecting dependencies in the GUI
         // the automatic loading above could get difficult to understand
 
@@ -96,8 +96,8 @@ public class SmeltApplicationModel extends AbstractEventGenerator<SmeltApplicati
     }
 
     /**
-     * Loads an application specification from a file. This function simply parses the contents of the file (expecting
-     * a Smelt specifciation) and calls {@link #loadApplicationSpecification(DocumentNode)} with the result. Any errors
+     * Loads an application specification from a file. This function simply parses the contents of the file (expecting a
+     * Smelt specifciation) and calls {@link #loadApplicationSpecification(DocumentNode)} with the result. Any errors
      * encountered during reading and parsing are reported.
      */
     public void loadApplicationSpecification(File file) throws IOException, SmeltParseFailureException {

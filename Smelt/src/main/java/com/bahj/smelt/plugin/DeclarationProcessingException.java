@@ -14,7 +14,7 @@ public class DeclarationProcessingException extends Exception {
     private static final long serialVersionUID = 1L;
 
     private Collection<DeclarationProcessingFailure> failures;
-    
+
     public DeclarationProcessingException(DeclarationProcessingFailure... failures) {
         this(Arrays.asList(failures));
     }

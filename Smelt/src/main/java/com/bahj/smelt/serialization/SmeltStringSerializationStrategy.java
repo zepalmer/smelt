@@ -19,7 +19,7 @@ public interface SmeltStringSerializationStrategy<T> extends SmeltSerializationS
      * The standard encoding used in this serialization strategy.
      */
     public static final String CHARSET_ENCODING = "UTF-8";
-    
+
     /**
      * Transforms an object into a string.
      * 
@@ -45,11 +45,11 @@ public interface SmeltStringSerializationStrategy<T> extends SmeltSerializationS
     default public T deserialize(InputStream is) throws DeserializationException, IOException {
         StringBuilder sb = new StringBuilder();
         int byt;
-        // Read up to MAX_HEADER_DIGITS digits from the stream.  (If the stream is invalid, this keeps us from reading
+        // Read up to MAX_HEADER_DIGITS digits from the stream. (If the stream is invalid, this keeps us from reading
         // a huge file looking for the terminator.)
         final int MAX_HEADER_DIGITS = 12;
         while ((byt = is.read()) != -1 && byt >= '0' && byt <= '9' && sb.length() <= MAX_HEADER_DIGITS) {
-            sb.append((char)byt);
+            sb.append((char) byt);
         }
         if (sb.length() > MAX_HEADER_DIGITS) {
             throw new DeserializationException("Could not find valid string length header in stream.");
@@ -81,7 +81,7 @@ public interface SmeltStringSerializationStrategy<T> extends SmeltSerializationS
         // And finally deserialize the string.
         return stringToObject(data);
     }
-    
+
     default public void serialize(OutputStream os, T obj) throws SerializationException, IOException {
         // Transform the object into some data.
         byte[] data = objectToString(obj).getBytes(CHARSET_ENCODING);
@@ -89,6 +89,6 @@ public interface SmeltStringSerializationStrategy<T> extends SmeltSerializationS
         os.write((data.length + ".").getBytes("US-ASCII"));
         // Now write the data itself.
         os.write(data);
-        // And we're done.  (This direction is a bit easier.)
+        // And we're done. (This direction is a bit easier.)
     }
 }

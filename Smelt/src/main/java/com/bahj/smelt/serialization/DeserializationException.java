@@ -12,7 +12,8 @@ public class DeserializationException extends Exception {
         super();
     }
 
-    public DeserializationException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    public DeserializationException(String message, Throwable cause, boolean enableSuppression,
+            boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

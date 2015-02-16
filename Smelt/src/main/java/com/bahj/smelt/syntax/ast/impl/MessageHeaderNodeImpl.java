@@ -16,8 +16,8 @@ public class MessageHeaderNodeImpl extends AbstractAstNodeImpl implements Messag
     private List<? extends PositionalArgumentNode> positional;
     private Map<String, ? extends NamedArgumentNode> named;
 
-    public MessageHeaderNodeImpl(SourceLocation location, String name, List<? extends PositionalArgumentNode> positional,
-            Map<String, ? extends NamedArgumentNode> named) {
+    public MessageHeaderNodeImpl(SourceLocation location, String name,
+            List<? extends PositionalArgumentNode> positional, Map<String, ? extends NamedArgumentNode> named) {
         super(location);
         this.name = name;
         this.positional = positional;

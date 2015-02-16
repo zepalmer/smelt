@@ -6,6 +6,7 @@ import com.google.gson.JsonPrimitive;
 /**
  * A wrapper type for {@link JsonElement} which provides a number of checking and coercion routines, each of which makes
  * use of checked exceptions.
+ * 
  * @author Zachary Palmer
  */
 public class JsonWrapper<T extends JsonElement> {
@@ -19,7 +20,7 @@ public class JsonWrapper<T extends JsonElement> {
     public T getElement() {
         return element;
     }
-    
+
     public JsonObjectWrapper asObject() throws JsonFormatException {
         if (this.element.isJsonObject()) {
             return new JsonObjectWrapper(this.element.getAsJsonObject());
@@ -27,15 +28,15 @@ public class JsonWrapper<T extends JsonElement> {
             throw failureByMismatch("object");
         }
     }
-    
-    public JsonArrayWrapper asArray()  throws JsonFormatException {
-        if (this.element.isJsonArray())  {
+
+    public JsonArrayWrapper asArray() throws JsonFormatException {
+        if (this.element.isJsonArray()) {
             return new JsonArrayWrapper(this.element.getAsJsonArray());
         } else {
             throw failureByMismatch("array");
         }
     }
-    
+
     public JsonPrimitiveWrapper asPrimitive() throws JsonFormatException {
         if (this.element.isJsonPrimitive()) {
             return new JsonPrimitiveWrapper(this.element.getAsJsonPrimitive());
@@ -43,23 +44,23 @@ public class JsonWrapper<T extends JsonElement> {
             throw failureByMismatch("primitive");
         }
     }
-    
+
     public boolean isNull() {
         return this.element.isJsonNull();
     }
-    
+
     public String asString() throws JsonFormatException {
         return this.asPrimitive().asString();
     }
-    
+
     protected JsonFormatException failureByMismatch(String expectation) {
         return failureWithMessage("Expected " + expectation + " but found " + getJsonTypeDescription());
     }
-    
+
     protected JsonFormatException failureWithMessage(String message) {
-        return new JsonFormatException(message+": "+this.element);
+        return new JsonFormatException(message + ": " + this.element);
     }
-    
+
     public String getJsonTypeDescription() {
         if (this.element.isJsonObject()) {
             return "object";

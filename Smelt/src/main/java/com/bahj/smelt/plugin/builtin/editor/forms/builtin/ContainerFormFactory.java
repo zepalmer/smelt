@@ -14,23 +14,28 @@ import com.bahj.smelt.plugin.builtin.editor.forms.FormFactory;
 
 /**
  * A form factory which constructs a container around a number of forms from other factories.
+ * 
  * @author Zachary Palmer
  */
 public class ContainerFormFactory implements FormFactory {
     public enum Orientation {
         HORIZONTAL, VERTICAL
     }
-    
+
     private List<FormFactory> factories;
     private Orientation orientation;
-    
+
     private int spacing;
-    
+
     /**
      * Creates a new container factory.
-     * @param factories The factories which make the components of this form.
-     * @param orientation The orientation of this form (vertical or horizontal).
-     * @param spacing The spacing between elements in this form.
+     * 
+     * @param factories
+     *            The factories which make the components of this form.
+     * @param orientation
+     *            The orientation of this form (vertical or horizontal).
+     * @param spacing
+     *            The spacing between elements in this form.
      */
     public ContainerFormFactory(List<FormFactory> factories, Orientation orientation, int spacing) {
         this.factories = factories;
@@ -39,7 +44,7 @@ public class ContainerFormFactory implements FormFactory {
     }
 
     @Override
-    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
+    public Form createForm(SmeltValue<?, ?> value) throws SmeltTypeMismatchException {
         // There are two types of containers: horizontal and vertical. Build an appropriate component to
         // host the children based on this.
         JPanel panel = new JPanel();

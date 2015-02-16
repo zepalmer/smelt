@@ -29,7 +29,9 @@ public abstract class AbstractEventGenerator<T extends Event> implements EventGe
 
     /**
      * Dispatches the provided event to all listeners.
-     * @param event The event object to dispatch.
+     * 
+     * @param event
+     *            The event object to dispatch.
      */
     protected <U extends T> void fireEvent(U event) {
         // NOTE: The type parameter on this function wouldn't be strictly necessary but helps the type inference engine.

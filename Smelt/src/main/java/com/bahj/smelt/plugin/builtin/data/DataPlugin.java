@@ -14,9 +14,10 @@ import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 
 /**
- * This plugin provides functionality for managing data models and databases in Smelt.  It is actually a symbolic
- * plugin which forces the load of two other plugins: the data model plugin and the data GUI plugin (the latter of
- * which provides menu options and other GUI-related tools).
+ * This plugin provides functionality for managing data models and databases in Smelt. It is actually a symbolic plugin
+ * which forces the load of two other plugins: the data model plugin and the data GUI plugin (the latter of which
+ * provides menu options and other GUI-related tools).
+ * 
  * @author Zachary Palmer
  */
 public class DataPlugin implements SmeltPlugin {

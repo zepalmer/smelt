@@ -22,6 +22,7 @@ public class SmeltBasicMenuItem extends SmeltAbstractMenuItem {
 
     /**
      * The action to take when the menu item is selected.
+     * 
      * @return The action to take.
      */
     public Action getAction() {

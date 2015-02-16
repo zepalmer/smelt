@@ -52,12 +52,15 @@ public class Configuration {
     public Set<Class<? extends SmeltPlugin>> getPlugins() {
         return this.plugins;
     }
-    
+
     /**
      * Creates a configuration which contains the default plugins.
+     * 
      * @return A new configuration with default plugins.
-     * @throws ClassNotFoundException If one of the default classes cannot be found.
-     * @throws ClassCastException If one of the default classes cannot be coerced to {@link SmeltPlugin}.
+     * @throws ClassNotFoundException
+     *             If one of the default classes cannot be found.
+     * @throws ClassCastException
+     *             If one of the default classes cannot be coerced to {@link SmeltPlugin}.
      */
     public static Configuration createDefaultConfiguration() throws ClassNotFoundException, ClassCastException {
         Configuration configuration = new Configuration();

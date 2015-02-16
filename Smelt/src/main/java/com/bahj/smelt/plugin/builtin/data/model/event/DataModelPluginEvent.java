@@ -6,6 +6,7 @@ import com.bahj.smelt.util.event.Event;
 
 /**
  * The supertype of all events from the data model plugin.
+ * 
  * @author Zachary Palmer
  */
 public abstract class DataModelPluginEvent implements Event {

@@ -10,6 +10,6 @@ public abstract class DeclarationNodeDecorator<T extends DeclarationNode> extend
     }
 
     public abstract MessageNodeDecorator insistMessageNode() throws DeclarationProcessingException;
-    
+
     public abstract ListNodeDecorator insistListNode() throws DeclarationProcessingException;
 }

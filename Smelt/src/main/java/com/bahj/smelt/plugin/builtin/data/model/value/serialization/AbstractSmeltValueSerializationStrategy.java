@@ -17,7 +17,7 @@ import com.google.gson.JsonObject;
  * 
  * @author Zachary Palmer
  */
-public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V,E>>
+public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>>
         implements SmeltValueSerializationStrategy {
     private static final String CLASS_KEY = "smeltValueClass";
     private static final String VALUE_KEY = "smeltValue";

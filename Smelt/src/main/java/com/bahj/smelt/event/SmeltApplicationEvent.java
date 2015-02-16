@@ -14,5 +14,5 @@ public abstract class SmeltApplicationEvent implements Event {
     public SmeltApplicationModel getApplicationModel() {
         return applicationModel;
     }
-    
+
 }

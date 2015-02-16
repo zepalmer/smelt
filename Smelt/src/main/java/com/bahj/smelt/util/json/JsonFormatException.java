@@ -2,6 +2,7 @@ package com.bahj.smelt.util.json;
 
 /**
  * An exception raised when a JSON object is not of an expected format.
+ * 
  * @author Zachary Palmer
  */
 public class JsonFormatException extends Exception {

@@ -8,11 +8,12 @@ import javax.swing.Action;
 
 /**
  * A Swing {@link Action} which simply accepts a consumer to execute when the action is triggered.
+ * 
  * @author Zachary Palmer
  */
 public class BasicAction extends AbstractAction {
     private static final long serialVersionUID = 1L;
-    
+
     private Consumer<ActionEvent> consumer;
 
     public BasicAction(Consumer<ActionEvent> Consumer) {

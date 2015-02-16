@@ -92,7 +92,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
         popupMenu.setLabel(obj.toString());
         obj.visit(new TreeObjectVisitor<JPopupMenu, Void, RuntimeException>() {
             @Override
-            public Void visitType(TreeTypeObject<?,?,?> obj, JPopupMenu popupMenu) {
+            public Void visitType(TreeTypeObject<?, ?, ?> obj, JPopupMenu popupMenu) {
                 JMenuItem createItem = new JMenuItem("New");
                 createItem.setMnemonic(KeyEvent.VK_N);
                 createItem.addActionListener((ActionEvent e) -> {
@@ -108,7 +108,7 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
             }
 
             @Override
-            public Void visitValue(TreeValueObject<?,?> obj, JPopupMenu popupMenu) {
+            public Void visitValue(TreeValueObject<?, ?> obj, JPopupMenu popupMenu) {
                 // TODO: options for edit, delete, etc.
                 throw new NotYetImplementedException();
             }
@@ -118,16 +118,16 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
     }
 
     private void doubleClickOn(DefaultMutableTreeNode node) {
-        TreeObject obj = (TreeObject)node.getUserObject();
-        obj.visit(new TreeObjectVisitor<Void,Void,RuntimeException>() {
+        TreeObject obj = (TreeObject) node.getUserObject();
+        obj.visit(new TreeObjectVisitor<Void, Void, RuntimeException>() {
             @Override
-            public Void visitType(TreeTypeObject<?,?,?> obj, Void arg) throws RuntimeException {
+            public Void visitType(TreeTypeObject<?, ?, ?> obj, Void arg) throws RuntimeException {
                 // TODO: does anything belong here?
                 return null;
             }
 
             @Override
-            public Void visitValue(TreeValueObject<?,?> obj, Void arg) throws RuntimeException {
+            public Void visitValue(TreeValueObject<?, ?> obj, Void arg) throws RuntimeException {
                 editorModel.openEditor(obj.getValue());
                 return null;
             }

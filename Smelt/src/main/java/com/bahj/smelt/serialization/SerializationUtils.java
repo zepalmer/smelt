@@ -31,8 +31,8 @@ public class SerializationUtils {
      * @throws DeserializationException
      *             If a deserialization error occurs while reading the object.
      */
-    public static <T> T readFile(File file, SmeltSerializationStrategy<T> strategy)
-            throws DeserializationException, IOException {
+    public static <T> T readFile(File file, SmeltSerializationStrategy<T> strategy) throws DeserializationException,
+            IOException {
         FileInputStream fis = new FileInputStream(file);
         T ret = strategy.deserialize(fis);
         fis.close();

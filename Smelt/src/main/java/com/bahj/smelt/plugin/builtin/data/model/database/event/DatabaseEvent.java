@@ -5,6 +5,7 @@ import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 
 /**
  * The base class for events which occur on a Smelt database.
+ * 
  * @author Zachary Palmer
  */
 public abstract class DatabaseEvent extends DataModelPluginEvent {

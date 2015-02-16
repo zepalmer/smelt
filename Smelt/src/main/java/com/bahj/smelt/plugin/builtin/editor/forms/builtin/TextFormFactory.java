@@ -23,7 +23,7 @@ public class TextFormFactory implements FormFactory {
     }
 
     @Override
-    public Form createForm(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
+    public Form createForm(SmeltValue<?, ?> value) throws SmeltTypeMismatchException {
         SmeltText textValue = TextType.INSTANCE.coerce(value);
 
         // Create the component.

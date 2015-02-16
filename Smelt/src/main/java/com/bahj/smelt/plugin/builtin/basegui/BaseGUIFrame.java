@@ -50,14 +50,14 @@ public class BaseGUIFrame extends JFrame {
         // Set up the docking space.
         this.dockingControl = new CControl(this);
         this.primaryWorkingArea = this.dockingControl.createWorkingArea(PRIMARY_WORKING_AREA_KEY);
-        
+
         // Add it to the primary frame.
         this.setContentPane(this.dockingControl.getContentArea());
-        
+
         // Configure default appearance of the primary working area.
         this.primaryWorkingArea.setVisible(true);
         this.primaryWorkingArea.setLocation(CLocation.base().normalEast(0.75));
-        
+
         // Set to an Eclipse-like theme.
         this.dockingControl.setTheme(ThemeMap.KEY_ECLIPSE_THEME);
     }

@@ -13,7 +13,7 @@ import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltEnumEvent;
  * 
  * @author Zachary Palmer
  */
-public class EnumType extends AbstractSmeltType<SmeltEnumValue,SmeltEnumEvent> {
+public class EnumType extends AbstractSmeltType<SmeltEnumValue, SmeltEnumEvent> {
     private String name;
     private List<String> choices;
 
@@ -42,7 +42,7 @@ public class EnumType extends AbstractSmeltType<SmeltEnumValue,SmeltEnumEvent> {
     }
 
     @Override
-    public SmeltEnumValue coerce(SmeltValue<?,?> value) throws SmeltTypeMismatchException {
+    public SmeltEnumValue coerce(SmeltValue<?, ?> value) throws SmeltTypeMismatchException {
         if (value instanceof SmeltEnumValue && value.getType().equals(this)) {
             return (SmeltEnumValue) value;
         } else {

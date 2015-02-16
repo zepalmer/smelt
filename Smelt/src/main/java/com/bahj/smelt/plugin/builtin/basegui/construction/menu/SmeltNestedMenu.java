@@ -45,7 +45,7 @@ public class SmeltNestedMenu extends SmeltAbstractMenuItem {
                 .orElse(null);
         // @formatter:on
     }
-    
+
     public List<List<? extends SmeltMenuItem>> getMenuItems() {
         return Collections.unmodifiableList(this.menuItems);
     }

@@ -32,14 +32,14 @@ public class SmeltValueSerializationStrategyRegistry {
     public Set<SmeltValueSerializationStrategy> getStrategies() {
         return Collections.unmodifiableSet(strategies);
     }
-    
+
     private void checkNonEmpty() {
         if (this.strategies.size() == 0) {
             throw new IllegalStateException("Cannot serialize a database with zero value strategies.");
-        }        
+        }
     }
 
-    public JsonElement serializeValue(SmeltValueWrapper<?,?> valueWrapper) throws SerializationException {
+    public JsonElement serializeValue(SmeltValueWrapper<?, ?> valueWrapper) throws SerializationException {
         checkNonEmpty();
         SerializationException exception = null;
         for (SmeltValueSerializationStrategy strategy : this.strategies) {
@@ -52,7 +52,7 @@ public class SmeltValueSerializationStrategyRegistry {
         throw exception;
     }
 
-    public SmeltValueWrapper<?,?> deserializeValue(JsonElement json) throws DeserializationException {
+    public SmeltValueWrapper<?, ?> deserializeValue(JsonElement json) throws DeserializationException {
         checkNonEmpty();
         DeserializationException exception = null;
         for (SmeltValueSerializationStrategy strategy : this.strategies) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.bahj.smelt.syntax.ast.NamedArgumentNode;
 
-public class NamedArgumentNodeDecorator extends AstNodeDecorator<NamedArgumentNode> implements NamedArgumentNode{
+public class NamedArgumentNodeDecorator extends AstNodeDecorator<NamedArgumentNode> implements NamedArgumentNode {
     public NamedArgumentNodeDecorator(NamedArgumentNode backingNode, DecoratorNodeContext context) {
         super(backingNode, context);
     }

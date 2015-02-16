@@ -5,16 +5,16 @@ import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltTextEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltTextUpdateEvent;
 
 public class SmeltText extends AbstractSmeltValue<SmeltText, SmeltTextEvent> {
-	private String value;
+    private String value;
 
-	public SmeltText(TextType type, String value) {
+    public SmeltText(TextType type, String value) {
         super(type);
         this.value = value;
     }
 
     public String getValue() {
-		return value;
-	}
+        return value;
+    }
 
     public void setValue(String value) {
         if (!value.equals(this.value)) {
@@ -27,5 +27,5 @@ public class SmeltText extends AbstractSmeltValue<SmeltText, SmeltTextEvent> {
     @Override
     public String getDescription() {
         return this.value;
-    }    
+    }
 }

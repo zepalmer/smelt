@@ -40,7 +40,7 @@ public interface GUIConstructionContext {
     default public void addMenuItemGroup(String menuName, SmeltMenuItem... items) {
         addMenuItemGroup(menuName, Arrays.asList(items));
     }
-    
+
     /**
      * Creates an {@link Action} based on a {@link GUIExecutionContext}. This allows the behavior of plugins' GUI
      * components to be defined independent of the concrete GUI but in reference to GUI-related functionality exposed

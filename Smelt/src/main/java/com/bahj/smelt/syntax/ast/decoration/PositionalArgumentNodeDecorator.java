@@ -7,8 +7,7 @@ import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
 
 public class PositionalArgumentNodeDecorator extends AstNodeDecorator<PositionalArgumentNode> implements
         PositionalArgumentNode {
-    public PositionalArgumentNodeDecorator(PositionalArgumentNode backingNode,
-            DecoratorNodeContext context) {
+    public PositionalArgumentNodeDecorator(PositionalArgumentNode backingNode, DecoratorNodeContext context) {
         super(backingNode, context);
     }
 
@@ -16,10 +15,12 @@ public class PositionalArgumentNodeDecorator extends AstNodeDecorator<Positional
     public List<String> getComponents() {
         return this.backingNode.getComponents();
     }
-    
+
     /**
      * Insists that this positional argument consists of only one component.
-     * @throws DeclarationProcessingException If this node contains no components or more than one component.
+     * 
+     * @throws DeclarationProcessingException
+     *             If this node contains no components or more than one component.
      * @return The component, if there is only one of them.
      */
     public String insistSingleComponent() throws DeclarationProcessingException {

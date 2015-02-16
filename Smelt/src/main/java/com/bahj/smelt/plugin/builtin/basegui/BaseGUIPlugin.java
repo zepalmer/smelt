@@ -43,8 +43,9 @@ import com.bahj.smelt.util.swing.FileFilterUtils;
  * Other plugins may add content to the GUI by responding to the {@link BaseGUIInitializingEvent} that this plugin fires
  * in response to the global {@link SmeltApplicationPluginsConfiguredEvent}. That object is useful in two ways: first,
  * it allows the addition of menu items via the {@link GUIConstructionContext} contained in the event. Second, that
- * {@link GUIConstructionContext} contains a {@link StrongReferenceImpl} to a {@link GUIExecutionContext} (which may only be
- * used <i>after</i> the {@link BaseGUIInitializedEvent} begins dispatch) which can be used to add tabs to the tab pane.
+ * {@link GUIConstructionContext} contains a {@link StrongReferenceImpl} to a {@link GUIExecutionContext} (which may
+ * only be used <i>after</i> the {@link BaseGUIInitializedEvent} begins dispatch) which can be used to add tabs to the
+ * tab pane.
  * 
  * @author Zachary Palmer
  */

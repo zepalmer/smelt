@@ -8,23 +8,23 @@ import com.bahj.smelt.syntax.ast.AstNode;
 import com.bahj.smelt.syntax.ast.ListNode;
 
 public class ListNodeImpl extends AbstractAstNodeImpl implements ListNode {
-	private List<String> values;
+    private List<String> values;
 
-	public ListNodeImpl(SourceLocation location, List<String> values) {
-		super(location);
-		this.values = values;
-	}
+    public ListNodeImpl(SourceLocation location, List<String> values) {
+        super(location);
+        this.values = values;
+    }
 
-	@Override
+    @Override
     public List<String> getValues() {
-		return values;
-	}
+        return values;
+    }
 
     @Override
     public String getSimpleDescription() {
         StringBuilder sb = new StringBuilder();
         for (String value : this.values) {
-            if (sb.length() >  0){
+            if (sb.length() > 0) {
                 sb.append(", ");
             }
             sb.append(value);

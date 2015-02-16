@@ -25,7 +25,7 @@ public class PositionalArgumentNodeImpl extends AbstractAstNodeImpl implements A
     public String getSimpleDescription() {
         StringBuilder sb = new StringBuilder();
         for (String component : this.components) {
-            if (sb.length()>0) {
+            if (sb.length() > 0) {
                 sb.append(" ");
             }
             sb.append(component);
