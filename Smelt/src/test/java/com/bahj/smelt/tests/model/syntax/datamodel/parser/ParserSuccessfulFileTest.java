@@ -33,7 +33,7 @@ public class ParserSuccessfulFileTest {
 
     @Parameters(name="successParse: {0}")
     public static Collection<Object[]> findTestFiles() {
-        File root = new File("test-data" + File.separator + "success");
+        File root = new File(String.join(File.separator, "src","test","resources","success"));
         List<Object[]> args = new ArrayList<>();
         for (File f : root.listFiles()) {
             if (f.getName().endsWith(".smeltm")) {
