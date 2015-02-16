@@ -46,13 +46,13 @@ public class SmeltDatabase extends AbstractEventGenerator<DatabaseEvent> {
 
     public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void add(V value) {
         getValueSetByType(value.getType()).add(value);
-        this.valueWrappers.add(new SmeltValueWrapper<>(value));
+        this.valueWrappers.add(new SmeltValueWrapper<V,E>(value));
         fireEvent(new DatabaseObjectAddedEvent(this, value));
     }
 
     public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void remove(V value) {
         getValueSetByType(value.getType()).remove(value);
-        this.valueWrappers.remove(new SmeltValueWrapper<>(value));
+        this.valueWrappers.remove(new SmeltValueWrapper<V,E>(value));
         fireEvent(new DatabaseObjectRemovedEvent(this, value));
     }
 

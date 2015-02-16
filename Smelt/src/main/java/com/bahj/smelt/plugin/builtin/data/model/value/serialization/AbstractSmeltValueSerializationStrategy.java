@@ -61,7 +61,7 @@ public abstract class AbstractSmeltValueSerializationStrategy<V extends SmeltVal
                         + this.valueClass.getName() + "; the provided object is a serialized " + className);
             }
             JsonWrapper<?> valueJson = wrapperObject.getRequiredField(VALUE_KEY);
-            return new SmeltValueWrapper<>(jsonToValue(valueJson));
+            return new SmeltValueWrapper<V,E>(jsonToValue(valueJson));
         } catch (JsonFormatException e) {
             throw new DeserializationException("Deserialization failed: incorrectly formatted JSON", e);
         }

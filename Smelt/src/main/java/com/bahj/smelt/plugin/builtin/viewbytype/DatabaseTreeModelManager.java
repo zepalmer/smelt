@@ -20,6 +20,7 @@ import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueDescriptionUpdateEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 import com.bahj.smelt.util.MappedComparator;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
@@ -65,10 +66,17 @@ public class DatabaseTreeModelManager {
                 new EventListener<DatabaseObjectAddedEvent>() {
                     @Override
                     public void eventOccurred(DatabaseObjectAddedEvent event) {
-                        DefaultMutableTreeNode valueNode = buildValueNode(event.getWrapper().getSmeltValue());
+                        handleValue(event.getWrapper());
+                    }
+
+                    // Using the following function to name V and E.  Eclipse is smart enough to infer this, but the
+                    // Java 1.8.0_20 compiler is not.
+                    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void handleValue(
+                            SmeltValueWrapper<V, E> valueWrapper) {
+                        V value = valueWrapper.getSmeltValue();
+                        DefaultMutableTreeNode valueNode = buildValueNode(value);
                         insertValueIntoTree(valueNode);
-                        event.getWrapper().getSmeltValue()
-                                .addListener(DatabaseTreeModelManager.this.titleUpdateListener);
+                        value.addListener(DatabaseTreeModelManager.this.titleUpdateListener);
                     }
                 }));
         this.plugin.addListener(new TypedEventListener<>(DatabaseObjectRemovedEvent.class,

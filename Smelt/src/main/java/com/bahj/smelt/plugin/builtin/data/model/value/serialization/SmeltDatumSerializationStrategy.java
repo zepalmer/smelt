@@ -7,7 +7,10 @@ import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.util.NotYetImplementedException;
@@ -60,8 +63,15 @@ public class SmeltDatumSerializationStrategy extends
         JsonObjectWrapper propertyMap = datumObject.getField(PROPERTY_MAP_KEY).asObject();
         for (Map.Entry<String, JsonElement> entry : propertyMap.getElement().entrySet()) {
             String fieldName = entry.getKey();
-            datum.set(fieldName, this.registry.deserializeValue(entry.getValue()).getSmeltValue());
+            JsonElement jsonValue = entry.getValue();
+            doDatumSet(datum, fieldName, this.registry.deserializeValue(jsonValue));
         }
         return datum;
+    }
+
+    // This method exists solely to name V and E. This is not necessary for Eclipse, but it is required for jdk1.8.0_20.
+    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void doDatumSet(SmeltDatum datum,
+            String fieldName, SmeltValueWrapper<V,E> valueWrapper) {
+        datum.set(fieldName, valueWrapper.getSmeltValue());
     }
 }

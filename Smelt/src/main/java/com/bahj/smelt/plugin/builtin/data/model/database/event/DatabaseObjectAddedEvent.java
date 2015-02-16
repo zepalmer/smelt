@@ -16,7 +16,7 @@ public class DatabaseObjectAddedEvent extends DatabaseEvent {
     public <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> DatabaseObjectAddedEvent(
             SmeltDatabase database, V value) {
         super(database);
-        this.wrapper = new SmeltValueWrapper<>(value);
+        this.wrapper = new SmeltValueWrapper<V, E>(value);
     }
 
     public SmeltValueWrapper<?, ?> getWrapper() {

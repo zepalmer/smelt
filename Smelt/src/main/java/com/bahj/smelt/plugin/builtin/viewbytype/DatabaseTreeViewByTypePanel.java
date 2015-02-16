@@ -3,6 +3,7 @@ package com.bahj.smelt.plugin.builtin.viewbytype;
 import java.awt.BorderLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -18,6 +19,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
 
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
+import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.editor.EditorModel;
 import com.bahj.smelt.util.NotYetImplementedException;
 
@@ -95,12 +100,22 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
             public Void visitType(TreeTypeObject<?, ?, ?> obj, JPopupMenu popupMenu) {
                 JMenuItem createItem = new JMenuItem("New");
                 createItem.setMnemonic(KeyEvent.VK_N);
-                createItem.addActionListener((ActionEvent e) -> {
-                    // Create a new instance of this type and add it to the database.
+                createItem.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // Create a new instance of this type and add it to the database.
                         if (plugin.getDatabase() != null) {
-                            plugin.getDatabase().add(obj.getType().instantiate());
+                            addTypeToDatabase(plugin.getDatabase(), obj.getType());
                         }
-                    });
+                    }
+
+                    // We extract this expression to its own method to give names to V and E.  This is not necessary
+                    // for Eclipse, but it's necessary for jdk1.8.0_20.
+                    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void addTypeToDatabase(
+                            SmeltDatabase database, SmeltType<V, E> type) {
+                        database.add(type.instantiate());
+                    }
+                });
 
                 popupMenu.add(createItem);
 

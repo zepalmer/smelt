@@ -7,6 +7,7 @@ import java.util.Map;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltDatum;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 
 /**
  * Represents a structured data type in Smelt.
@@ -54,9 +55,15 @@ public class DataType extends AbstractSmeltType<SmeltDatum, SmeltDatumEvent> {
     public SmeltDatum instantiate() {
         SmeltDatum datum = new SmeltDatum(this);
         for (Map.Entry<String, SmeltType<?, ?>> property : properties.entrySet()) {
-            datum.set(property.getKey(), property.getValue().instantiate());
+            SmeltType<?,?> type = property.getValue();
+            datum.set(property.getKey(), instantiate(type));
         }
         return datum;
+    }
+    
+    // This function only exists to name V and E, which is not necessary for Eclipse but is necessary for jdk1.8.0_20.
+    private <V extends SmeltValue<V,E>, E extends SmeltValueEvent<V,E>> V instantiate(SmeltType<V,E> type) {
+        return type.instantiate();
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.data.model.database;
 
+import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltValueSerializationStrategyRegistry;
 import com.bahj.smelt.plugin.builtin.data.model.value.utils.SmeltValueWrapper;
 import com.bahj.smelt.serialization.DeserializationException;
@@ -50,12 +52,17 @@ public class SmeltDatabaseSerializationStrategy implements SmeltJSONSerializatio
             SmeltDatabase database = new SmeltDatabase();
             for (JsonElement element : valuesArray.getElement()) {
                 SmeltValueWrapper<?, ?> valueWrapper = this.registry.deserializeValue(element);
-                database.add(valueWrapper.getSmeltValue());
+                addValueToDatabase(database, valueWrapper);
             }
 
             return database;
         } catch (JsonFormatException e) {
             throw new DeserializationException("Provided JSON object was not a correctly-formatted database object.", e);
         }
+    }
+
+    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void addValueToDatabase(
+            SmeltDatabase database, SmeltValueWrapper<V, E> valueWrapper) {
+        database.add(valueWrapper.getSmeltValue());
     }
 }
