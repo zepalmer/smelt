@@ -143,7 +143,6 @@ public class DatabaseTreeViewByTypePanel extends JPanel {
 
             @Override
             public Void visitValue(TreeValueObject<?, ?> obj, Void arg) throws RuntimeException {
-                // editorModel.openEditor(obj.getValue());
                 doOpenEditor(obj);
                 return null;
             }
