@@ -1,0 +1,12 @@
+data: character
+  firstName: text
+  lastName: text
+  city: text
+
+editor: character
+  container: vertical
+    container: vertical, name=Name
+      firstName
+      lastName
+    container: vertical, name=Homeland
+      city

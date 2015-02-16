@@ -13,6 +13,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.bahj.smelt.util.FileUtils;
+
 @RunWith(Parameterized.class)
 public class ParserSuccessfulFileTest {
     private File file;
@@ -36,7 +38,7 @@ public class ParserSuccessfulFileTest {
         File root = new File(String.join(File.separator, "src","test","resources","success"));
         List<Object[]> args = new ArrayList<>();
         for (File f : root.listFiles()) {
-            if (f.getName().endsWith(".smeltm")) {
+            if (f.getName().endsWith(FileUtils.SMELT_SPEC_EXTENSION)) {
                 args.add(new Object[] { f });
             }
         }
