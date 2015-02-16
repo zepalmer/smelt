@@ -1,5 +1,6 @@
 package com.bahj.smelt.plugin.builtin.data.gui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -158,14 +159,19 @@ public class DataGUIPlugin implements SmeltPlugin {
     private static class MenuActions {
         private DataModelPlugin dataModelPlugin;
         private BaseGUIPlugin baseGUIPlugin;
+        
+        private File currentFile;
 
         public MenuActions(DataModelPlugin dataModelPlugin, BaseGUIPlugin baseGUIPlugin) {
             super();
             this.dataModelPlugin = dataModelPlugin;
             this.baseGUIPlugin = baseGUIPlugin;
+            
+            this.currentFile = null;
         }
 
         public void newDatabase(GUIExecutionContext context) {
+            this.currentFile = null;
             // TODO: appropriate confirmation prompts if a database is already loaded
             dataModelPlugin.setDatabase(new SmeltDatabase());
         }
@@ -177,8 +183,11 @@ public class DataGUIPlugin implements SmeltPlugin {
             chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             int result = chooser.showOpenDialog(this.baseGUIPlugin.getBaseFrame());
             if (result == JFileChooser.APPROVE_OPTION) {
+                this.currentFile = null;
                 try {
-                    dataModelPlugin.openDatabase(chooser.getSelectedFile());
+                    File selectedFile = chooser.getSelectedFile();
+                    dataModelPlugin.openDatabase(selectedFile);
+                    this.currentFile = selectedFile;
                 } catch (IOException e) {
                     throw new NotYetImplementedException(e);
                 } catch (DeserializationException e) {
@@ -188,7 +197,17 @@ public class DataGUIPlugin implements SmeltPlugin {
         }
 
         public void saveDatabase(GUIExecutionContext context) {
-            // TODO: save file to known filename (or present GUI if necessary)
+            if (this.currentFile == null) {
+                saveDatabaseAs(context);
+            } else {
+                try {
+                    dataModelPlugin.saveDatabase(this.currentFile);
+                } catch (IOException e) {
+                    throw new NotYetImplementedException(e);
+                } catch (SerializationException e) {
+                    throw new NotYetImplementedException(e);
+                }
+            }
         }
 
         public void saveDatabaseAs(GUIExecutionContext context) {
@@ -198,7 +217,9 @@ public class DataGUIPlugin implements SmeltPlugin {
             int result = chooser.showSaveDialog(this.baseGUIPlugin.getBaseFrame());
             if (result == JFileChooser.APPROVE_OPTION) {
                 try {
-                    dataModelPlugin.saveDatabase(chooser.getSelectedFile());
+                    File selectedFile = chooser.getSelectedFile();
+                    dataModelPlugin.saveDatabase(selectedFile);
+                    this.currentFile = selectedFile;
                 } catch (IOException e) {
                     throw new NotYetImplementedException(e);
                 } catch (SerializationException e) {
@@ -210,6 +231,7 @@ public class DataGUIPlugin implements SmeltPlugin {
         public void closeDatabase(GUIExecutionContext context) {
             // TODO: appropriate confirmation prompts
             dataModelPlugin.setDatabase(null);
+            this.currentFile = null;
         }
     }
 }
