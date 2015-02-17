@@ -132,13 +132,17 @@ declaration
 list
 :
     IDENTIFIER
-    ( ',' IDENTIFIER )*
-    ','?
+    (
+        ',' IDENTIFIER
+    )* ','?
 ;
 
 message
 :
-    messageHeader (end messageBody?)?
+    messageHeader
+    (
+        end messageBody?
+    )?
 ;
 
 messageHeader
@@ -160,12 +164,12 @@ declarationArgument
 
 namedArgument
 :
-    IDENTIFIER '=' IDENTIFIER+
+    IDENTIFIER '=' string+
 ;
 
 positionalArgument
 :
-    IDENTIFIER+
+    string+
 ;
 
 messageBody
@@ -177,6 +181,11 @@ end
 :
     EOL
     | EOF
+;
+
+string
+:   STRING
+    | IDENTIFIER
 ;
 
 // LEXER RULES ////////////////////////////////////////////////////////////////
@@ -194,6 +203,11 @@ WHITESPACE
 IDENTIFIER
 :
     IDENTIFIER_START IDENTIFIER_CONT*
+;
+
+STRING
+:
+    '"' STRING_CHAR* '"'
 ;
 
 EQUALS
@@ -225,4 +239,18 @@ IDENTIFIER_CONT
     .
     {Character.isDigit(_input.LA(-1)) || Character.isAlphabetic(_input.LA(-1))}?
 
+;
+
+fragment
+STRING_CHAR
+:
+    ~["\\]
+    | STRING_ESCAPE_SEQUENCE
+;
+
+fragment
+STRING_ESCAPE_SEQUENCE
+:
+    '\\' '"'
+    | '\\' '\\'
 ;

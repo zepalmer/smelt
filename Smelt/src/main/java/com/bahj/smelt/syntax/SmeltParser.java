@@ -6,9 +6,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -32,6 +32,7 @@ import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.MessageContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.MessageHeaderContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.NamedArgumentContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.PositionalArgumentContext;
+import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.StringContext;
 import com.bahj.smelt.syntax.ast.ArgumentNode;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.DocumentNode;
@@ -165,25 +166,51 @@ public class SmeltParser {
     }
 
     private NamedArgumentNode astTransform(NamedArgumentContext namedArgumentContext) {
-        Iterator<TerminalNode> it = namedArgumentContext.IDENTIFIER().iterator();
-        String name = it.next().getText();
-        List<String> args = new ArrayList<>();
-        while (it.hasNext()) {
-            args.add(it.next().getText());
-        }
+        String name = namedArgumentContext.IDENTIFIER().getText();
+        List<String> args = namedArgumentContext.string().stream().map(SmeltParser::processString)
+                .collect(Collectors.toList());
         return new NamedArgumentNodeImpl(locationOf(namedArgumentContext), name, args);
     }
 
     private PositionalArgumentNode astTransform(PositionalArgumentContext positionalArgumentContext) {
-        List<String> args = new ArrayList<>();
-        for (TerminalNode node : positionalArgumentContext.IDENTIFIER()) {
-            args.add(node.getText());
-        }
+        List<String> args = positionalArgumentContext.string().stream().map(SmeltParser::processString)
+                .collect(Collectors.toList());
         return new PositionalArgumentNodeImpl(locationOf(positionalArgumentContext), args);
     }
 
     private SourceLocation locationOf(ParserRuleContext context) {
         return new SourceLocation(resourceName, context.getStart().getLine(), context.getStart()
                 .getCharPositionInLine());
+    }
+
+    private static String processString(StringContext context) {
+        if (context.STRING() == null) {
+            return context.IDENTIFIER().getText();
+        } else {
+            String raw = context.STRING().getText();
+            // This is a quoted string. We need to remove the quotes and process the escapes.
+            StringBuilder result = new StringBuilder();
+            raw = raw.substring(1, raw.length() - 1); // remove quotes
+            for (int i = 0; i < raw.length(); i++) {
+                switch (raw.charAt(i)) {
+                    case '\\':
+                        i++;
+                        switch (raw.charAt(i)) {
+                            case '\\':
+                                result.append('\\');
+                                break;
+                            case '"':
+                                result.append('"');
+                                break;
+                            default:
+                                throw new IllegalStateException("Unrecognized escape code!");
+                        }
+                        break;
+                    default:
+                        result.append(raw.charAt(i));
+                }
+            }
+            return result.toString();
+        }
     }
 }
