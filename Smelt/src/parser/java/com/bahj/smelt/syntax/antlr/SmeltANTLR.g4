@@ -184,7 +184,8 @@ end
 ;
 
 string
-:   STRING
+:
+    STRING
     | IDENTIFIER
 ;
 
@@ -198,6 +199,11 @@ NEWLINE
 WHITESPACE
 :
     ' '+
+;
+
+COMMENT
+:
+    '#' ~( '\r' | '\n' )* -> skip
 ;
 
 IDENTIFIER
