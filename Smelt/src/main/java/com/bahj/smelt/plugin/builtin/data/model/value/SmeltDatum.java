@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
+import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyChangeEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltDatumPropertyInnerUpdateEvent;
@@ -45,8 +46,28 @@ public class SmeltDatum extends AbstractSmeltValue<SmeltDatum, SmeltDatumEvent> 
      * @return The value of that field (or <code>null</code> if that field has no value).
      */
     public SmeltValue<?, ?> get(String fieldName) {
-        SmeltValueWrapper<?, ?> wrapper = this.properties.get(fieldName).getValueWrapper();
-        return (wrapper == null) ? null : wrapper.getSmeltValue();
+        FieldEntry<?, ?> entry = this.properties.get(fieldName);
+        if (entry == null) {
+            // Should we have a value here?
+            SmeltType<?, ?> fieldType = this.dataType.getProperties().get(fieldName);
+            if (fieldType != null) {
+                // Seems like this property was added to the type after the value was created. Fix that.
+                setFieldToDefault(fieldName, fieldType);
+                return this.get(fieldName);
+            } else {
+                // This is a property that neither the value nor the type has.
+                return null;
+            }
+        } else {
+            SmeltValueWrapper<?, ?> wrapper = entry.getValueWrapper();
+            return (wrapper == null) ? null : wrapper.getSmeltValue();
+        }
+    }
+
+    // This method is only necessary because the jdk1.8.0_25 type inference engine is weaker than that of Eclipse.
+    private <V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void setFieldToDefault(String fieldName,
+            SmeltType<V, E> fieldType) {
+        this.set(fieldName, fieldType.instantiate());
     }
 
     /**
