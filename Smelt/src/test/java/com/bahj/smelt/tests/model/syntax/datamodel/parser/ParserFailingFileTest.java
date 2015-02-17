@@ -35,7 +35,7 @@ public class ParserFailingFileTest {
 
     @Parameters(name="failureParse: {0}")
     public static Collection<Object[]> findTestFiles() {
-        File root = new File(String.join(File.separator, "src","test","resources","failure"));
+        File root = new File(String.join(File.separator, "src","test","resources","parse-failure"));
         List<Object[]> args = new ArrayList<>();
         for (File f : root.listFiles()) {
             if (f.getName().endsWith(FileUtils.SMELT_SPEC_EXTENSION)) {
