@@ -81,4 +81,13 @@ public class MessageHeaderNodeDecorator extends AstNodeDecorator<MessageHeaderNo
             return this.getPositional().get(0);
         }
     }
+    
+    /**
+     * Creates a processor for named arguments.  This processor uses a builder pattern to allow each argument to be
+     * processed independently and to error if additional unhandled arguments are found.
+     * @return A named argument processor for this node.
+     */
+    public NamedArgumentProcessor namedArgumentProcessor() {
+        return new NamedArgumentProcessor(this);
+    }
 }

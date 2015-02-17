@@ -22,6 +22,7 @@ public class DatumFieldFormFactory implements FormFactory {
     private SmeltType<?, ?> fieldType;
     private String fieldName;
     private int labelSpacing;
+    private String fieldDisplayName;
 
     public DatumFieldFormFactory(FormFactoryRegistry formFactoryRegistry, SmeltType<?, ?> fieldType, String fieldName,
             int labelSpacing) {
@@ -30,6 +31,11 @@ public class DatumFieldFormFactory implements FormFactory {
         this.fieldType = fieldType;
         this.fieldName = fieldName;
         this.labelSpacing = labelSpacing;
+        this.fieldDisplayName = fieldName;
+    }
+    
+    public void setFieldDisplayName(String fieldDisplayName) {
+        this.fieldDisplayName = fieldDisplayName;
     }
 
     @Override
@@ -54,7 +60,7 @@ public class DatumFieldFormFactory implements FormFactory {
             Form form = factory.createForm(fieldValue);
             JPanel panel = new JPanel(new BorderLayout());
             panel.add(form.getComponent(), BorderLayout.CENTER);
-            String fieldDisplay = fieldName; // TODO: allow forms to override this display name
+            String fieldDisplay = this.fieldDisplayName;
             JLabel fieldLabel = new JLabel(fieldDisplay, SwingConstants.RIGHT);
             fieldLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, labelSpacing));
             panel.add(fieldLabel, BorderLayout.WEST);

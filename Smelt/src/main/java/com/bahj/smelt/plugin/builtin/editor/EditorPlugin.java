@@ -244,9 +244,18 @@ public class EditorPlugin implements SmeltPlugin {
                 String fieldName = messageNodeDecorator.getHeader().getName();
 
                 // First, do some sanity checking on the node.
-                messageNodeDecorator.getHeader().insistNoNamedArguments();
                 messageNodeDecorator.getHeader().insistNoPositionalArguments();
                 messageNodeDecorator.insistNoChildren();
+
+                // Extract some options
+                class Options {
+                    public String displayName = fieldName;
+                }
+                Options options = new Options();
+                messageNodeDecorator.getHeader().namedArgumentProcessor()
+                        .allow("display", (NamedArgumentNodeDecorator n) -> {
+                            options.displayName = String.join(" ", n.getArgs());
+                        }).finsh();
 
                 // Next, ensure that the type in question has a field by that name. If it does not, eagerly fail.
                 SmeltType<?, ?> fieldType = type.getProperties().get(fieldName);
@@ -260,8 +269,10 @@ public class EditorPlugin implements SmeltPlugin {
 
                 // Now create a factory which will get an appropriate form for the component. We do this lazily so we
                 // don't have to worry about the order in which forms are defined.
-                return new DatumFieldFormFactory(EditorPlugin.this.formFactoryRegistry, fieldType, fieldName,
-                        MINOR_SPACING);
+                DatumFieldFormFactory factory = new DatumFieldFormFactory(EditorPlugin.this.formFactoryRegistry,
+                        fieldType, fieldName, MINOR_SPACING);
+                factory.setFieldDisplayName(options.displayName);
+                return factory;
             }
         }
     }
