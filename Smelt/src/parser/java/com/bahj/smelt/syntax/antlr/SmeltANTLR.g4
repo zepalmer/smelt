@@ -138,7 +138,7 @@ list
 
 message
 :
-    messageHeader messageBody?
+    messageHeader (end messageBody?)?
 ;
 
 messageHeader
@@ -149,7 +149,7 @@ messageHeader
         (
             ',' declarationArgument
         )* ','?
-    )? end
+    )?
 ;
 
 declarationArgument

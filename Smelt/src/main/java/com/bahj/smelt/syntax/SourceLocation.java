@@ -28,6 +28,11 @@ public class SourceLocation {
     public int getColumn() {
         return column;
     }
+    
+    @Override
+    public String toString() {
+        return this.filename + "@" + this.line + ":" + this.column;
+    }
 
     @Override
     public int hashCode() {
