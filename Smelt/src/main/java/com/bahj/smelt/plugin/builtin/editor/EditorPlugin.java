@@ -261,7 +261,7 @@ public class EditorPlugin implements SmeltPlugin {
                 SmeltType<?, ?> fieldType = type.getProperties().get(fieldName);
                 if (fieldType == null) {
                     // TODO: appropriate error
-                    throw new NotYetImplementedException();
+                    throw new NotYetImplementedException("Field " + fieldName + " in form does not exist on type.");
                 }
 
                 // Indicate that this field's type should have a form.
