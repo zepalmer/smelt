@@ -1,10 +1,13 @@
 package com.bahj.smelt.plugin.builtin.editor.forms.builtin;
 
-import java.awt.GridLayout;
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltTypeMismatchException;
@@ -57,12 +60,15 @@ public class ContainerFormFactory implements FormFactory {
         if (this.groupName != null) {
             panel.setBorder(BorderFactory.createTitledBorder(this.groupName));
         }
+        Function<Integer, Component> strutFn;
         switch (orientation) {
             case HORIZONTAL:
-                panel.setLayout(new GridLayout(1, factories.size(), spacing, 0));
+                panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+                strutFn = Box::createHorizontalStrut;
                 break;
             case VERTICAL:
-                panel.setLayout(new GridLayout(factories.size(), 1, 0, spacing));
+                panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+                strutFn = Box::createVerticalStrut;
                 break;
             default:
                 throw new IllegalStateException("Unrecognized container orientation: " + orientation);
@@ -77,7 +83,13 @@ public class ContainerFormFactory implements FormFactory {
             // ACTUALLY, we're probably better off having that failover policy handled by the child form itself.
             forms.add(factory.createForm(value));
         }
+        boolean first = true;
         for (Form form : forms) {
+            if (first) {
+                first = false;
+            } else {
+                panel.add(strutFn.apply(spacing));
+            }
             panel.add(form.getComponent());
         }
 
