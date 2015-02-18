@@ -19,32 +19,26 @@ import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.bahj.smelt.syntax.antlr.SmeltANTLRLexer;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.DeclarationArgumentContext;
+import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.DeclarationBodyContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.DeclarationContext;
+import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.DeclarationHeaderContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.DocumentContext;
-import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.ListContext;
-import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.MessageBodyContext;
-import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.MessageContext;
-import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.MessageHeaderContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.NamedArgumentContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.PositionalArgumentContext;
 import com.bahj.smelt.syntax.antlr.SmeltANTLRParser.StringContext;
 import com.bahj.smelt.syntax.ast.ArgumentNode;
+import com.bahj.smelt.syntax.ast.DeclarationHeaderNode;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.DocumentNode;
-import com.bahj.smelt.syntax.ast.ListNode;
-import com.bahj.smelt.syntax.ast.MessageHeaderNode;
-import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.NamedArgumentNode;
 import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
+import com.bahj.smelt.syntax.ast.impl.DeclarationHeaderNodeImpl;
+import com.bahj.smelt.syntax.ast.impl.DeclarationNodeImpl;
 import com.bahj.smelt.syntax.ast.impl.DocumentNodeImpl;
-import com.bahj.smelt.syntax.ast.impl.ListNodeImpl;
-import com.bahj.smelt.syntax.ast.impl.MessageHeaderNodeImpl;
-import com.bahj.smelt.syntax.ast.impl.MessageNodeImpl;
 import com.bahj.smelt.syntax.ast.impl.NamedArgumentNodeImpl;
 import com.bahj.smelt.syntax.ast.impl.PositionalArgumentNodeImpl;
 
@@ -108,36 +102,18 @@ public class SmeltParser {
     }
 
     private DeclarationNode astTransform(DeclarationContext declarationContext) {
-        if (declarationContext.list() != null) {
-            return astTransform(declarationContext.list());
-        } else if (declarationContext.message() != null) {
-            return astTransform(declarationContext.message());
-        } else {
-            throw new IllegalStateException("Unrecognized declaration context type.");
-        }
-    }
-
-    private ListNode astTransform(ListContext listContext) {
-        List<String> values = new ArrayList<>();
-        for (TerminalNode node : listContext.IDENTIFIER()) {
-            values.add(node.getText());
-        }
-        return new ListNodeImpl(locationOf(listContext), values);
-    }
-
-    private MessageNode astTransform(MessageContext messageContext) {
-        MessageHeaderNode header = astTransform(messageContext.messageHeader());
-        MessageBodyContext bodyContext = messageContext.messageBody();
+        DeclarationHeaderNode header = astTransform(declarationContext.declarationHeader());
+        DeclarationBodyContext bodyContext = declarationContext.declarationBody();
         List<DeclarationNode> children = new ArrayList<>();
         if (bodyContext != null) {
             for (DeclarationContext declContext : bodyContext.declaration()) {
                 children.add(astTransform(declContext));
             }
         }
-        return new MessageNodeImpl(locationOf(messageContext), header, children);
+        return new DeclarationNodeImpl(locationOf(declarationContext), header, children);
     }
 
-    private MessageHeaderNode astTransform(MessageHeaderContext messageHeaderContext) {
+    private DeclarationHeaderNode astTransform(DeclarationHeaderContext messageHeaderContext) {
         String name = messageHeaderContext.IDENTIFIER().getText();
         List<PositionalArgumentNode> posArgs = new ArrayList<>();
         Map<String, NamedArgumentNode> namedArgs = new HashMap<>();
@@ -152,7 +128,7 @@ public class SmeltParser {
                 throw new IllegalStateException("Unrecognized argument node type.");
             }
         }
-        return new MessageHeaderNodeImpl(locationOf(messageHeaderContext), name, posArgs, namedArgs);
+        return new DeclarationHeaderNodeImpl(locationOf(messageHeaderContext), name, posArgs, namedArgs);
     }
 
     private ArgumentNode astTransform(DeclarationArgumentContext declarationArgumentContext) {

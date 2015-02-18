@@ -7,16 +7,16 @@ import java.util.Map;
 import com.bahj.smelt.syntax.SourceLocation;
 import com.bahj.smelt.syntax.ast.ArgumentNode;
 import com.bahj.smelt.syntax.ast.AstNode;
-import com.bahj.smelt.syntax.ast.MessageHeaderNode;
+import com.bahj.smelt.syntax.ast.DeclarationHeaderNode;
 import com.bahj.smelt.syntax.ast.NamedArgumentNode;
 import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
 
-public class MessageHeaderNodeImpl extends AbstractAstNodeImpl implements MessageHeaderNode {
+public class DeclarationHeaderNodeImpl extends AbstractAstNodeImpl implements DeclarationHeaderNode {
     private String name;
     private List<? extends PositionalArgumentNode> positional;
     private Map<String, ? extends NamedArgumentNode> named;
 
-    public MessageHeaderNodeImpl(SourceLocation location, String name,
+    public DeclarationHeaderNodeImpl(SourceLocation location, String name,
             List<? extends PositionalArgumentNode> positional, Map<String, ? extends NamedArgumentNode> named) {
         super(location);
         this.name = name;

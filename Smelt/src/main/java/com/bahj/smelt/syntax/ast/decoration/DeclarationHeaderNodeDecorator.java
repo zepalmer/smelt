@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.bahj.smelt.plugin.DeclarationProcessingException;
-import com.bahj.smelt.syntax.ast.MessageHeaderNode;
+import com.bahj.smelt.syntax.ast.DeclarationHeaderNode;
 import com.bahj.smelt.syntax.ast.NamedArgumentNode;
 import com.bahj.smelt.syntax.ast.PositionalArgumentNode;
 
-public class MessageHeaderNodeDecorator extends AstNodeDecorator<MessageHeaderNode> implements MessageHeaderNode {
-    public MessageHeaderNodeDecorator(MessageHeaderNode backingNode, DecoratorNodeContext context) {
+public class DeclarationHeaderNodeDecorator extends AstNodeDecorator<DeclarationHeaderNode> implements DeclarationHeaderNode {
+    public DeclarationHeaderNodeDecorator(DeclarationHeaderNode backingNode, DecoratorNodeContext context) {
         super(backingNode, context);
     }
 

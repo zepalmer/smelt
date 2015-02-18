@@ -6,6 +6,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
@@ -33,9 +34,7 @@ public class EnumFormFactory implements FormFactory {
             throw new NotYetImplementedException(); // TODO: appropriate error
         }
         SmeltEnumValue enumValue = (SmeltEnumValue) value;
-        EnumType type = (EnumType) enumValue.getType(); // TODO: add T parameter
-                                                        // (along with V and E)
-                                                        // to fix this
+        EnumType type = (EnumType) enumValue.getType(); // TODO: add T parameter (along with V and E) to fix this
 
         // Create a list of options. We always allow null as an option.
         List<Option> options = new ArrayList<>();
@@ -67,7 +66,7 @@ public class EnumFormFactory implements FormFactory {
         box.setSelectedItem(matchingCurrent);
         box.setEditable(false);
         box.setRenderer(new ListCellRenderer<Option>() {
-            private DefaultListCellRenderer renderer;
+            private DefaultListCellRenderer renderer = new DefaultListCellRenderer();
 
             @Override
             public Component getListCellRendererComponent(JList<? extends Option> list, Option value, int index,
@@ -87,8 +86,7 @@ public class EnumFormFactory implements FormFactory {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 Option selectedOption = (Option) box.getSelectedItem();
-                if ((selectedOption.getChoice() == null && enumValue.getChoice() != null)
-                        || !selectedOption.getChoice().equals(enumValue.getChoice())) {
+                if (!Objects.equals(selectedOption.getChoice(), enumValue.getChoice())) {
                     // The selected option has changed; update the value.
                     enumValue.setChoice(selectedOption.getChoice());
                 }
@@ -100,12 +98,11 @@ public class EnumFormFactory implements FormFactory {
             @Override
             public void eventOccurred(SmeltEnumEvent event) {
                 Option selectedOption = (Option) box.getSelectedItem();
-                if ((selectedOption.getChoice() == null && enumValue.getChoice() != null)
-                        || !selectedOption.getChoice().equals(enumValue.getChoice())) {
-                    // The value changed out from under us.  Update the value.
+                if (!Objects.equals(selectedOption.getChoice(), enumValue.getChoice())) {
+                    // The value changed out from under us. Update the value.
                     for (Option option : options) {
-                        if ((option == null && enumValue.getChoice() == null) ||
-                                option.getChoice().equals(enumValue.getChoice())) {
+                        if ((option == null && enumValue.getChoice() == null)
+                                || option.getChoice().equals(enumValue.getChoice())) {
                             // Found it.
                             box.setSelectedItem(option);
                             break;
@@ -121,7 +118,7 @@ public class EnumFormFactory implements FormFactory {
     }
 
     private static class Option {
-        public static final Option NULL_CHOICE = new Option("", null, false);
+        public static final Option NULL_CHOICE = new Option(" ", null, false);
 
         private String display;
         private String choice;

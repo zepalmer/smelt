@@ -18,18 +18,18 @@ import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
+import com.bahj.smelt.plugin.builtin.data.model.type.EnumType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactory;
 import com.bahj.smelt.plugin.builtin.editor.forms.FormFactoryRegistry;
 import com.bahj.smelt.plugin.builtin.editor.forms.builtin.ContainerFormFactory;
 import com.bahj.smelt.plugin.builtin.editor.forms.builtin.DatumFieldFormFactory;
+import com.bahj.smelt.plugin.builtin.editor.forms.builtin.EnumFormFactory;
 import com.bahj.smelt.plugin.builtin.editor.forms.builtin.TextFormFactory;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
-import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
-import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.NamedArgumentNodeDecorator;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.EventListener;
@@ -103,8 +103,8 @@ public class EditorPlugin implements SmeltPlugin {
 
     @Override
     public boolean claimsDeclaration(SmeltPluginDeclarationHandlerContext context, DeclarationNode declarationNode) {
-        if (declarationNode instanceof MessageNode) {
-            MessageNode messageNode = (MessageNode) declarationNode;
+        if (declarationNode instanceof DeclarationNode) {
+            DeclarationNode messageNode = (DeclarationNode) declarationNode;
             return messageNode.getHeader().getName().equals("editor");
         } else {
             return false;
@@ -117,10 +117,19 @@ public class EditorPlugin implements SmeltPlugin {
         DataModelPlugin dataModelPlugin = context.getModel().getPluginRegistry().getPlugin(DataModelPlugin.class);
         DecoratorNodeContext decoratorNodeContext = new DecoratorNodeContext(context, this);
 
+        // Add forms for all of the enum types
+        for (SmeltType<?, ?> type : dataModelPlugin.getModel().getTypes().values()) {
+            if (type instanceof EnumType) {
+                this.formFactoryRegistry.registerFormFactory(type, new EnumFormFactory());
+            }
+        }
+
+        // Process the editor declarations
         Set<String> requiredTypeNames = new HashSet<String>();
         for (DeclarationNode node : declarationNodes) {
-            if (node instanceof MessageNode) {
-                MessageNodeDecorator messageNode = new MessageNodeDecorator((MessageNode) node, decoratorNodeContext);
+            if (node instanceof DeclarationNode) {
+                DeclarationNodeDecorator messageNode = new DeclarationNodeDecorator((DeclarationNode) node,
+                        decoratorNodeContext);
                 String typeName = messageNode.getHeader().insistSinglePositionalArgument("type name")
                         .insistSingleComponent();
                 SmeltType<?, ?> type = dataModelPlugin.getModel().getTypes().get(typeName);
@@ -140,6 +149,7 @@ public class EditorPlugin implements SmeltPlugin {
             }
         }
 
+        // Ensure that all of the types mentioned by the forms have factories
         Set<String> missingTypes = new HashSet<>();
         for (String requiredTypeName : requiredTypeNames) {
             if (dataModelPlugin.getModel().getTypes().get(requiredTypeName) == null) {
@@ -155,11 +165,11 @@ public class EditorPlugin implements SmeltPlugin {
     }
 
     private Set<String> processDeclarationAndRegisterFactory(SmeltPluginDeclarationHandlerContext context,
-            DataModelPlugin dataModelPlugin, DataType type, MessageNodeDecorator messageNodeDecorator)
+            DataModelPlugin dataModelPlugin, DataType type, DeclarationNodeDecorator declarationNodeDecorator)
             throws DeclarationProcessingException {
-        DeclarationNodeDecorator<?> decoratedDeclarationNode = messageNodeDecorator.insistOneChild();
+        DeclarationNodeDecorator topContainerNode = declarationNodeDecorator.insistOneChild();
         FormFactoryBuilder builder = new FormFactoryBuilder(type);
-        FormFactory factory = builder.buildFormFactory(decoratedDeclarationNode);
+        FormFactory factory = builder.buildFormFactory(topContainerNode);
         this.formFactoryRegistry.registerFormFactory(type, factory);
         return builder.getRequiredTypeNames();
     }
@@ -194,13 +204,12 @@ public class EditorPlugin implements SmeltPlugin {
          * @throws DeclarationProcessingException
          *             If the provided node is incorrectly formatted.
          */
-        public FormFactory buildFormFactory(DeclarationNodeDecorator<?> node) throws DeclarationProcessingException {
-            MessageNodeDecorator messageNodeDecorator = node.insistMessageNode();
+        public FormFactory buildFormFactory(DeclarationNodeDecorator node) throws DeclarationProcessingException {
             // Each decorator is either a container or a base element. We build a factory appropriately.
-            if (messageNodeDecorator.getHeader().getName().equals("container")) {
+            if (node.getHeader().getName().equals("container")) {
                 String name = null;
-                for (Map.Entry<String, ? extends NamedArgumentNodeDecorator> entry : messageNodeDecorator.getHeader()
-                        .getNamed().entrySet()) {
+                for (Map.Entry<String, ? extends NamedArgumentNodeDecorator> entry : node.getHeader().getNamed()
+                        .entrySet()) {
                     NamedArgumentNodeDecorator namedArgumentNodeDecorator = entry.getValue();
                     switch (namedArgumentNodeDecorator.getName()) {
                         case "name":
@@ -211,7 +220,7 @@ public class EditorPlugin implements SmeltPlugin {
                                     + namedArgumentNodeDecorator.getName() + " unrecognized here.");
                     }
                 }
-                String orientationName = messageNodeDecorator.getHeader().insistSinglePositionalArgument("orientation")
+                String orientationName = node.getHeader().insistSinglePositionalArgument("orientation")
                         .insistSingleComponent();
                 ContainerFormFactory.Orientation orientation;
                 switch (orientationName) {
@@ -228,9 +237,9 @@ public class EditorPlugin implements SmeltPlugin {
 
                 // Create form factories for each child. Each of these factories will take the SmeltDatum as an
                 // argument and build part of its form; we will glue them together.
-                List<? extends DeclarationNodeDecorator<?>> children = messageNodeDecorator.getChildren();
+                List<? extends DeclarationNodeDecorator> children = node.getChildren();
                 List<FormFactory> factories = new ArrayList<>(children.size());
-                for (DeclarationNodeDecorator<?> child : children) {
+                for (DeclarationNodeDecorator child : children) {
                     factories.add(this.buildFormFactory(child));
                 }
 
@@ -241,21 +250,20 @@ public class EditorPlugin implements SmeltPlugin {
                 }
                 return factory;
             } else {
-                String fieldName = messageNodeDecorator.getHeader().getName();
+                String fieldName = node.getHeader().getName();
 
                 // First, do some sanity checking on the node.
-                messageNodeDecorator.getHeader().insistNoPositionalArguments();
-                messageNodeDecorator.insistNoChildren();
+                node.getHeader().insistNoPositionalArguments();
+                node.insistNoChildren();
 
                 // Extract some options
                 class Options {
                     public String displayName = fieldName;
                 }
                 Options options = new Options();
-                messageNodeDecorator.getHeader().namedArgumentProcessor()
-                        .allow("display", (NamedArgumentNodeDecorator n) -> {
-                            options.displayName = String.join(" ", n.getArgs());
-                        }).finsh();
+                node.getHeader().namedArgumentProcessor().allow("display", (NamedArgumentNodeDecorator n) -> {
+                    options.displayName = String.join(" ", n.getArgs());
+                }).finsh();
 
                 // Next, ensure that the type in question has a field by that name. If it does not, eagerly fail.
                 SmeltType<?, ?> fieldType = type.getProperties().get(fieldName);

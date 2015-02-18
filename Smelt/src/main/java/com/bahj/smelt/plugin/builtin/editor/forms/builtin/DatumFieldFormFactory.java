@@ -33,7 +33,7 @@ public class DatumFieldFormFactory implements FormFactory {
         this.labelSpacing = labelSpacing;
         this.fieldDisplayName = fieldName;
     }
-    
+
     public void setFieldDisplayName(String fieldDisplayName) {
         this.fieldDisplayName = fieldDisplayName;
     }
@@ -51,9 +51,11 @@ public class DatumFieldFormFactory implements FormFactory {
         // Fetch the value currently contained in that field.
         SmeltValue<?, ?> fieldValue = datum.get(fieldName);
 
-        // Fetch the form factory for this field's type. (This will exist because the plugin has already
-        // treated the field type as required.)
+        // Fetch the form factory for this field's type.
         FormFactory factory = this.formFactoryRegistry.getFormFactory(fieldType);
+        if (factory == null) {
+            throw new NotYetImplementedException("No factory found for field type " + fieldType); // TODO
+        }
 
         // Create the form if possible.
         try {

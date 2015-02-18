@@ -39,7 +39,7 @@ public class EnumType extends AbstractSmeltType<SmeltEnumValue, SmeltEnumEvent> 
      */
     @Override
     public SmeltEnumValue instantiate() {
-        return null;
+        return new SmeltEnumValue(this, null);
     }
 
     @Override

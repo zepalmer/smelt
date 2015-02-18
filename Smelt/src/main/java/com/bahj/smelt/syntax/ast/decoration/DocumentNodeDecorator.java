@@ -12,9 +12,9 @@ public class DocumentNodeDecorator extends AstNodeDecorator<DocumentNode> implem
     }
 
     @Override
-    public List<DeclarationNode> getDeclarations() {
+    public List<? extends DeclarationNodeDecorator> getDeclarations() {
         return this.backingNode.getDeclarations().parallelStream()
-                .map((DeclarationNode node) -> DecorationUtils.decorateDeclarationNode(node, this.context))
+                .map((DeclarationNode node) -> new DeclarationNodeDecorator(node, this.getContext()))
                 .collect(Collectors.toList());
     }
 }

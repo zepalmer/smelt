@@ -22,7 +22,7 @@ public interface SmeltType<V extends SmeltValue<V, E>, E extends SmeltValueEvent
 
     /**
      * Instantiates a default value for this type. Callers should bear in mind that the resulting {@link SmeltValue} may
-     * be <code>null</code>.
+     * contain <code>null</code> values.
      * 
      * @return A default value for this type.
      */

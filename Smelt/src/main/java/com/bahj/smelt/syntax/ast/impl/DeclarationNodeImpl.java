@@ -5,22 +5,21 @@ import java.util.List;
 
 import com.bahj.smelt.syntax.SourceLocation;
 import com.bahj.smelt.syntax.ast.AstNode;
+import com.bahj.smelt.syntax.ast.DeclarationHeaderNode;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
-import com.bahj.smelt.syntax.ast.MessageHeaderNode;
-import com.bahj.smelt.syntax.ast.MessageNode;
 
-public class MessageNodeImpl extends AbstractAstNodeImpl implements MessageNode {
-    private MessageHeaderNode header;
+public class DeclarationNodeImpl extends AbstractAstNodeImpl implements DeclarationNode {
+    private DeclarationHeaderNode header;
     private List<DeclarationNode> children;
 
-    public MessageNodeImpl(SourceLocation location, MessageHeaderNode header, List<DeclarationNode> children) {
+    public DeclarationNodeImpl(SourceLocation location, DeclarationHeaderNode header, List<DeclarationNode> children) {
         super(location);
         this.header = header;
         this.children = children;
     }
 
     @Override
-    public MessageHeaderNode getHeader() {
+    public DeclarationHeaderNode getHeader() {
         return header;
     }
 

@@ -9,16 +9,16 @@ import java.util.function.Function;
 import com.bahj.smelt.plugin.DeclarationProcessingException;
 
 public class NamedArgumentProcessor {
-    private MessageHeaderNodeDecorator node;
+    private DeclarationHeaderNodeDecorator node;
     private Map<String, ? extends NamedArgumentNodeDecorator> unprocessedArgumentNodeMap;
 
-    public NamedArgumentProcessor(MessageHeaderNodeDecorator node) {
+    public NamedArgumentProcessor(DeclarationHeaderNodeDecorator node) {
         super();
         this.node = node;
         this.unprocessedArgumentNodeMap = new HashMap<>(node.getNamed());
     }
 
-    public MessageHeaderNodeDecorator getNode() {
+    public DeclarationHeaderNodeDecorator getNode() {
         return node;
     }
 

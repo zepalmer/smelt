@@ -36,11 +36,8 @@ import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.serialization.SerializationUtils;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
-import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
-import com.bahj.smelt.syntax.ast.decoration.ListNodeDecorator;
-import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 import com.bahj.smelt.util.event.EventListener;
@@ -83,8 +80,8 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
 
     @Override
     public boolean claimsDeclaration(SmeltPluginDeclarationHandlerContext context, DeclarationNode declarationNode) {
-        if (declarationNode instanceof MessageNode) {
-            MessageNode messageNode = (MessageNode) declarationNode;
+        if (declarationNode instanceof DeclarationNode) {
+            DeclarationNode messageNode = (DeclarationNode) declarationNode;
             String name = messageNode.getHeader().getName();
             return name.equals("data") || name.equals("enum"); // TODO: handle enum types as well
         } else {
@@ -100,11 +97,11 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
         // -- so no cyclic types need be created, but we might need to initialize a new data type during the middle of
         // initializing another. We accomplish this by keeping a dictionary of unhandled declarations and gradually
         // (and statefully) consuming them, raising the appropriate exceptions in the case of a problem.
-        Map<String, MessageNodeDecorator> declarationsByName = new HashMap<>();
+        Map<String, DeclarationNodeDecorator> declarationsByName = new HashMap<>();
         DecoratorNodeContext decoratorNodeContext = new DecoratorNodeContext(context, this);
         for (DeclarationNode declarationNode : declarationNodes) {
-            if (declarationNode instanceof MessageNode) {
-                MessageNodeDecorator messageNode = new MessageNodeDecorator((MessageNode) declarationNode,
+            if (declarationNode instanceof DeclarationNode) {
+                DeclarationNodeDecorator messageNode = new DeclarationNodeDecorator((DeclarationNode) declarationNode,
                         decoratorNodeContext);
                 messageNode.getHeader().insistNoNamedArguments();
                 String name = messageNode.getHeader().insistSinglePositionalArgument("name").insistSingleComponent();
@@ -122,7 +119,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
         class DeclarationProcessor {
             private Set<String> consumedNames = new HashSet<>();
             private Set<String> processedNames = new HashSet<>();
-            private Map<String, MessageNodeDecorator> declarations = declarationsByName;
+            private Map<String, DeclarationNodeDecorator> declarations = declarationsByName;
 
             public void processDeclaration(String name) throws DeclarationProcessingException {
                 if (processedNames.contains(name)) {
@@ -143,7 +140,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                     consumedNames.add(name);
 
                     // Process the declaration for this name.
-                    MessageNodeDecorator node = declarations.get(name);
+                    DeclarationNodeDecorator node = declarations.get(name);
                     switch (node.getHeader().getName()) {
                         case "data":
                             try {
@@ -171,7 +168,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                 }
             }
 
-            private DataType constructDataTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
+            private DataType constructDataTypeFromDeclaration(String typeName, DeclarationNodeDecorator messageNode)
                     throws DeclarationProcessingException {
                 // Sanity checks on the outer node.
                 messageNode.getHeader().insistSinglePositionalArgument("data type name");
@@ -180,13 +177,12 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                 // For each child, assemble a field.
                 Map<String, SmeltType<?, ?>> fields = new HashMap<>();
                 String firstTextFieldName = null;
-                for (DeclarationNodeDecorator<?> node : messageNode.getChildren()) {
-                    MessageNodeDecorator fieldMessage = node.insistMessageNode();
-                    fieldMessage.getHeader().insistNoNamedArguments();
-                    fieldMessage.insistNoChildren();
-                    SmeltType<?, ?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
+                for (DeclarationNodeDecorator fieldNode : messageNode.getChildren()) {
+                    fieldNode.getHeader().insistNoNamedArguments();
+                    fieldNode.insistNoChildren();
+                    SmeltType<?, ?> fieldType = getTypeForTypeName(fieldNode.getHeader()
                             .insistSinglePositionalArgument("field name").insistSingleComponent());
-                    String fieldName = fieldMessage.getHeader().getName();
+                    String fieldName = fieldNode.getHeader().getName();
                     if (firstTextFieldName == null && fieldType.equals(TextType.INSTANCE)) {
                         firstTextFieldName = fieldName;
                     }
@@ -195,15 +191,22 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                 return new DataType(typeName, fields, firstTextFieldName);
             }
 
-            private EnumType constructEnumTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
+            private EnumType constructEnumTypeFromDeclaration(String typeName, DeclarationNodeDecorator declarationNode)
                     throws DeclarationProcessingException {
                 // Sanity checks.
-                messageNode.getHeader().insistSinglePositionalArgument("enumeration name");
-                messageNode.getHeader().insistNoNamedArguments();
-                ListNodeDecorator listNode = messageNode.insistOneChild().insistListNode();
+                declarationNode.getHeader().insistSinglePositionalArgument("enumeration name");
+                declarationNode.getHeader().insistNoNamedArguments();
 
-                // Build the enum type.
-                List<String> choices = new ArrayList<>(listNode.getValues());
+                // For each child, add an option.
+                List<String> choices = new ArrayList<>();
+                for (DeclarationNodeDecorator child : declarationNode.getChildren()) {
+                    child.insistNoChildren();
+                    child.getHeader().insistNoPositionalArguments();
+                    child.getHeader().insistNoNamedArguments();
+                    choices.add(child.getHeader().getName());
+                }
+
+                // Now build the type.
                 return new EnumType(typeName, choices);
             }
 

@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.data.model.value;
 
+import java.util.Objects;
+
 import com.bahj.smelt.plugin.builtin.data.model.type.EnumType;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltEnumEvent;
 import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltEnumUpdateEvent;
@@ -19,7 +21,7 @@ public class SmeltEnumValue extends AbstractSmeltValue<SmeltEnumValue, SmeltEnum
     public void setChoice(String choice) {
         String oldChoice = this.choice;
         this.choice = choice;
-        if ((this.choice == null && oldChoice != null) || !this.choice.equals(oldChoice)) {
+        if (!Objects.equals(this.choice, oldChoice)) {
             fireEvent(new SmeltEnumUpdateEvent(this, oldChoice, choice));
         }
     }
