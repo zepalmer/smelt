@@ -18,15 +18,16 @@ public class EnumType extends AbstractSmeltType<SmeltEnumValue, SmeltEnumEvent> 
     private List<String> choices;
 
     public EnumType(String name, String... choices) {
-        this(Arrays.asList(choices));
+        this(name, Arrays.asList(choices));
+    }
+
+    public EnumType(String name, List<String> choices) {
+        this.name = name;
+        this.choices = new ArrayList<>(choices);
     }
 
     public String getName() {
         return name;
-    }
-
-    public EnumType(List<String> choices) {
-        this.choices = new ArrayList<>(choices);
     }
 
     public List<String> getChoices() {

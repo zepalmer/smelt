@@ -2,9 +2,11 @@ package com.bahj.smelt.plugin.builtin.data.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +25,7 @@ import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException;
 import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
+import com.bahj.smelt.plugin.builtin.data.model.type.EnumType;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.data.model.value.serialization.SmeltDatumSerializationStrategy;
@@ -36,6 +39,7 @@ import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.syntax.ast.MessageNode;
 import com.bahj.smelt.syntax.ast.decoration.DeclarationNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.DecoratorNodeContext;
+import com.bahj.smelt.syntax.ast.decoration.ListNodeDecorator;
 import com.bahj.smelt.syntax.ast.decoration.MessageNodeDecorator;
 import com.bahj.smelt.util.NotYetImplementedException;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
@@ -82,7 +86,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
         if (declarationNode instanceof MessageNode) {
             MessageNode messageNode = (MessageNode) declarationNode;
             String name = messageNode.getHeader().getName();
-            return name.equals("data"); // TODO: handle enum types as well
+            return name.equals("data") || name.equals("enum"); // TODO: handle enum types as well
         } else {
             return false;
         }
@@ -139,13 +143,27 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
                     consumedNames.add(name);
 
                     // Process the declaration for this name.
-                    // TODO: handle enum types as well
-                    DataType dataType = constructDataTypeFromDeclaration(name, declarations.get(name));
-                    try {
-                        model.addType(dataType);
-                    } catch (DuplicateTypeNameException e) {
-                        // TODO: handle this exception
-                        throw new NotYetImplementedException(e);
+                    MessageNodeDecorator node = declarations.get(name);
+                    switch (node.getHeader().getName()) {
+                        case "data":
+                            try {
+                                model.addType(constructDataTypeFromDeclaration(name, node));
+                            } catch (DuplicateTypeNameException e) {
+                                // TODO: handle this exception
+                                throw new NotYetImplementedException(e);
+                            }
+                            break;
+                        case "enum":
+                            try {
+                                model.addType(constructEnumTypeFromDeclaration(name, node));
+                            } catch (DuplicateTypeNameException e) {
+                                // TODO: handle this exception
+                                throw new NotYetImplementedException(e);
+                            }
+                            break;
+                        default:
+                            throw new IllegalStateException("Received unexpected node for processing ("
+                                    + node.getHeader().getName() + "): " + node);
                     }
 
                     // Finally, indicate that we have processed this declaration.
@@ -155,26 +173,38 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
 
             private DataType constructDataTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
                     throws DeclarationProcessingException {
+                // Sanity checks on the outer node.
+                messageNode.getHeader().insistSinglePositionalArgument("data type name");
+                messageNode.getHeader().insistNoNamedArguments();
+
+                // For each child, assemble a field.
                 Map<String, SmeltType<?, ?>> fields = new HashMap<>();
                 String firstTextFieldName = null;
                 for (DeclarationNodeDecorator<?> node : messageNode.getChildren()) {
-                    if (node instanceof MessageNodeDecorator) {
-                        MessageNodeDecorator fieldMessage = (MessageNodeDecorator) node;
-                        fieldMessage.getHeader().insistNoNamedArguments();
-                        fieldMessage.insistNoChildren();
-                        SmeltType<?, ?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
-                                .insistSinglePositionalArgument("field name").insistSingleComponent());
-                        String fieldName = fieldMessage.getHeader().getName();
-                        if (firstTextFieldName == null && fieldType.equals(TextType.INSTANCE)) {
-                            firstTextFieldName = fieldName;
-                        }
-                        fields.put(fieldName, fieldType);
-                    } else {
-                        // TODO: report syntax error via appropriate exception
-                        throw new NotYetImplementedException();
+                    MessageNodeDecorator fieldMessage = node.insistMessageNode();
+                    fieldMessage.getHeader().insistNoNamedArguments();
+                    fieldMessage.insistNoChildren();
+                    SmeltType<?, ?> fieldType = getTypeForTypeName(fieldMessage.getHeader()
+                            .insistSinglePositionalArgument("field name").insistSingleComponent());
+                    String fieldName = fieldMessage.getHeader().getName();
+                    if (firstTextFieldName == null && fieldType.equals(TextType.INSTANCE)) {
+                        firstTextFieldName = fieldName;
                     }
+                    fields.put(fieldName, fieldType);
                 }
                 return new DataType(typeName, fields, firstTextFieldName);
+            }
+
+            private EnumType constructEnumTypeFromDeclaration(String typeName, MessageNodeDecorator messageNode)
+                    throws DeclarationProcessingException {
+                // Sanity checks.
+                messageNode.getHeader().insistSinglePositionalArgument("enumeration name");
+                messageNode.getHeader().insistNoNamedArguments();
+                ListNodeDecorator listNode = messageNode.insistOneChild().insistListNode();
+
+                // Build the enum type.
+                List<String> choices = new ArrayList<>(listNode.getValues());
+                return new EnumType(typeName, choices);
             }
 
             private SmeltType<?, ?> getTypeForTypeName(String name) throws DeclarationProcessingException {

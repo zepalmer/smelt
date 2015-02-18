@@ -19,7 +19,9 @@ public class SmeltEnumValue extends AbstractSmeltValue<SmeltEnumValue, SmeltEnum
     public void setChoice(String choice) {
         String oldChoice = this.choice;
         this.choice = choice;
-        fireEvent(new SmeltEnumUpdateEvent(this, oldChoice, choice));
+        if ((this.choice == null && oldChoice != null) || !this.choice.equals(oldChoice)) {
+            fireEvent(new SmeltEnumUpdateEvent(this, oldChoice, choice));
+        }
     }
 
     @Override
