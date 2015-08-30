@@ -22,6 +22,7 @@ import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseSavedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.model.DuplicateTypeNameException;
 import com.bahj.smelt.plugin.builtin.data.model.model.SmeltDataModel;
 import com.bahj.smelt.plugin.builtin.data.model.type.DataType;
@@ -268,13 +269,14 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
         }
         if (this.database != null) {
             this.database.removeListener(this.relayListener);
+            SmeltDatabase oldDatabase = this.database;
             this.database = null;
-            fireEvent(new DatabaseClosedEvent());
+            fireEvent(new DatabaseClosedEvent(oldDatabase));
         }
         if (database != null) {
             this.database = database;
             this.database.addListener(this.relayListener);
-            fireEvent(new DatabaseOpenedEvent());
+            fireEvent(new DatabaseOpenedEvent(this.database));
         }
     }
 
@@ -294,6 +296,7 @@ public class DataModelPlugin extends AbstractEventGenerator<DataModelPluginEvent
     public void saveDatabase(File selectedFile) throws IOException, SerializationException {
         SmeltDatabaseSerializationStrategy strategy = createDatabaseSerializationStrategy();
         SerializationUtils.writeFileSafely(selectedFile, strategy, this.database);
+        fireEvent(new DatabaseSavedEvent());
     }
 
     private SmeltDatabaseSerializationStrategy createDatabaseSerializationStrategy() {

@@ -4,10 +4,14 @@ import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -23,6 +27,8 @@ import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.basegui.construction.GUIConstructionContext;
 import com.bahj.smelt.plugin.builtin.basegui.construction.GUIConstructionContextImpl;
 import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltBasicMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUICloseOccurringEvent;
+import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUICloseRequestedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
@@ -50,7 +56,7 @@ import com.bahj.smelt.util.swing.FileFilterUtils;
  * 
  * @author Zachary Palmer
  */
-public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implements SmeltPlugin {
+public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent>implements SmeltPlugin {
     /** The frame which contains the GUI. */
     private BaseGUIFrame frame;
     /** The model to which this plugin is registered. */
@@ -74,27 +80,30 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                                 (ActionEvent e) -> performOpenSmeltSpecification());
                         final Action closeSpecificationAction = new BasicAction(
                                 (ActionEvent e) -> performCloseSmeltSpecification());
-                        guiContext.addMenuItemGroup("File", Arrays.asList(new SmeltBasicMenuItem(
-                                "Open Smelt Specification", openSpecificationAction, KeyEvent.VK_P), new SmeltBasicMenuItem(
-                                "Close Smelt Specification", closeSpecificationAction, KeyEvent.VK_L)));
+                        guiContext.addMenuItemGroup("File",
+                                Arrays.asList(
+                                        new SmeltBasicMenuItem("Open Smelt Specification", openSpecificationAction,
+                                                KeyEvent.VK_P),
+                                        new SmeltBasicMenuItem("Close Smelt Specification", closeSpecificationAction,
+                                                KeyEvent.VK_L)));
                         guiContext.addMenuMnemonicSuggestion("File", KeyEvent.VK_F);
 
                         // We can only close the Smelt specification if one has been opened.
                         closeSpecificationAction.setEnabled(false);
                         model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationLoadedEvent.class,
                                 new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
-                                    @Override
-                                    public void eventOccurred(SmeltApplicationSpecificationLoadedEvent event) {
-                                        closeSpecificationAction.setEnabled(true);
-                                    }
-                                }));
+                            @Override
+                            public void eventOccurred(SmeltApplicationSpecificationLoadedEvent event) {
+                                closeSpecificationAction.setEnabled(true);
+                            }
+                        }));
                         model.addListener(new TypedEventListener<>(SmeltApplicationSpecificationUnloadedEvent.class,
                                 new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
-                                    @Override
-                                    public void eventOccurred(SmeltApplicationSpecificationUnloadedEvent event) {
-                                        closeSpecificationAction.setEnabled(false);
-                                    }
-                                }));
+                            @Override
+                            public void eventOccurred(SmeltApplicationSpecificationUnloadedEvent event) {
+                                closeSpecificationAction.setEnabled(false);
+                            }
+                        }));
 
                         // Tell all of the plugins that we're currently gathering contributions for the GUI. It's now or
                         // never for them.
@@ -103,28 +112,48 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         // Add the traditional "Exit" option to the end of the "File" menu.
                         guiContext.addMenuItemGroup("File",
                                 Collections.singletonList(new SmeltBasicMenuItem("Exit", new AbstractAction() {
-                                    private static final long serialVersionUID = 1L;
+                            private static final long serialVersionUID = 1L;
 
-                                    @Override
-                                    public void actionPerformed(ActionEvent e) {
-                                        // TODO: something a little more elegant than this - prompts and stuff
-                                        System.exit(0);
-                                    }
-                                }, KeyEvent.VK_X)));
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+                            }
+                        }, KeyEvent.VK_X)));
 
                         // Now build the GUI.
                         frame = new BaseGUIFrame(guiContext);
-                        guiContext.getExecutionContextReference().setValue(
-                                new GUIExecutionContext(frame.getPlacementContext()));
+                        guiContext.getExecutionContextReference()
+                                .setValue(new GUIExecutionContext(frame.getPlacementContext()));
 
                         // Let everyone know the GUI's finished.
                         fireEvent(new BaseGUIInitializedEvent(guiContext.getExecutionContextReference()));
 
+                        // Whenever window closing is triggered, ask all of the plugins if they have any objections.
+                        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                        frame.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosing(WindowEvent e) {
+                                // The user has attempted to close the window. Fire a notification to all listening
+                                // plugins to indicate that the window could be closed.
+                                BaseGUICloseRequestedEvent closingEvent = new BaseGUICloseRequestedEvent();
+                                fireEvent(closingEvent);
+                                List<Function<GUIExecutionContext, Boolean>> challenges = closingEvent.getChallenges();
+                                boolean cancel = false;
+                                for (Function<GUIExecutionContext, Boolean> challenge : challenges) {
+                                    if (!challenge.apply(guiContext.getExecutionContextReference().getValue())) {
+                                        cancel = true;
+                                        break;
+                                    }
+                                }
+                                if (!cancel) {
+                                    fireEvent(new BaseGUICloseOccurringEvent());
+                                    frame.dispose();
+                                }
+                            }
+                        });
+
                         // And now show it. (We can't just pack the frame because the internal desktop doesn't really
                         // have a preferred size.)
-                        // TODO: change to dispatching a closing event for the GUI plugin so other plugins have a chance
-                        // to persist data, prompt the user, or even object to closing.
-                        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                         DisplayMode displayMode = frame.getGraphicsConfiguration().getDevice().getDisplayMode();
                         frame.setSize(new Dimension((int) (displayMode.getWidth() * FRAME_DISPLAY_RATIO),
                                 (int) (displayMode.getHeight() * FRAME_DISPLAY_RATIO)));
@@ -151,7 +180,8 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
     }
 
     @Override
-    public void processDeclarations(SmeltPluginDeclarationHandlerContext context, Set<DeclarationNode> declarationNodes) {
+    public void processDeclarations(SmeltPluginDeclarationHandlerContext context,
+            Set<DeclarationNode> declarationNodes) {
         // This plugin should never receive any declarations to handle.
         if (declarationNodes.size() > 0) {
             throw new IllegalStateException("Declarations provided to base GUI plugin erroneously!");

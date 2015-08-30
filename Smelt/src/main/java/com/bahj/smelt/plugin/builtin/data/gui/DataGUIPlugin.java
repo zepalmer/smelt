@@ -10,6 +10,7 @@ import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
@@ -20,12 +21,15 @@ import com.bahj.smelt.plugin.SmeltPlugin;
 import com.bahj.smelt.plugin.SmeltPluginDeclarationHandlerContext;
 import com.bahj.smelt.plugin.builtin.basegui.BaseGUIPlugin;
 import com.bahj.smelt.plugin.builtin.basegui.construction.menu.SmeltBasicMenuItem;
+import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUICloseRequestedEvent;
 import com.bahj.smelt.plugin.builtin.basegui.event.BaseGUIInitializingEvent;
 import com.bahj.smelt.plugin.builtin.basegui.execution.GUIExecutionContext;
 import com.bahj.smelt.plugin.builtin.data.model.DataModelPlugin;
 import com.bahj.smelt.plugin.builtin.data.model.database.SmeltDatabase;
+import com.bahj.smelt.plugin.builtin.data.model.database.event.DatabaseEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseClosedEvent;
 import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseOpenedEvent;
+import com.bahj.smelt.plugin.builtin.data.model.event.DatabaseSavedEvent;
 import com.bahj.smelt.serialization.DeserializationException;
 import com.bahj.smelt.serialization.SerializationException;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
@@ -35,9 +39,12 @@ import com.bahj.smelt.util.event.TypedEventListener;
 import com.bahj.smelt.util.swing.FileFilterUtils;
 
 public class DataGUIPlugin implements SmeltPlugin {
+    /** Tracks whether there are changes to the database which have not yet been saved. */
+    private boolean dirtyDatabase = false;
 
     @Override
     public void registeredToApplicationModel(SmeltApplicationModel model) {
+        // dataModelPlugin.addListener(new TypedEventListener<>(
         // Make sure that we add components to the GUI after the configuration is loaded.
         model.addListener(new TypedEventListener<>(SmeltApplicationConfigurationLoadedEvent.class,
                 new EventListener<SmeltApplicationConfigurationLoadedEvent>() {
@@ -126,6 +133,67 @@ public class DataGUIPlugin implements SmeltPlugin {
                                     public void eventOccurred(SmeltApplicationSpecificationUnloadedEvent event) {
                                         newDatabaseAction.setEnabled(false);
                                         openDatabaseAction.setEnabled(false);
+                                    }
+                                }));
+
+                                // Keep the dirtyDatabase field up to date.
+                                EventListener<DatabaseEvent> databaseEventListener = new EventListener<DatabaseEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseEvent event) {
+                                        dirtyDatabase = true;
+                                    }
+                                };
+                                dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
+                                        new EventListener<DatabaseOpenedEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseOpenedEvent event) {
+                                        dirtyDatabase = false;
+                                        event.getDatabase().addListener(databaseEventListener);
+                                    }
+                                }));
+                                dataModelPlugin.addListener(new TypedEventListener<>(DatabaseSavedEvent.class,
+                                        new EventListener<DatabaseSavedEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseSavedEvent event) {
+                                        dirtyDatabase = false;
+                                    }
+                                }));
+                                dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
+                                        new EventListener<DatabaseClosedEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseClosedEvent event) {
+                                        dirtyDatabase = false;
+                                        event.getDatabase().removeListener(databaseEventListener);
+                                    }
+                                }));
+
+                                // If the application is asked to close when the database hasn't yet been saved, we
+                                // should prompt the user.
+                                guiPlugin.addListener(new TypedEventListener<>(BaseGUICloseRequestedEvent.class,
+                                        new EventListener<BaseGUICloseRequestedEvent>() {
+                                    @Override
+                                    public void eventOccurred(BaseGUICloseRequestedEvent event) {
+                                        if (dirtyDatabase) {
+                                            event.addChallenge((GUIExecutionContext context) -> {
+                                                int answer = JOptionPane.showConfirmDialog(baseGUIPlugin.getBaseFrame(),
+                                                        "You have not yet saved your changes.  Save now?",
+                                                        "Save Changes?", JOptionPane.YES_NO_CANCEL_OPTION,
+                                                        JOptionPane.WARNING_MESSAGE);
+                                                switch (answer) {
+                                                    case JOptionPane.YES_OPTION:
+                                                        menuActions.saveDatabase(context);
+                                                        return true;
+                                                    case JOptionPane.NO_OPTION:
+                                                        return true;
+                                                    case JOptionPane.CANCEL_OPTION:
+                                                        return false;
+                                                    default:
+                                                        // This would happen if the user closed the dialog. Let's be
+                                                        // safe and assume they meant "cancel".
+                                                        return false;
+                                                }
+                                            });
+                                        }
                                     }
                                 }));
                             }

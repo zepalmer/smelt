@@ -7,7 +7,7 @@ import com.bahj.smelt.plugin.builtin.data.model.event.DataModelPluginEvent;
 import com.bahj.smelt.plugin.builtin.data.model.type.SmeltType;
 import com.bahj.smelt.plugin.builtin.data.model.type.TextType;
 import com.bahj.smelt.plugin.builtin.data.model.value.SmeltValue;
-import com.bahj.smelt.plugin.builtin.data.model.value.event.SmeltValueEvent;
+import com.bahj.smelt.plugin.builtin.data.model.value.event.AbstractSmeltValueEvent;
 import com.bahj.smelt.util.event.AbstractEventGenerator;
 
 /**
@@ -30,8 +30,10 @@ public class SmeltDataModel extends AbstractEventGenerator<DataModelPluginEvent>
         }
     }
 
-    public <T extends SmeltType<V, E>, V extends SmeltValue<V, E>, E extends SmeltValueEvent<V, E>> void addType(T type)
-            throws DuplicateTypeNameException {
+    // TODO: the constraint on E should be SmeltValueEvent<V,E>, but that produces a type error; is this an Eclipse or
+    // JDK bug or am I just missing something?
+    public <T extends SmeltType<V, E>, V extends SmeltValue<V, E>, E extends AbstractSmeltValueEvent<V, E>> void addType(
+            T type) throws DuplicateTypeNameException {
         SmeltType<?, ?> existing = this.types.get(type.getName());
         if (existing != null) {
             throw new DuplicateTypeNameException(existing.getName(), existing, type);
