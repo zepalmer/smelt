@@ -120,7 +120,8 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         // Let everyone know the GUI's finished.
                         fireEvent(new BaseGUIInitializedEvent(guiContext.getExecutionContextReference()));
 
-                        // And now show it. (We can't just pack the frame
+                        // And now show it. (We can't just pack the frame because the internal desktop doesn't really
+                        // have a preferred size.)
                         // TODO: change to dispatching a closing event for the GUI plugin so other plugins have a chance
                         // to persist data, prompt the user, or even object to closing.
                         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
