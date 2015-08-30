@@ -30,3 +30,12 @@ then permits plugins to be loaded which add declaration processors, so the
 semantics of the Smelt specification language are not fixed.  The parser,
 however, is always indentation-based and maintains a consistent base syntax.
 
+Current Status
+--------------
+
+Smelt is *very* much in an alpha state and not ready for production use.  The
+database format has been selected to make data extraction relatively easy in
+the event that backward compatibility is broken or a user needs to cease using
+the application.  Please feel free to experiment, ask for features, or even
+contribute.  That said, set your expectations rather low.
+
