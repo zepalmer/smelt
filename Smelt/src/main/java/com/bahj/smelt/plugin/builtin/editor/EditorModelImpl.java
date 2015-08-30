@@ -35,6 +35,10 @@ import com.bahj.smelt.util.swing.WidthStretchPanel;
  * @author Zachary Palmer
  */
 public class EditorModelImpl implements EditorModel {
+    /** The number of unit increments per movement of e.g. the mouse wheel when scrolling an editor panel. */
+    private static final int SCROLL_SPEED = 16;
+    // TODO: consider extracting this to a user preference (once user preferences exist)
+    
     private DataModelPlugin dataModelPlugin;
     private FormFactoryRegistry formFactoryRegistry;
     private ReadableStrongReference<GUIExecutionContext> guiExecutionContextRef;
@@ -86,6 +90,7 @@ public class EditorModelImpl implements EditorModel {
             WidthStretchPanel panel = new WidthStretchPanel(editor);
             panel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2)); // TODO: constant somewhere?
             JScrollPane editorScrollPane = new JScrollPane(panel);
+            editorScrollPane.getVerticalScrollBar().setUnitIncrement(SCROLL_SPEED);
 
             // Set up a dockable for this editor
             DefaultMultipleCDockable editorDockable = new DefaultMultipleCDockable(null);
