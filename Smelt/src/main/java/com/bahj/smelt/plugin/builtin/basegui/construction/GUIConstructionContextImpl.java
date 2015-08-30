@@ -35,6 +35,16 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
     }
 
     @Override
+    public void addMenuMnemonicSuggestion(String menuName, Integer... mnemonics) {
+        SmeltNestedMenu menu = (SmeltNestedMenu) menuBar.getMenuItemByName(menuName);
+        if (menu == null) {
+            menu = new SmeltNestedMenu(menuName);
+            menuBar.addSingleMenuItem(menu);
+        }
+        menu.addSuggestedMnemonics(mnemonics);
+    }
+
+    @Override
     public Action constructExecutionAction(Consumer<? super GUIExecutionContext> actionFunction) {
         return new GUIAction(actionFunction);
     }

@@ -1,5 +1,6 @@
 package com.bahj.smelt.plugin.builtin.data.gui;
 
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -48,86 +49,87 @@ public class DataGUIPlugin implements SmeltPlugin {
                         BaseGUIPlugin guiPlugin = model.getPluginRegistry().getPlugin(BaseGUIPlugin.class);
                         guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializingEvent.class,
                                 new EventListener<BaseGUIInitializingEvent>() {
+                            @Override
+                            public void eventOccurred(BaseGUIInitializingEvent event) {
+                                final DataModelPlugin dataModelPlugin = model.getPluginRegistry()
+                                        .getPlugin(DataModelPlugin.class);
+                                final BaseGUIPlugin baseGUIPlugin = model.getPluginRegistry()
+                                        .getPlugin(BaseGUIPlugin.class);
+
+                                MenuActions menuActions = new MenuActions(dataModelPlugin, baseGUIPlugin);
+
+                                final Action newDatabaseAction = event.getContext()
+                                        .constructExecutionAction(menuActions::newDatabase);
+                                final Action openDatabaseAction = event.getContext()
+                                        .constructExecutionAction(menuActions::openDatabase);
+                                final Action saveDatabaseAction = event.getContext()
+                                        .constructExecutionAction(menuActions::saveDatabase);
+                                final Action saveDatabaseAsAction = event.getContext()
+                                        .constructExecutionAction(menuActions::saveDatabaseAs);
+                                final Action closeDatabaseAction = event.getContext()
+                                        .constructExecutionAction(menuActions::closeDatabase);
+
+                                newDatabaseAction.setEnabled(false);
+                                openDatabaseAction.setEnabled(false);
+                                saveDatabaseAction.setEnabled(false);
+                                saveDatabaseAsAction.setEnabled(false);
+                                closeDatabaseAction.setEnabled(false);
+
+                                event.getContext()
+                                        .addMenuItemGroup("File", new SmeltBasicMenuItem("New Database",
+                                                newDatabaseAction, KeyEvent.VK_N),
+                                        new SmeltBasicMenuItem("Open Database", openDatabaseAction, KeyEvent.VK_O),
+                                        new SmeltBasicMenuItem("Save Database", saveDatabaseAction, KeyEvent.VK_S),
+                                        new SmeltBasicMenuItem("Save Database As...", saveDatabaseAsAction,
+                                                KeyEvent.VK_A),
+                                        new SmeltBasicMenuItem("Close Database", closeDatabaseAction, KeyEvent.VK_C));
+                                event.getContext().addMenuMnemonicSuggestion("File", KeyEvent.VK_F);
+
+                                // When the specification is loaded, databases can be opened.
+                                model.addListener(
+                                        new TypedEventListener<>(SmeltApplicationSpecificationLoadedEvent.class,
+                                                new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
                                     @Override
-                                    public void eventOccurred(BaseGUIInitializingEvent event) {
-                                        final DataModelPlugin dataModelPlugin = model.getPluginRegistry().getPlugin(
-                                                DataModelPlugin.class);
-                                        final BaseGUIPlugin baseGUIPlugin = model.getPluginRegistry().getPlugin(
-                                                BaseGUIPlugin.class);
+                                    public void eventOccurred(SmeltApplicationSpecificationLoadedEvent event) {
+                                        newDatabaseAction.setEnabled(true);
+                                        openDatabaseAction.setEnabled(true);
+                                    }
+                                }));
 
-                                        MenuActions menuActions = new MenuActions(dataModelPlugin, baseGUIPlugin);
+                                // When a database is opened, it can be saved or closed.
+                                dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
+                                        new EventListener<DatabaseOpenedEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseOpenedEvent event) {
+                                        saveDatabaseAction.setEnabled(true);
+                                        saveDatabaseAsAction.setEnabled(true);
+                                        closeDatabaseAction.setEnabled(true);
+                                    }
+                                }));
 
-                                        final Action newDatabaseAction = event.getContext().constructExecutionAction(
-                                                menuActions::newDatabase);
-                                        final Action openDatabaseAction = event.getContext().constructExecutionAction(
-                                                menuActions::openDatabase);
-                                        final Action saveDatabaseAction = event.getContext().constructExecutionAction(
-                                                menuActions::saveDatabase);
-                                        final Action saveDatabaseAsAction = event.getContext()
-                                                .constructExecutionAction(menuActions::saveDatabaseAs);
-                                        final Action closeDatabaseAction = event.getContext().constructExecutionAction(
-                                                menuActions::closeDatabase);
-
-                                        newDatabaseAction.setEnabled(false);
-                                        openDatabaseAction.setEnabled(false);
+                                // When the database is closed, it can no longer be saved or closed.
+                                dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
+                                        new EventListener<DatabaseClosedEvent>() {
+                                    @Override
+                                    public void eventOccurred(DatabaseClosedEvent event) {
                                         saveDatabaseAction.setEnabled(false);
                                         saveDatabaseAsAction.setEnabled(false);
                                         closeDatabaseAction.setEnabled(false);
-
-                                        event.getContext().addMenuItemGroup("File",
-                                                new SmeltBasicMenuItem("New Database", newDatabaseAction),
-                                                new SmeltBasicMenuItem("Open Database", openDatabaseAction),
-                                                new SmeltBasicMenuItem("Save Database", saveDatabaseAction),
-                                                new SmeltBasicMenuItem("Save Database As...", saveDatabaseAsAction),
-                                                new SmeltBasicMenuItem("Close Database", closeDatabaseAction));
-
-                                        // When the specification is loaded, databases can be opened.
-                                        model.addListener(new TypedEventListener<>(
-                                                SmeltApplicationSpecificationLoadedEvent.class,
-                                                new EventListener<SmeltApplicationSpecificationLoadedEvent>() {
-                                                    @Override
-                                                    public void eventOccurred(
-                                                            SmeltApplicationSpecificationLoadedEvent event) {
-                                                        newDatabaseAction.setEnabled(true);
-                                                        openDatabaseAction.setEnabled(true);
-                                                    }
-                                                }));
-
-                                        // When a database is opened, it can be saved or closed.
-                                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseOpenedEvent.class,
-                                                new EventListener<DatabaseOpenedEvent>() {
-                                                    @Override
-                                                    public void eventOccurred(DatabaseOpenedEvent event) {
-                                                        saveDatabaseAction.setEnabled(true);
-                                                        saveDatabaseAsAction.setEnabled(true);
-                                                        closeDatabaseAction.setEnabled(true);
-                                                    }
-                                                }));
-
-                                        // When the database is closed, it can no longer be saved or closed.
-                                        dataModelPlugin.addListener(new TypedEventListener<>(DatabaseClosedEvent.class,
-                                                new EventListener<DatabaseClosedEvent>() {
-                                                    @Override
-                                                    public void eventOccurred(DatabaseClosedEvent event) {
-                                                        saveDatabaseAction.setEnabled(false);
-                                                        saveDatabaseAsAction.setEnabled(false);
-                                                        closeDatabaseAction.setEnabled(false);
-                                                    }
-                                                }));
-
-                                        // When the specification is unloaded, databases can no longer be opened.
-                                        model.addListener(new TypedEventListener<>(
-                                                SmeltApplicationSpecificationUnloadedEvent.class,
-                                                new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
-                                                    @Override
-                                                    public void eventOccurred(
-                                                            SmeltApplicationSpecificationUnloadedEvent event) {
-                                                        newDatabaseAction.setEnabled(false);
-                                                        openDatabaseAction.setEnabled(false);
-                                                    }
-                                                }));
                                     }
                                 }));
+
+                                // When the specification is unloaded, databases can no longer be opened.
+                                model.addListener(
+                                        new TypedEventListener<>(SmeltApplicationSpecificationUnloadedEvent.class,
+                                                new EventListener<SmeltApplicationSpecificationUnloadedEvent>() {
+                                    @Override
+                                    public void eventOccurred(SmeltApplicationSpecificationUnloadedEvent event) {
+                                        newDatabaseAction.setEnabled(false);
+                                        openDatabaseAction.setEnabled(false);
+                                    }
+                                }));
+                            }
+                        }));
                     }
                 }));
 

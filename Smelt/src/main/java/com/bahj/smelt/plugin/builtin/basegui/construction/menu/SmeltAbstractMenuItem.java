@@ -1,5 +1,10 @@
 package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * An abstract type which handles common attributes of menu items.
  * 
@@ -8,17 +13,7 @@ package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 public class SmeltAbstractMenuItem implements SmeltMenuItem {
 
     private String name;
-    private Integer suggestedMnemonic;
-
-    /**
-     * Creates a new (abstract) menu item. No mnemonic is suggested.
-     * 
-     * @param name
-     *            The name of the item.
-     */
-    public SmeltAbstractMenuItem(String name) {
-        this(name, null);
-    }
+    private List<Integer> suggestedMnemonics;
 
     /**
      * Creates a new (abstract) menu item.
@@ -28,10 +23,10 @@ public class SmeltAbstractMenuItem implements SmeltMenuItem {
      * @param suggestedMnemonic
      *            The mnemonic suggested for this item, or <code>null</code> for no suggestion.
      */
-    public SmeltAbstractMenuItem(String name, Integer suggestedMnemonic) {
+    public SmeltAbstractMenuItem(String name, Integer... suggestedMnemonics) {
         super();
         this.name = name;
-        this.suggestedMnemonic = suggestedMnemonic;
+        this.suggestedMnemonics = new ArrayList<>(Arrays.asList(suggestedMnemonics));
     }
 
     /**
@@ -45,11 +40,20 @@ public class SmeltAbstractMenuItem implements SmeltMenuItem {
     }
 
     /**
-     * Retrieves the mnemonic suggested for this menu item.
+     * Retrieves the mnemonics suggested for this menu item.
      * 
-     * @return The suggested mnemonic or <code>null</code> if no mnemonic is suggested.
+     * @return The suggested mnemonics, in the order in which they are preferred.
      */
-    public Integer getSuggestedMnemonic() {
-        return suggestedMnemonic;
+    public List<Integer> getSuggestedMnemonics() {
+        return Collections.unmodifiableList(suggestedMnemonics);
+    }
+
+    @Override
+    public void addSuggestedMnemonics(Integer... mnemonics) {
+        for (Integer mnemonic : mnemonics) {
+            if (!this.suggestedMnemonics.contains(mnemonic)) {
+                this.suggestedMnemonics.add(mnemonic);
+            }
+        }
     }
 }

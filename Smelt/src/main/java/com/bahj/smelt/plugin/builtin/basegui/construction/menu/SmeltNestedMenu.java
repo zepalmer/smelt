@@ -13,8 +13,8 @@ import java.util.stream.Stream;
 public class SmeltNestedMenu extends SmeltAbstractMenuItem {
     private List<List<? extends SmeltMenuItem>> menuItems;
 
-    public SmeltNestedMenu(String name) {
-        super(name);
+    public SmeltNestedMenu(String name, Integer... suggestedMnemonics) {
+        super(name, suggestedMnemonics);
         this.menuItems = new ArrayList<>();
     }
 

@@ -10,13 +10,8 @@ import javax.swing.Action;
 public class SmeltBasicMenuItem extends SmeltAbstractMenuItem {
     private Action action;
 
-    public SmeltBasicMenuItem(String name, Action action) {
-        super(name);
-        this.action = action;
-    }
-
-    public SmeltBasicMenuItem(String name, Integer suggestedMnemonic, Action action) {
-        super(name, suggestedMnemonic);
+    public SmeltBasicMenuItem(String name, Action action, Integer... suggestedMnemonics) {
+        super(name, suggestedMnemonics);
         this.action = action;
     }
 

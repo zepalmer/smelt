@@ -1,5 +1,7 @@
 package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 
+import java.util.List;
+
 public interface SmeltMenuItem {
 
     /**
@@ -9,4 +11,16 @@ public interface SmeltMenuItem {
      */
     public String getName();
 
+    /**
+     * Retrieves the mnemonics suggested for this menu item.
+     * 
+     * @return The suggested mnemonics, in the order in which they are preferred.
+     */
+    public List<Integer> getSuggestedMnemonics();
+    
+    /**
+     * Adds a mnemonic to the list of suggestions.  It will take last priority.  This method has no effect if the
+     * provided mnemonic is already attached to that menu item.
+     */
+    public void addSuggestedMnemonics(Integer... mnemonics);
 }

@@ -1,6 +1,7 @@
 package com.bahj.smelt.plugin.builtin.viewbytype;
 
 import java.awt.CardLayout;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -10,12 +11,6 @@ import java.util.function.Supplier;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
-import bibliothek.gui.dock.common.MultipleCDockable;
-import bibliothek.gui.dock.common.event.CDockableStateListener;
-import bibliothek.gui.dock.common.intern.CDockable;
-import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 import com.bahj.smelt.SmeltApplicationModel;
 import com.bahj.smelt.event.SmeltApplicationConfigurationLoadedEvent;
@@ -38,6 +33,12 @@ import com.bahj.smelt.plugin.builtin.editor.EditorPlugin;
 import com.bahj.smelt.syntax.ast.DeclarationNode;
 import com.bahj.smelt.util.event.EventListener;
 import com.bahj.smelt.util.event.TypedEventListener;
+
+import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import bibliothek.gui.dock.common.MultipleCDockable;
+import bibliothek.gui.dock.common.event.CDockableStateListener;
+import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.common.mode.ExtendedMode;
 
 public class ViewByTypePlugin implements SmeltPlugin {
     @Override
@@ -64,7 +65,8 @@ public class ViewByTypePlugin implements SmeltPlugin {
                                                                     ViewByTypePlugin.this.presentObjectsByTypeView(
                                                                             dataModelPlugin,
                                                                             editorPlugin.getEditorModel(), context);
-                                                                })));
+                                                                }), KeyEvent.VK_T));
+                                        event.getContext().addMenuMnemonicSuggestion("View", KeyEvent.VK_V);
                                     }
                                 }));
                     }

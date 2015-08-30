@@ -3,6 +3,7 @@ package com.bahj.smelt.plugin.builtin.basegui;
 import java.awt.Dimension;
 import java.awt.DisplayMode;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,8 +75,9 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                         final Action closeSpecificationAction = new BasicAction(
                                 (ActionEvent e) -> performCloseSmeltSpecification());
                         guiContext.addMenuItemGroup("File", Arrays.asList(new SmeltBasicMenuItem(
-                                "Open Smelt Specification", openSpecificationAction), new SmeltBasicMenuItem(
-                                "Close Smelt Specification", closeSpecificationAction)));
+                                "Open Smelt Specification", openSpecificationAction, KeyEvent.VK_P), new SmeltBasicMenuItem(
+                                "Close Smelt Specification", closeSpecificationAction, KeyEvent.VK_L)));
+                        guiContext.addMenuMnemonicSuggestion("File", KeyEvent.VK_F);
 
                         // We can only close the Smelt specification if one has been opened.
                         closeSpecificationAction.setEnabled(false);
@@ -108,7 +110,7 @@ public class BaseGUIPlugin extends AbstractEventGenerator<BaseGUIEvent> implemen
                                         // TODO: something a little more elegant than this - prompts and stuff
                                         System.exit(0);
                                     }
-                                })));
+                                }, KeyEvent.VK_X)));
 
                         // Now build the GUI.
                         frame = new BaseGUIFrame(guiContext);
