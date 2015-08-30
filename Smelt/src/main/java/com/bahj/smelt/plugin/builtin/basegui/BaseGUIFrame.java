@@ -99,6 +99,10 @@ public class BaseGUIFrame extends JFrame {
             JMenuItem jitem = new JMenuItem();
             jitem.setAction(basicItem.getAction());
             jitem.setText(basicItem.getName());
+            if (item.getSuggestedAccelerator() != null) {
+                // TODO: some way of resolving conflicts.
+                jitem.setAccelerator(item.getSuggestedAccelerator());
+            }
             return jitem;
         } else {
             throw new IllegalStateException("Unrecognized Smelt menu item type.");

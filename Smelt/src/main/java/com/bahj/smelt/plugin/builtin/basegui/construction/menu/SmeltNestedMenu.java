@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
+import javax.swing.KeyStroke;
+
 /**
  * Represents a nested menu in a Smelt menu bar.
  * 
@@ -13,8 +15,8 @@ import java.util.stream.Stream;
 public class SmeltNestedMenu extends SmeltAbstractMenuItem {
     private List<List<? extends SmeltMenuItem>> menuItems;
 
-    public SmeltNestedMenu(String name, Integer... suggestedMnemonics) {
-        super(name, suggestedMnemonics);
+    public SmeltNestedMenu(String name, KeyStroke accelerator, Integer... suggestedMnemonics) {
+        super(name, accelerator, suggestedMnemonics);
         this.menuItems = new ArrayList<>();
     }
 

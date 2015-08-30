@@ -22,13 +22,13 @@ import com.bahj.smelt.util.StrongReferenceImpl;
 public class GUIConstructionContextImpl implements GUIConstructionContext {
     private StrongReference<GUIExecutionContext> executionContextReference = new StrongReferenceImpl<GUIExecutionContext>(
             null);
-    private SmeltNestedMenu menuBar = new SmeltNestedMenu(null);
+    private SmeltNestedMenu menuBar = new SmeltNestedMenu(null, null);
 
     @Override
     public void addMenuItemGroup(String menuName, List<? extends SmeltMenuItem> items) {
         SmeltNestedMenu menu = (SmeltNestedMenu) menuBar.getMenuItemByName(menuName);
         if (menu == null) {
-            menu = new SmeltNestedMenu(menuName);
+            menu = new SmeltNestedMenu(menuName, null);
             menuBar.addSingleMenuItem(menu);
         }
         menu.addMenuItemGroup(items);
@@ -38,7 +38,7 @@ public class GUIConstructionContextImpl implements GUIConstructionContext {
     public void addMenuMnemonicSuggestion(String menuName, Integer... mnemonics) {
         SmeltNestedMenu menu = (SmeltNestedMenu) menuBar.getMenuItemByName(menuName);
         if (menu == null) {
-            menu = new SmeltNestedMenu(menuName);
+            menu = new SmeltNestedMenu(menuName, null);
             menuBar.addSingleMenuItem(menu);
         }
         menu.addSuggestedMnemonics(mnemonics);

@@ -1,6 +1,7 @@
 package com.bahj.smelt.plugin.builtin.viewbytype;
 
 import java.awt.CardLayout;
+import java.awt.Event;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.function.Supplier;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 import com.bahj.smelt.SmeltApplicationModel;
@@ -55,20 +57,18 @@ public class ViewByTypePlugin implements SmeltPlugin {
                         EditorPlugin editorPlugin = pluginRegistry.getPlugin(EditorPlugin.class);
                         guiPlugin.addListener(new TypedEventListener<>(BaseGUIInitializingEvent.class,
                                 new EventListener<BaseGUIInitializingEvent>() {
-                                    @Override
-                                    public void eventOccurred(BaseGUIInitializingEvent event) {
-                                        event.getContext().addMenuItemGroup(
-                                                "View",
-                                                new SmeltBasicMenuItem("Objects by Type", event.getContext()
-                                                        .constructExecutionAction(
-                                                                (GUIExecutionContext context) -> {
-                                                                    ViewByTypePlugin.this.presentObjectsByTypeView(
-                                                                            dataModelPlugin,
-                                                                            editorPlugin.getEditorModel(), context);
-                                                                }), KeyEvent.VK_T));
-                                        event.getContext().addMenuMnemonicSuggestion("View", KeyEvent.VK_V);
-                                    }
-                                }));
+                            @Override
+                            public void eventOccurred(BaseGUIInitializingEvent event) {
+                                KeyStroke objectsByTypeAccelerator = KeyStroke.getKeyStroke(KeyEvent.VK_T,
+                                        Event.CTRL_MASK | Event.SHIFT_MASK);
+                                event.getContext().addMenuItemGroup("View", new SmeltBasicMenuItem("Objects by Type",
+                                        event.getContext().constructExecutionAction((GUIExecutionContext context) -> {
+                                    ViewByTypePlugin.this.presentObjectsByTypeView(dataModelPlugin,
+                                            editorPlugin.getEditorModel(), context);
+                                }), objectsByTypeAccelerator, KeyEvent.VK_T));
+                                event.getContext().addMenuMnemonicSuggestion("View", KeyEvent.VK_V);
+                            }
+                        }));
                     }
                 }));
     }

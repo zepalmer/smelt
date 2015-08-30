@@ -2,6 +2,8 @@ package com.bahj.smelt.plugin.builtin.basegui.construction.menu;
 
 import java.util.List;
 
+import javax.swing.KeyStroke;
+
 public interface SmeltMenuItem {
 
     /**
@@ -23,4 +25,10 @@ public interface SmeltMenuItem {
      * provided mnemonic is already attached to that menu item.
      */
     public void addSuggestedMnemonics(Integer... mnemonics);
+    
+    /**
+     * Retrieves the suggested accelerator for this menu item.
+     * @return The suggested accelerator as a {@link Keystroke} or <code>null</code> if no accelerator is set.
+     */
+    public KeyStroke getSuggestedAccelerator();
 }

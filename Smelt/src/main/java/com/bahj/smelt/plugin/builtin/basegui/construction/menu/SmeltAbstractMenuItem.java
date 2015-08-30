@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.KeyStroke;
+
 /**
  * An abstract type which handles common attributes of menu items.
  * 
@@ -14,18 +16,22 @@ public class SmeltAbstractMenuItem implements SmeltMenuItem {
 
     private String name;
     private List<Integer> suggestedMnemonics;
+    private KeyStroke accelerator;
 
     /**
      * Creates a new (abstract) menu item.
      * 
      * @param name
      *            The name of the item.
+     * @param accelerator
+     *            The accelerator keystroke for this item, or <code>null</code> for no accelerator.
      * @param suggestedMnemonic
      *            The mnemonic suggested for this item, or <code>null</code> for no suggestion.
      */
-    public SmeltAbstractMenuItem(String name, Integer... suggestedMnemonics) {
+    public SmeltAbstractMenuItem(String name, KeyStroke accelerator, Integer... suggestedMnemonics) {
         super();
         this.name = name;
+        this.accelerator = accelerator;
         this.suggestedMnemonics = new ArrayList<>(Arrays.asList(suggestedMnemonics));
     }
 
@@ -56,4 +62,9 @@ public class SmeltAbstractMenuItem implements SmeltMenuItem {
             }
         }
     }
+
+    public KeyStroke getSuggestedAccelerator() {
+        return accelerator;
+    }
+
 }
